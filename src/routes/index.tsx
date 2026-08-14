@@ -115,11 +115,13 @@ function CalculatorComponent() {
 
     const addContator = (label: string, amps: number, baseWEG: number) => {
       const rating = pickCeil(contatores, amps) || contatores[contatores.length - 1];
-      const idx = contatores.indexOf(rating) / (contatores.length - 1);
+      const foundIdx = contatores.indexOf(rating);
+      const idx = (foundIdx === -1 ? contatores.length - 1 : foundIdx) / (contatores.length - 1);
       brands.forEach(b => {
+        const brandKey = b as keyof typeof modelosContator;
         materials.push({
           item: marca === "comparar" ? `${label} (${nomeMarca[b]})` : label,
-          desc: `${rating} A AC-3 · ${modelosContator[b as keyof typeof modelosContator](rating)} — ${nomeMarca[b]}`,
+          desc: `${rating} A AC-3 · ${modelosContator[brandKey](rating)} — ${nomeMarca[b]}`,
           qtd: quantidade, un: "un", preco: precoRef(baseWEG, idx, b)
         });
       });
