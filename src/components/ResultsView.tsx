@@ -39,13 +39,47 @@ export const ResultsView = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {['Condutor', 'Disjuntor', 'Contator', 'Relé Térmico'].map((item) => (
-          <Card key={item} className="bg-panel border-border p-4 text-center space-y-2">
-            <div className="text-xs text-muted font-bold uppercase">{item}</div>
-            <div className="text-white font-bold">Produto Compatível</div>
-            <Button variant="link" size="sm" className="text-accent h-auto p-0">Ver detalhes <ChevronRight className="w-3 h-3" /></Button>
-          </Card>
-        ))}
+        {/* Condutor */}
+        <Card className="bg-panel border-border p-4 text-center space-y-2">
+          <div className="text-xs text-muted font-bold uppercase text-slate-400">Condutor</div>
+          <div className="text-white font-bold">{currentResults.finalCableSection} mm²</div>
+          <div className="text-[10px] text-slate-500">PVC / Cobre</div>
+        </Card>
+
+        {/* Disjuntor */}
+        <Card className="bg-panel border-border p-4 text-center space-y-2">
+          <div className="text-xs text-muted font-bold uppercase text-slate-400">Disjuntor</div>
+          <div className="text-white font-bold">
+            {currentResults.protections.breaker ? currentResults.protections.breaker.model : 'Não encontrado'}
+          </div>
+          <div className="text-[10px] text-slate-500">
+            {currentResults.protections.breaker?.manufacturer || '-'} {currentResults.protections.breaker?.nominalCurrent ? `(${currentResults.protections.breaker.nominalCurrent}A)` : ''}
+          </div>
+        </Card>
+
+        {/* Contator */}
+        <Card className="bg-panel border-border p-4 text-center space-y-2">
+          <div className="text-xs text-muted font-bold uppercase text-slate-400">Contator</div>
+          <div className="text-white font-bold">
+            {currentResults.protections.contactor?.[0] ? currentResults.protections.contactor[0].model : 'Não encontrado'}
+          </div>
+          <div className="text-[10px] text-slate-500">
+            {currentResults.protections.contactor?.[0]?.manufacturer || '-'} {currentResults.protections.contactor?.[0]?.nominalCurrent ? `(${currentResults.protections.contactor[0].nominalCurrent}A)` : ''}
+          </div>
+        </Card>
+
+        {/* Relé Térmico */}
+        <Card className="bg-panel border-border p-4 text-center space-y-2">
+          <div className="text-xs text-muted font-bold uppercase text-slate-400">Relé Térmico</div>
+          <div className="text-white font-bold">
+            {currentResults.protections.thermalRelay ? currentResults.protections.thermalRelay.model : 'Não encontrado'}
+          </div>
+          <div className="text-[10px] text-slate-500">
+            {currentResults.protections.thermalRelay?.adjustmentRange 
+              ? `${currentResults.protections.thermalRelay.adjustmentRange.min}-${currentResults.protections.thermalRelay.adjustmentRange.max}A`
+              : '-'}
+          </div>
+        </Card>
       </div>
 
       <div className="flex justify-center pt-8">

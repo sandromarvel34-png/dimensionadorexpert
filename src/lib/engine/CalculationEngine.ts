@@ -5,6 +5,8 @@ import {
   TechnicalReference 
 } from '../../types';
 
+import { findCompatibleProduct } from '../catalog';
+
 export class CalculationEngine {
   // Constantes físicas (Referência: NBR 5410)
   private static readonly RHO_COPPER = 0.0178; // ohm.mm²/m a 20°C
@@ -87,7 +89,12 @@ export class CalculationEngine {
     const finalSection = Math.max(secAmp, dropResult.section, inputs.phase === 'trifasico' ? 2.5 : 1.5);
     const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
 
-    // Mock de referências técnicas (devem vir do banco no futuro)
+    // Dimensionamento de componentes baseado na corrente
+    const breaker = findCompatibleProduct('disjuntor', In * 1.25, 'WEG');
+    const contactor = findCompatibleProduct('contator', In, 'WEG');
+    const thermalRelay = findCompatibleProduct('releTermico', In, 'WEG');
+
+    // Mock de referências técnicas
     const refs: TechnicalReference[] = [
       {
         id: 'ref1',
@@ -105,7 +112,11 @@ export class CalculationEngine {
       finalCableSection: finalSection,
       voltageDropCalculated: dropResult.actualDrop,
       limitingCriterion,
-      protections: {}, // Populado por outra lógica de catálogo
+      protections: {
+        breaker,
+        contactor: contactor ? [contactor] : undefined,
+        thermalRelay
+      },
       references: refs
     };
   }
