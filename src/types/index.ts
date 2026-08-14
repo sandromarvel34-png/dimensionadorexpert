@@ -44,10 +44,10 @@ export interface CalculationResults {
   voltageDropCalculated: number; // %
   limitingCriterion: 'ampacity' | 'voltageDrop';
   protections: {
-    breaker?: ManufacturerProduct;
-    fuse?: ManufacturerProduct;
-    contactor?: ManufacturerProduct[];
-    thermalRelay?: ManufacturerProduct;
+    breaker?: ManufacturerProduct | null;
+    fuse?: ManufacturerProduct | null;
+    contactor?: ManufacturerProduct[] | null;
+    thermalRelay?: ManufacturerProduct | null;
   };
   references: TechnicalReference[];
 }
