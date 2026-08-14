@@ -4,7 +4,6 @@ import {
   ManufacturerProduct, 
   TechnicalReference 
 } from '../../types';
-
 import { findCompatibleProduct } from '../catalog';
 
 export class CalculationEngine {
@@ -90,9 +89,9 @@ export class CalculationEngine {
     const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
 
     // Dimensionamento de componentes baseado na corrente
-    const breaker = findCompatibleProduct('disjuntor', In * 1.25, 'WEG');
-    const contactor = findCompatibleProduct('contator', In, 'WEG');
-    const thermalRelay = findCompatibleProduct('releTermico', In, 'WEG');
+    const breaker = findCompatibleProduct('disjuntor', In * 1.25, 'WEG') || null;
+    const contactor = findCompatibleProduct('contator', In, 'WEG') || null;
+    const thermalRelay = findCompatibleProduct('releTermico', In, 'WEG') || null;
 
     // Mock de referências técnicas
     const refs: TechnicalReference[] = [
@@ -114,7 +113,7 @@ export class CalculationEngine {
       limitingCriterion,
       protections: {
         breaker,
-        contactor: contactor ? [contactor] : undefined,
+        contactor: contactor ? [contactor] : null,
         thermalRelay
       },
       references: refs
