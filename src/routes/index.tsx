@@ -96,7 +96,7 @@ function CalculatorComponent() {
   const calculate = () => {
     const { potencia, tensao, distancia, quedaAdm, tipoPartida, marca, quantidade, padrao, valorHora } = formData;
     const fatores: Record<number, number> = { 220: 2.639, 380: 1.529, 440: 1.320 };
-    const In = potencia * fatores[tensao];
+    const In = potencia * (fatores[tensao] || 1.529);
     const termico = pickTermico(In);
     const disjuntor = pickCeil(disjuntores, In * 1.25);
     const caboAmpacidade = pickCaboByAmp(In);
