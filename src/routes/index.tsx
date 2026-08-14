@@ -177,7 +177,8 @@ function CalculatorComponent() {
       { item: "Bornes e terminais", desc: "identificação", qtd: quantidade, un: "kit", preco: 28 }
     );
 
-    materials.push({ item: "Gabinete elétrico", desc: `Padrão ${padrao}`, qtd: 1, un: "un", preco: paineis[padrao as keyof typeof paineis].preco });
+    const painel = paineis[padrao as keyof typeof paineis];
+    materials.push({ item: "Gabinete elétrico", desc: `Padrão ${padrao}`, qtd: 1, un: "un", preco: painel ? painel.preco : 0 });
     if (padrao === "premium") materials.push({ item: "Emergência + Fechadura", desc: "Premium", qtd: 1, un: "un", preco: 120 });
 
     const horasBase: Record<string, number> = { direta: 3, reversao: 4, estrelaTriangulo: 6, compensada: 6.5, softstarter: 4, inversor: 4.5 };
