@@ -104,7 +104,7 @@ function CalculatorComponent() {
     const cosphi = 0.86;
     const S = (100 * Math.sqrt(3) * rho * distancia * In * cosphi) / (quedaAdm * tensao);
     const caboQuedaTensao = pickCaboBySection(S);
-    const caboMinimoNBR = cabos.find(c => c.mm === SECAO_MINIMA_FORCA)!;
+    const caboMinimoNBR = cabos.find(c => c.mm === SECAO_MINIMA_FORCA) || cabos[1];
     const caboFinal = [caboAmpacidade, caboQuedaTensao, caboMinimoNBR].reduce((a, b) => {
       if (!a || !b) return a || b;
       return b.mm > a.mm ? b : a;
