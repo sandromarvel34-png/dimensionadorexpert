@@ -265,177 +265,296 @@ function CalculatorComponent() {
         <div className="badge">ACESSO VITALÍCIO</div>
       </header>
 
-      <div className="grid">
-        <div className="sidebar">
-          <div className="card">
-            <h3>Dados da proposta</h3>
-            {['propNumero', 'cliNome', 'cliDoc', 'cliContato', 'tecNome', 'propLocal'].map(field => (
-              <div className="field" key={field}>
-                <label>{field === 'propNumero' ? 'Nº da proposta' : field === 'cliNome' ? 'Cliente' : field === 'cliDoc' ? 'CNPJ/CPF' : field === 'cliContato' ? 'Contato' : field === 'tecNome' ? 'Técnico' : 'Local'}</label>
-                <input type="text" id={field} value={(formData as any)[field]} onChange={handleChange} />
-              </div>
-            ))}
-            <div className="field">
-              <label>Data</label>
-              <input type="date" id="propData" value={formData.propData} onChange={handleChange} />
+      {view === 'dashboard' && (
+        <div className="dashboard">
+          <section className="dashboard-hero">
+            <h2>⚡ Novo Dimensionamento</h2>
+            <p>Encontre rapidamente o condutor, proteção e componentes ideais para sua aplicação.</p>
+            <button className="btn-large" onClick={() => { setView('wizard'); setStep(1); }}>
+              + Novo dimensionamento
+            </button>
+            
+            <div className="info-cards">
+              <div className="info-card"><i>🔌</i> Condutor dimensionado</div>
+              <div className="info-card"><i>📐</i> Queda de tensão</div>
+              <div className="info-card"><i>🛡️</i> Proteção recomendada</div>
+              <div className="info-card"><i>⚙️</i> Contator / Relé</div>
+              <div className="info-card"><i>🏭</i> Catálogo WEG/Siemens/Schneider</div>
+              <div className="info-card"><i>📄</i> Exportação PDF</div>
+            </div>
+          </section>
+
+          <section className="card">
+            <h3>Meus dimensionamentos</h3>
+            {history.length === 0 ? (
+              <p style={{ color: 'var(--muted)', textAlign: 'center', padding: '40px' }}>
+                Nenhum dimensionamento salvo ainda.
+              </p>
+            ) : (
+              <table className="history-table">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Cliente</th>
+                    <th>Carga</th>
+                    <th>Condutor</th>
+                    <th>Marca</th>
+                    <th style={{ textAlign: 'right' }}>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((item) => (
+                    <tr key={item.id}>
+                      <td>{new Date(item.date).toLocaleDateString()}</td>
+                      <td>{item.name}</td>
+                      <td>{item.potencia} CV / {item.tensao}V</td>
+                      <td>{item.cabo} mm²</td>
+                      <td>{nomeMarca[item.marca] || item.marca}</td>
+                      <td style={{ textAlign: 'right' }}>
+                        <button className="btn secondary" style={{ width: 'auto', padding: '4px 12px', margin: 0 }} onClick={() => {
+                          setFormData(prev => ({ ...prev, cliNome: item.name, potencia: item.potencia, tensao: item.tensao, marca: item.marca, tipoPartida: item.tipoPartida }));
+                          calculate();
+                        }}>Abrir</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </section>
+        </div>
+      )}
+
+      {view === 'wizard' && (
+        <div className="wizard">
+          <div className="wizard-steps">
+            <div className={`step-item ${step >= 1 ? 'active' : ''}`}>
+              <div className="step-circle">1</div>
+              Carga
+            </div>
+            <div className={`step-item ${step >= 2 ? 'active' : ''}`}>
+              <div className="step-circle">2</div>
+              Circuito
+            </div>
+            <div className={`step-item ${step >= 3 ? 'active' : ''}`}>
+              <div className="step-circle">3</div>
+              Proteção
+            </div>
+            <div className={`step-item ${step >= 4 ? 'active' : ''}`}>
+              <div className="step-circle">4</div>
+              Resultado
             </div>
           </div>
 
           <div className="card">
-            <h3>Parâmetros técnicos</h3>
-            <div className="field">
-              <label>Tipo de partida</label>
-              <select id="tipoPartida" value={formData.tipoPartida} onChange={handleChange}>
-                <option value="direta">Partida Direta</option>
-                <option value="reversao">Partida com Reversão</option>
-                <option value="estrelaTriangulo">Estrela-Triângulo</option>
-                <option value="compensada">Chave Compensada</option>
-                <option value="softstarter">Soft-Starter</option>
-                <option value="inversor">Inversor de Frequência</option>
-              </select>
+            {step === 1 && (
+              <div className="step-content">
+                <h3>Etapa 1 — Carga e Motor</h3>
+                <div className="client-grid">
+                  <div className="field">
+                    <label>Nome do Cliente</label>
+                    <input type="text" id="cliNome" value={formData.cliNome} onChange={handleChange} placeholder="Ex: Indústria XYZ" />
+                  </div>
+                  <div className="field">
+                    <label>Potência do Motor (CV)</label>
+                    <input type="number" id="potencia" value={formData.potencia} onChange={handleChange} min="0.5" step="0.5" />
+                    <div className="hint">Potência nominal do motor em Cavalos-Vapor.</div>
+                  </div>
+                  <div className="field">
+                    <label>Tensão de Trabalho (V)</label>
+                    <select id="tensao" value={formData.tensao} onChange={handleChange}>
+                      <option value="220">220 V</option>
+                      <option value="380">380 V</option>
+                      <option value="440">440 V</option>
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label>Quantidade de Motores</label>
+                    <input type="number" id="quantidade" value={formData.quantidade} onChange={handleChange} min="1" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="step-content">
+                <h3>Etapa 2 — Parâmetros do Circuito</h3>
+                <div className="client-grid">
+                  <div className="field">
+                    <label>Distância do Circuito (m)</label>
+                    <input type="number" id="distancia" value={formData.distancia} onChange={handleChange} min="1" />
+                    <div className="hint">Distância considerada no cálculo de queda de tensão.</div>
+                  </div>
+                  <div className="field">
+                    <label>Queda de Tensão Admitida (%)</label>
+                    <input type="number" id="quedaAdm" value={formData.quedaAdm} onChange={handleChange} min="1" step="0.5" />
+                    <div className="hint">Limite máximo de queda de tensão permitido (NBR 5410).</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="step-content">
+                <h3>Etapa 3 — Proteção e Fabricante</h3>
+                <div className="client-grid">
+                  <div className="field">
+                    <label>Tipo de Partida</label>
+                    <select id="tipoPartida" value={formData.tipoPartida} onChange={handleChange}>
+                      <option value="direta">Partida Direta</option>
+                      <option value="reversao">Partida com Reversão</option>
+                      <option value="estrelaTriangulo">Estrela-Triângulo</option>
+                      <option value="softstarter">Soft-Starter</option>
+                      <option value="inversor">Inversor de Frequência</option>
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label>Fabricante Preferencial</label>
+                    <select id="marca" value={formData.marca} onChange={handleChange}>
+                      <option value="weg">WEG</option>
+                      <option value="siemens">Siemens</option>
+                      <option value="schneider">Schneider</option>
+                      <option value="comparar">Todos (Comparativo)</option>
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label>Padrão do Painel</label>
+                    <select id="padrao" value={formData.padrao} onChange={handleChange}>
+                      <option value="basico">Básico</option>
+                      <option value="padrao">Padrão</option>
+                      <option value="premium">Premium</option>
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label>Valor da Hora Técnica (R$)</label>
+                    <input type="number" id="valorHora" value={formData.valorHora} onChange={handleChange} min="0" step="5" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="wizard-footer">
+              {step > 1 ? (
+                <button className="btn secondary" onClick={() => setStep(step - 1)}>Anterior</button>
+              ) : (
+                <button className="btn secondary" onClick={() => setView('dashboard')}>Cancelar</button>
+              )}
+              
+              {step < 3 ? (
+                <button className="btn" onClick={() => setStep(step + 1)}>Próximo</button>
+              ) : (
+                <button className="btn" onClick={calculate}>Gerar Solução</button>
+              )}
             </div>
-            <div className="field">
-              <label>Marca de referência</label>
-              <select id="marca" value={formData.marca} onChange={handleChange}>
-                <option value="weg">WEG</option>
-                <option value="siemens">Siemens</option>
-                <option value="schneider">Schneider</option>
-                <option value="comparar">Comparar as 3</option>
-              </select>
-            </div>
-            <div className="field">
-              <label>Potência (CV)</label>
-              <input type="number" id="potencia" value={formData.potencia} onChange={handleChange} min="0.5" step="0.5" />
-            </div>
-            <div className="field">
-              <label>Tensão (V)</label>
-              <select id="tensao" value={formData.tensao} onChange={handleChange}>
-                <option value="220">220 V</option>
-                <option value="380">380 V</option>
-                <option value="440">440 V</option>
-              </select>
-            </div>
-            <div className="field">
-              <label>Qtd. motores</label>
-              <input type="number" id="quantidade" value={formData.quantidade} onChange={handleChange} min="1" />
-            </div>
-            <div className="field">
-              <label>Distância (m)</label>
-              <input type="number" id="distancia" value={formData.distancia} onChange={handleChange} min="1" />
-            </div>
-            <div className="field">
-              <label>Queda Adm. (%)</label>
-              <input type="number" id="quedaAdm" value={formData.quedaAdm} onChange={handleChange} min="1" step="0.5" />
-            </div>
-            <div className="field">
-              <label>Padrão do painel</label>
-              <select id="padrao" value={formData.padrao} onChange={handleChange}>
-                <option value="basico">Básico</option>
-                <option value="padrao">Padrão</option>
-                <option value="premium">Premium</option>
-              </select>
-              <div className="hint">{paineis[formData.padrao as keyof typeof paineis]?.hint}</div>
-            </div>
-            <div className="field">
-              <label>Valor da hora (R$/h)</label>
-              <input type="number" id="valorHora" value={formData.valorHora} onChange={handleChange} min="0" step="5" />
-            </div>
-            <button className="btn" onClick={calculate}>Calcular orçamento</button>
-            <button className="btn secondary" onClick={() => window.print()}>Imprimir / salvar em PDF</button>
           </div>
         </div>
+      )}
 
-        <div>
-          <div className="readout">
-            <div className="readout-main">
-              <div className="rt-label">Corrente nominal estimada</div>
-              <div className="rt-value">{results ? results.In.toFixed(1) : "—"}<small>A</small></div>
-              <div className="rt-sub">{results ? `Motor de ${formData.potencia} CV em ${formData.tensao} V.` : "Preencha os dados e calcule."}</div>
+      {view === 'results' && results && (
+        <div className="results-view">
+          <div className="result-main-card">
+            <h2>CONDUTOR DIMENSIONADO</h2>
+            <div className="value">{results.caboFinal ? `${results.caboFinal.mm} mm²` : "—"}</div>
+            <div className="badge-status">🟢 Dimensionamento concluído</div>
+            <div className="rt-sub" style={{ marginTop: '20px' }}>
+              A seção final considera o maior resultado entre capacidade de corrente, queda de tensão e norma NBR 5410.
             </div>
-            <div className="readout-diagram">
-              <svg viewBox="0 0 150 90" width="150" height="90">
-                <rect x="4" y="4" width="142" height="82" rx="6" fill="none" stroke="#2A323A" stroke-width="1.4" />
-                <rect x="20" y="20" width="18" height="18" rx="2" fill="none" stroke="#F2B705" stroke-width="1.6" />
-                <circle cx="100" cy="29" r="12" fill="none" stroke="#B87333" stroke-width="1.6" />
-                <text x="100" y="33" text-anchor="middle" font-size="11" fill="#B87333" font-family="ui-monospace,monospace">M</text>
-              </svg>
-              <div className="diagram-caption">{formData.tipoPartida.toUpperCase()}</div>
+            <button className="btn secondary" style={{ width: 'auto', marginTop: '20px' }} onClick={() => {
+              const el = document.getElementById('calc-memory');
+              el?.scrollIntoView({ behavior: 'smooth' });
+            }}>Ver memória de cálculo</button>
+          </div>
+
+          <div className="info-cards" style={{ marginBottom: '30px' }}>
+            <div className="info-card">
+              <h3>🔌 Condutor</h3>
+              <div className="v">{results.caboFinal?.mm} mm²</div>
+              <div className="hint">Material compatível</div>
+            </div>
+            <div className="info-card">
+              <h3>🛡️ Disjuntor</h3>
+              <div className="v">{results.disjuntor} A</div>
+              <div className="hint">Proteção recomendada</div>
+            </div>
+            <div className="info-card">
+              <h3>⚙️ Contator</h3>
+              <div className="v">{results.In > 0 ? "Compatível" : "—"}</div>
+              <div className="hint">Manobra de carga</div>
+            </div>
+            <div className="info-card">
+              <h3>🌡️ Relé Térmico</h3>
+              <div className="v">{results.termico ? `${results.termico.min}–${results.termico.max} A` : "—"}</div>
+              <div className="hint">Faixa de ajuste</div>
             </div>
           </div>
 
-          {results && (
-            <>
-              <div className="specs">
-                <div className="spec"><div className="k">Relé térmico</div><div className="v"><em>{results.termico ? `${results.termico.min}–${results.termico.max} A` : "N/A"}</em></div></div>
-                <div className="spec"><div className="k">Disjuntor motor</div><div className="v"><em>{results.disjuntor || "N/A"} A</em></div></div>
-                <div className="spec"><div className="k">Bitola por ampacidade</div><div className="v"><em>{results.caboAmpacidade.mm} mm²</em></div></div>
-                <div className="spec"><div className="k">Bitola por queda de tensão</div><div className="v"><em>{results.caboQuedaTensao.mm} mm²</em></div></div>
-                <div className="spec"><div className="k">Seção mínima NBR 5410 (força)</div><div className="v"><em>{SECAO_MINIMA_FORCA} mm²</em></div></div>
-                <div className="spec highlight"><div className="k">Bitola adotada (maior das 3)</div><div className="v"><em>{results.caboFinal ? `${results.caboFinal.mm} mm²` : "N/A"}</em></div></div>
-                <div className="spec"><div className="k">Marca de referência</div><div className="v">{formData.marca === 'comparar' ? 'WEG / Siemens / Schneider' : (nomeMarca[formData.marca] || formData.marca)}</div></div>
-              </div>
+          <div className="card">
+            <h3>Solução recomendada por fabricante</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Componente</th>
+                  <th>WEG</th>
+                  <th>Siemens</th>
+                  <th>Schneider</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="item">Contator</td>
+                  <td>{modelosContator.weg(pickCeil(contatores, results.In * 1.15))}</td>
+                  <td>{modelosContator.siemens(pickCeil(contatores, results.In * 1.15))}</td>
+                  <td>{modelosContator.schneider(pickCeil(contatores, results.In * 1.15))}</td>
+                </tr>
+                <tr>
+                  <td className="item">Relé Térmico</td>
+                  <td>{linhaReleTermico.weg}</td>
+                  <td>{linhaReleTermico.siemens}</td>
+                  <td>{linhaReleTermico.schneider}</td>
+                </tr>
+                <tr>
+                  <td className="item">Disjuntor Motor</td>
+                  <td>{linhaDisjuntorMotor.weg}</td>
+                  <td>{linhaDisjuntorMotor.siemens}</td>
+                  <td>{linhaDisjuntorMotor.schneider}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-              <div className="card">
-                <h3>Lista de materiais e orçamento</h3>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Item / modelo</th>
-                      <th style={{ textAlign: 'right' }}>Qtd.</th>
-                      <th style={{ textAlign: 'right' }}>Un.</th>
-                      <th style={{ textAlign: 'right' }}>Preço (R$)</th>
-                      <th style={{ textAlign: 'right' }}>Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {results.materials.map((m: any, i: number) => (
-                      <tr key={i}>
-                        <td className="item">{m.item}<span className="desc">{m.desc}</span></td>
-                        <td className="num">{m.qtd}</td>
-                        <td className="num">{m.un}</td>
-                        <td className="num">
-                          <input
-                            className="price-input"
-                            type="number"
-                            value={m.preco}
-                            onChange={(e) => updateMaterialPrice(i, parseFloat(e.target.value) || 0)}
-                          />
-                        </td>
-                        <td className="num">R$ {(m.qtd * m.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+          <div id="calc-memory" className="card">
+            <h3>Memória de cálculo</h3>
+            <div className="disclaimer">
+              <strong>1. Corrente de Projeto:</strong><br />
+              In = (Potência em CV × fator) / Tensão<br />
+              In = ({formData.potencia} × {(results.In / formData.potencia).toFixed(3)}) / {formData.tensao}<br />
+              <strong>Resultado: {results.In.toFixed(2)} A</strong>
+            </div>
+            <div className="disclaimer" style={{ marginTop: '10px' }}>
+              <strong>2. Critério 1 — Capacidade de Corrente:</strong><br />
+              Seção mínima para {results.In.toFixed(2)} A: {results.caboAmpacidade.mm} mm²<br />
+              Capacidade do cabo: {results.caboAmpacidade.amp} A
+            </div>
+            <div className="disclaimer" style={{ marginTop: '10px' }}>
+              <strong>3. Critério 2 — Queda de Tensão:</strong><br />
+              Distância: {formData.distancia}m | Tensão: {formData.tensao}V<br />
+              Queda calculada: {formData.quedaAdm}% | Seção necessária: {results.caboQuedaTensao.mm} mm²
+            </div>
+            <div className="disclaimer" style={{ marginTop: '10px', background: 'var(--panel)' }}>
+              <strong>4. Seleção Final:</strong><br />
+              Capacidade de corrente: {results.caboAmpacidade.mm} mm²<br />
+              Queda de tensão: {results.caboQuedaTensao.mm} mm²<br />
+              Seção mínima NBR 5410: {SECAO_MINIMA_FORCA} mm²<br />
+              <strong>CONDUTOR FINAL ADOTADO: {results.caboFinal.mm} mm²</strong>
+            </div>
+          </div>
 
-              <div className="card">
-                <h3>Tempo de execução e mão de obra</h3>
-                <div className="labor-grid">
-                  <div className="field">
-                    <label>Horas estimadas</label>
-                    <input type="number" className="price-input" style={{ width: '100%' }} value={horasEstimadas} onChange={(e) => setHorasEstimadas(parseFloat(e.target.value) || 0)} min="0" step="0.5" />
-                  </div>
-                  <div className="field">
-                    <label>Valor hora (R$/h)</label>
-                    <input type="number" className="price-input" style={{ width: '100%' }} value={valorHoraTabela} onChange={(e) => setValorHoraTabela(parseFloat(e.target.value) || 0)} min="0" step="5" />
-                  </div>
-                  <div className="field">
-                    <label>Mão de obra (R$)</label>
-                    <input type="text" className="price-input" style={{ width: '100%', color: 'var(--good)' }} value={fmt(totalMaoObra)} disabled />
-                  </div>
-                </div>
-                <div className="hint">
-                  {results ? `Estimativa: ${results.horasTotais.toFixed(1)}h montagem + ... acabamento.` : "Preencha os dados e calcule."}
-                </div>
-
-                <div className="totals">
-                  <div className="row"><span>Materiais</span><span>{fmt(totalMateriais)}</span></div>
-                  <div className="row"><span>Mão de obra</span><span>{fmt(totalMaoObra)}</span></div>
-                  <div className="grand"><span>Total geral</span><span>{fmt(totalMateriais + totalMaoObra)}</span></div>
-                </div>
-              </div>
-            </>
-          )}
+          <div className="wizard-footer">
+            <button className="btn secondary" onClick={() => setView('wizard')}>Voltar e Ajustar</button>
+            <button className="btn" onClick={() => window.print()}>Exportar Proposta</button>
+          </div>
+        </div>
+      )}
 
           <div className="disclaimer">
             <strong>Sobre os valores e modelos:</strong>
