@@ -66,7 +66,8 @@ export function calculateVoltageDrop(
 
 export function pickCeil(arr: number[], target: number): number {
   for (const v of arr) { if (v >= target) return v; }
-  return arr[arr.length - 1];
+  const last = arr[arr.length - 1];
+  return last !== undefined ? last : 0;
 }
 
 export function findSectionByAmpacity(material: Material, current: number): number {
