@@ -290,7 +290,7 @@ function CalculatorComponent() {
                 <option value="padrao">Padrão</option>
                 <option value="premium">Premium</option>
               </select>
-              <div className="hint">{paineis[formData.padrao as keyof typeof paineis].hint}</div>
+              <div className="hint">{paineis[formData.padrao as keyof typeof paineis]?.hint}</div>
             </div>
             <div className="field">
               <label>Valor da hora (R$/h)</label>
