@@ -14,7 +14,197 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      manufacturer_products: {
+        Row: {
+          adjustment_range_max: number | null
+          adjustment_range_min: number | null
+          category: string
+          commercial_code: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          manufacturer: string
+          model: string
+          nominal_current: number | null
+          power_range_max: number | null
+          power_range_min: number | null
+          price: number | null
+          updated_at: string | null
+          voltage: number | null
+        }
+        Insert: {
+          adjustment_range_max?: number | null
+          adjustment_range_min?: number | null
+          category: string
+          commercial_code: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          manufacturer: string
+          model: string
+          nominal_current?: number | null
+          power_range_max?: number | null
+          power_range_min?: number | null
+          price?: number | null
+          updated_at?: string | null
+          voltage?: number | null
+        }
+        Update: {
+          adjustment_range_max?: number | null
+          adjustment_range_min?: number | null
+          category?: string
+          commercial_code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          manufacturer?: string
+          model?: string
+          nominal_current?: number | null
+          power_range_max?: number | null
+          power_range_min?: number | null
+          price?: number | null
+          updated_at?: string | null
+          voltage?: number | null
+        }
+        Relationships: []
+      }
+      motor_calculations: {
+        Row: {
+          client_name: string | null
+          created_at: string | null
+          id: string
+          inputs: Json
+          results: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          client_name?: string | null
+          created_at?: string | null
+          id?: string
+          inputs: Json
+          results: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          client_name?: string | null
+          created_at?: string | null
+          id?: string
+          inputs?: Json
+          results?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      proposals: {
+        Row: {
+          calculation_id: string | null
+          client_data: Json
+          created_at: string | null
+          id: string
+          labor_info: Json | null
+          pricing_summary: Json
+          proposal_number: string
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          calculation_id?: string | null
+          client_data: Json
+          created_at?: string | null
+          id?: string
+          labor_info?: Json | null
+          pricing_summary: Json
+          proposal_number: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          calculation_id?: string | null
+          client_data?: Json
+          created_at?: string | null
+          id?: string
+          labor_info?: Json | null
+          pricing_summary?: Json
+          proposal_number?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_calculation_id_fkey"
+            columns: ["calculation_id"]
+            isOneToOne: false
+            referencedRelation: "motor_calculations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technical_references: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          section: string | null
+          source_document: string | null
+          standard_name: string
+          updated_at: string | null
+          version: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          section?: string | null
+          source_document?: string | null
+          standard_name: string
+          updated_at?: string | null
+          version?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          section?: string | null
+          source_document?: string | null
+          standard_name?: string
+          updated_at?: string | null
+          version?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +213,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +340,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
