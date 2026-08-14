@@ -16,27 +16,26 @@ export const THERMAL_RELAYS = [
 // Motor breakers (Amps)
 export const MOTOR_BREAKERS = [4, 6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 225];
 
-// Cable data (mm², ampacity at ~70°C PVC, reference price)
+// Cable data (mm², ampacity at ~70°C PVC)
 export const CABLES = [
-  { mm: 1.5, amp: 17.5, precoM: 1.8 },
-  { mm: 2.5, amp: 24, precoM: 2.8 },
-  { mm: 4, amp: 32, precoM: 4.5 },
-  { mm: 6, amp: 41, precoM: 6.8 },
-  { mm: 10, amp: 57, precoM: 11.5 },
-  { mm: 16, amp: 76, precoM: 18 },
-  { mm: 25, amp: 101, precoM: 28 },
-  { mm: 35, amp: 125, precoM: 40 },
-  { mm: 50, amp: 151, precoM: 58 },
-  { mm: 70, amp: 192, precoM: 82 },
-  { mm: 95, amp: 232, precoM: 112 }
+  { mm: 1.5, amp: 17.5 },
+  { mm: 2.5, amp: 24 },
+  { mm: 4, amp: 32 },
+  { mm: 6, amp: 41 },
+  { mm: 10, amp: 57 },
+  { mm: 16, amp: 76 },
+  { mm: 25, amp: 101 },
+  { mm: 35, amp: 125 },
+  { mm: 50, amp: 151 },
+  { mm: 70, amp: 192 },
+  { mm: 95, amp: 232 }
 ];
 
 export const CABLE_SECTIONS = CABLES.map(c => c.mm);
-
 export const MIN_SECTION_POWER = 2.5; // NBR 5410
 
 export type StartType = 'direta' | 'reversao' | 'estrelaTriangulo' | 'compensada' | 'softstarter' | 'inversor';
-export type Brand = 'weg' | 'siemens' | 'schneider' | 'comparar';
+export type Brand = 'todos' | 'weg' | 'siemens' | 'schneider';
 export type Material = 'copper' | 'aluminum';
 
 /**
@@ -66,30 +65,15 @@ export function calculateVoltageDrop(
 
 export function pickCeil(arr: number[], target: number): number {
   for (const v of arr) { if (v >= target) return v; }
-  const last = arr[arr.length - 1];
-  return last !== undefined ? last : 0;
+  return arr[arr.length - 1] || 0;
 }
 
 export function findSectionByAmpacity(material: Material, current: number): number {
   for (const c of CABLES) { if (c.amp >= current) return c.mm; }
-  const last = CABLES[CABLES.length - 1];
-  return last ? last.mm : 95;
+  return 95; // Max fallback
 }
 
 export function pickThermalRelay(target: number) {
   for (const r of THERMAL_RELAYS) { if (target >= r.min && target <= r.max) return r; }
-  const last = THERMAL_RELAYS[THERMAL_RELAYS.length - 1];
-  return last || { min: 70, max: 104 };
-}
-
-export function pickCableByAmpacity(target: number) {
-  for (const c of CABLES) { if (c.amp >= target) return c; }
-  const last = CABLES[CABLES.length - 1];
-  return last || { mm: 95, amp: 232, precoM: 112 };
-}
-
-export function pickCableBySection(target: number) {
-  for (const c of CABLES) { if (c.mm >= target) return c; }
-  const last = CABLES[CABLES.length - 1];
-  return last || { mm: 95, amp: 232, precoM: 112 };
+  return { min: 70, max: 104 };
 }
