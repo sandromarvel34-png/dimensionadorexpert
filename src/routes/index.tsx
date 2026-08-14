@@ -321,9 +321,9 @@ function CalculatorComponent() {
           {results && (
             <>
               <div className="specs">
-                <div className="spec"><div className="k">Relé térmico</div><div className="v"><em>{results.termico?.min}–{results.termico?.max} A</em></div></div>
-                <div className="spec"><div className="k">Disjuntor motor</div><div className="v"><em>{results.disjuntor} A</em></div></div>
-                <div className="spec highlight"><div className="k">Bitola adotada</div><div className="v"><em>{results.caboFinal?.mm} mm²</em></div></div>
+                <div className="spec"><div className="k">Relé térmico</div><div className="v"><em>{results.termico ? `${results.termico.min}–${results.termico.max} A` : "N/A"}</em></div></div>
+                <div className="spec"><div className="k">Disjuntor motor</div><div className="v"><em>{results.disjuntor || "N/A"} A</em></div></div>
+                <div className="spec highlight"><div className="k">Bitola adotada</div><div className="v"><em>{results.caboFinal ? `${results.caboFinal.mm} mm²` : "N/A"}</em></div></div>
               </div>
 
               <div className="card">
