@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 // Technical Data Constants
-const contatores = [9, 12, 18, 25, 32, 40, 50, 65, 80, 95, 105, 150, 170, 210, 250, 300];
+const contatores: number[] = [9, 12, 18, 25, 32, 40, 50, 65, 80, 95, 105, 150, 170, 210, 250, 300];
 const termicos = [
   { min: 0.4, max: 0.63 }, { min: 0.63, max: 1 }, { min: 1, max: 1.6 }, { min: 1.6, max: 2.5 },
   { min: 2.5, max: 4 }, { min: 4, max: 6 }, { min: 5.5, max: 8 }, { min: 7, max: 10 }, { min: 9, max: 13 },
