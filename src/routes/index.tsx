@@ -42,6 +42,8 @@ export const Route = createFileRoute("/")({
 });
 
 function CalculatorComponent() {
+  const [view, setView] = useState<'dashboard' | 'wizard' | 'results'>('dashboard');
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     propNumero: "0001",
     propData: new Date().toISOString().split('T')[0],
@@ -63,8 +65,29 @@ function CalculatorComponent() {
 
   const [horasEstimadas, setHorasEstimadas] = useState(0);
   const [valorHoraTabela, setValorHoraTabela] = useState(150);
-
   const [results, setResults] = useState<any>(null);
+  const [history, setHistory] = useState<any[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('calc_history');
+    if (saved) setHistory(JSON.parse(saved));
+  }, []);
+
+  const saveToHistory = (res: any) => {
+    const newItem = {
+      id: Math.random().toString(36).substr(2, 9),
+      date: new Date().toISOString(),
+      name: formData.cliNome || "Sem nome",
+      potencia: formData.potencia,
+      tensao: formData.tensao,
+      cabo: res.caboFinal?.mm,
+      marca: formData.marca,
+      tipoPartida: formData.tipoPartida
+    };
+    const newHistory = [newItem, ...history].slice(0, 20);
+    setHistory(newHistory);
+    localStorage.setItem('calc_history', JSON.stringify(newHistory));
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
