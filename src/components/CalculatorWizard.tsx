@@ -48,8 +48,8 @@ export const CalculatorWizard = () => {
   return (
     <div className="max-w-4xl mx-auto py-8">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">Novo Dimensionamento</h2>
-        <p className="text-muted-foreground">Preencha os dados técnicos para iniciar o cálculo profissional.</p>
+        <h2 className="text-2xl font-bold text-slate-900 mb-2">Novo Dimensionamento</h2>
+        <p className="text-slate-500">Preencha os dados técnicos para iniciar o cálculo profissional.</p>
       </div>
 
       <form onSubmit={handleCalculate} className="space-y-6 bg-panel p-6 rounded-xl border border-border">

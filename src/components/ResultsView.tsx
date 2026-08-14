@@ -16,22 +16,22 @@ export const ResultsView = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-panel border-border p-6 border-l-4 border-l-accent">
-          <h3 className="text-sm font-bold text-muted uppercase tracking-wider mb-2">Condutor Dimensionado</h3>
-          <p className="text-5xl font-black text-white">{currentResults.finalCableSection} mm²</p>
+          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Condutor Dimensionado</h3>
+          <p className="text-5xl font-black text-slate-900">{currentResults.finalCableSection} mm²</p>
           <div className="mt-4 p-2 bg-accent/10 rounded text-accent text-sm font-bold flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse" /> Dimensionamento Concluído
           </div>
         </Card>
 
         <Card className="bg-panel border-border p-6 flex flex-col justify-between">
-          <h3 className="text-sm font-bold text-muted uppercase tracking-wider mb-2">Resumo da Solução</h3>
+          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Resumo da Solução</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b border-border">
-              <span className="text-white">Corrente Nominal</span>
+              <span className="text-slate-700">Corrente Nominal</span>
               <span className="font-mono text-accent">{currentResults.nominalCurrent.toFixed(1)} A</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-border">
-              <span className="text-white">Critério Dominante</span>
+              <span className="text-slate-700">Critério Dominante</span>
               <span className="font-mono text-accent uppercase text-xs">{currentResults.limitingCriterion}</span>
             </div>
           </div>
@@ -41,15 +41,15 @@ export const ResultsView = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Condutor */}
         <Card className="bg-panel border-border p-4 text-center space-y-2">
-          <div className="text-xs text-muted font-bold uppercase text-slate-400">Condutor</div>
-          <div className="text-white font-bold">{currentResults.finalCableSection} mm²</div>
+          <div className="text-xs text-slate-500 font-bold uppercase">Condutor</div>
+          <div className="text-slate-900 font-bold">{currentResults.finalCableSection} mm²</div>
           <div className="text-[10px] text-slate-500">PVC / Cobre</div>
         </Card>
 
         {/* Disjuntor */}
         <Card className="bg-panel border-border p-4 text-center space-y-2">
-          <div className="text-xs text-muted font-bold uppercase text-slate-400">Disjuntor</div>
-          <div className="text-white font-bold">
+          <div className="text-xs text-slate-500 font-bold uppercase">Disjuntor</div>
+          <div className="text-slate-900 font-bold">
             {currentResults.protections.breaker ? currentResults.protections.breaker.model : 'Não encontrado'}
           </div>
           <div className="text-[10px] text-slate-500">
@@ -59,8 +59,8 @@ export const ResultsView = () => {
 
         {/* Contator */}
         <Card className="bg-panel border-border p-4 text-center space-y-2">
-          <div className="text-xs text-muted font-bold uppercase text-slate-400">Contator</div>
-          <div className="text-white font-bold">
+          <div className="text-xs text-slate-500 font-bold uppercase">Contator</div>
+          <div className="text-slate-900 font-bold">
             {currentResults.protections.contactor?.[0] ? currentResults.protections.contactor[0].model : 'Não encontrado'}
           </div>
           <div className="text-[10px] text-slate-500">
@@ -70,8 +70,8 @@ export const ResultsView = () => {
 
         {/* Relé Térmico */}
         <Card className="bg-panel border-border p-4 text-center space-y-2">
-          <div className="text-xs text-muted font-bold uppercase text-slate-400">Relé Térmico</div>
-          <div className="text-white font-bold">
+          <div className="text-xs text-slate-500 font-bold uppercase">Relé Térmico</div>
+          <div className="text-slate-900 font-bold">
             {currentResults.protections.thermalRelay ? currentResults.protections.thermalRelay.model : 'Não encontrado'}
           </div>
           <div className="text-[10px] text-slate-500">
