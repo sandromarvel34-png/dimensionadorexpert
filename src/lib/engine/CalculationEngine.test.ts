@@ -1,5 +1,7 @@
+import { describe, test, expect } from 'vitest';
 import { CalculationEngine } from './CalculationEngine';
 import { CalculationInputs } from '../../types';
+
 
 describe('CalculationEngine', () => {
   const defaultInputs: CalculationInputs = {
