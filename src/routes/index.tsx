@@ -121,16 +121,32 @@ function CalculatorComponent() {
 
   const calculate = () => {
     const { potencia, tensao, distancia, quedaAdm, tipoPartida, marca, quantidade, padrao, valorHora } = formData;
+    
+    // Safety check to avoid 0mm2 / NaN / Infinity
+    if (!potencia || potencia <= 0 || !tensao || tensao <= 0) {
+      alert("Não foi possível determinar o resultado com os parâmetros e regras disponíveis. Verifique a potência e tensão.");
+      return;
+    }
+
     const fatores: Record<number, number> = { 220: 2.639, 380: 1.529, 440: 1.320 };
     const In = potencia * (fatores[tensao] || 1.529);
+    
+    if (isNaN(In) || In === Infinity || In <= 0) {
+      alert("Não foi possível determinar o resultado com os parâmetros e regras disponíveis. Corrente inválida.");
+      return;
+    }
+
     const termico = pickTermico(In);
     const disjuntor = pickCeil(disjuntores, In * 1.25);
     const caboAmpacidade = pickCaboByAmp(In);
     const rho = 0.0178;
     const cosphi = 0.86;
+    
+    // Safety for voltage drop
     const S = (100 * Math.sqrt(3) * rho * distancia * In * cosphi) / (quedaAdm * tensao);
-    const caboQuedaTensao = pickCaboBySection(S);
+    const caboQuedaTensao = pickCaboBySection(isNaN(S) || S === Infinity ? 0 : S);
     const caboMinimoNBR = cabos.find(c => c.mm === SECAO_MINIMA_FORCA) || cabos[1];
+    
     const caboFinal = [caboAmpacidade, caboQuedaTensao, caboMinimoNBR].reduce((a, b) => {
       if (!a || !b) return a || b;
       return b.mm > a.mm ? b : a;
