@@ -31,32 +31,51 @@ export const CABLES = [
   { mm: 95, amp: 232, precoM: 112 }
 ];
 
+export const CABLE_SECTIONS = CABLES.map(c => c.mm);
+
 export const MIN_SECTION_POWER = 2.5; // NBR 5410
 
 export type StartType = 'direta' | 'reversao' | 'estrelaTriangulo' | 'compensada' | 'softstarter' | 'inversor';
 export type Brand = 'weg' | 'siemens' | 'schneider' | 'comparar';
+export type Material = 'copper' | 'aluminum';
 
 /**
  * Calculates nominal current for a 3-phase motor
  */
 export function calculateMotorCurrent(cv: number, voltage: number): number {
   const factors: Record<number, number> = { 220: 2.639, 380: 1.529, 440: 1.320 };
-  return cv * (factors[voltage] || factors[380]);
+  return cv * (factors[voltage] || 1.529);
 }
 
 /**
  * Sizing by voltage drop (NBR 5410, 3-phase)
  */
-export function calculateCableByVoltageDrop(I: number, L: number, V: number, maxDropPercent: number) {
+export function calculateVoltageDrop(
+  material: Material,
+  length: number,
+  current: number,
+  section: number,
+  voltage: number,
+  phases: 1 | 3 = 3
+): number {
+  // We use the formula from the uploaded file for 3-phase
+  // S = (100 * √3 * ρ * L * I * cosφ) / (quedaAdm * V)
+  // Rearranging for QuedaAdm (voltage drop percentage):
+  // QuedaAdm = (100 * √3 * ρ * L * I * cosφ) / (S * V)
   const rho = 0.0178; // Copper resistivity
   const cosphi = 0.86;
-  const S = (100 * Math.sqrt(3) * rho * L * I * cosphi) / (maxDropPercent * V);
-  return pickCableBySection(S);
+  const multiplier = phases === 3 ? Math.sqrt(3) : 2;
+  return (100 * multiplier * rho * length * current * cosphi) / (section * voltage);
 }
 
 export function pickCeil(arr: number[], target: number): number {
   for (const v of arr) { if (v >= target) return v; }
   return arr[arr.length - 1];
+}
+
+export function findSectionByAmpacity(material: Material, current: number): number {
+  for (const c of CABLES) { if (c.amp >= current) return c.mm; }
+  return CABLES[CABLES.length - 1].mm;
 }
 
 export function pickThermalRelay(target: number) {
