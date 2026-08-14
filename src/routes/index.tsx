@@ -572,6 +572,8 @@ function CalculatorComponent() {
         </div>
       )}
 
+      {(view === 'wizard' || view === 'results') && (
+        <>
           <div className="disclaimer">
             <strong>Sobre os valores e modelos:</strong>
             <ul>
@@ -588,6 +590,8 @@ function CalculatorComponent() {
               <div><div className="linha">&nbsp;</div><span>{formData.cliNome || "—"}</span><br />Cliente</div>
             </div>
           </div>
+        </>
+      )}
     </div>
   );
 }
