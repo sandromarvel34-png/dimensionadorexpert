@@ -119,9 +119,10 @@ function CalculatorComponent() {
       const idx = (foundIdx === -1 ? contatores.length - 1 : foundIdx) / (contatores.length - 1);
       brands.forEach(b => {
         const brandKey = b as keyof typeof modelosContator;
+        const brandName = nomeMarca[b] || b;
         materials.push({
-          item: marca === "comparar" ? `${label} (${nomeMarca[b] || b})` : label,
-          desc: `${rating} A AC-3 · ${modelosContator[brandKey](rating)} — ${nomeMarca[b] || b}`,
+          item: marca === "comparar" ? `${label} (${brandName})` : label,
+          desc: `${rating} A AC-3 · ${modelosContator[brandKey](rating)} — ${brandName}`,
           qtd: quantidade, un: "un", preco: precoRef(baseWEG, idx, b)
         });
       });
