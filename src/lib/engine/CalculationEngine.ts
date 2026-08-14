@@ -22,11 +22,12 @@ export class CalculationEngine {
     if (unit === 'kW') powerCV = power / 0.7355;
 
     const fatores: Record<number, number> = { 220: 2.639, 380: 1.529, 440: 1.320 };
-    let fator = fatores[voltage] || fatores[380];
+    const fatorBase = fatores[voltage] || fatores[380];
+    let fator = fatorBase;
     
-    // Ajuste simples para monofásico se necessário (embora o arquivo foco em trifásico industrial)
+    // Ajuste simples para monofásico se necessário
     if (phase === 'monofasico') {
-      fator = fator * 1.732; // Aproximação √3 para conversão de base
+      fator = fatorBase * 1.732;
     }
 
     return powerCV * fator;
@@ -51,8 +52,8 @@ export class CalculationEngine {
       { mm: 95, amp: 232 }
     ];
 
-    const result = cabos.find(c => c.amp >= current) || cabos[cabos.length - 1];
-    return result.mm;
+    const result = cabos.find(c => c.amp >= current);
+    return result ? result.mm : 95;
   }
 
   /**
