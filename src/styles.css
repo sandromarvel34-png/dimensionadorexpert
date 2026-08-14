@@ -191,7 +191,7 @@ input:focus {
 .btn {
   width: 100%;
   background: var(--accent);
-  color: #1a1500;
+  color: #ffffff;
   border: none;
   padding: 12px 14px;
   border-radius: 7px;
