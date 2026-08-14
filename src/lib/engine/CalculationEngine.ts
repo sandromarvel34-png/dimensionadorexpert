@@ -22,7 +22,7 @@ export class CalculationEngine {
     if (unit === 'kW') powerCV = power / 0.7355;
 
     const fatores: Record<number, number> = { 220: 2.639, 380: 1.529, 440: 1.320 };
-    const fatorBase = fatores[voltage] || fatores[380];
+    const fatorBase = fatores[voltage] ?? 1.529;
     let fator = fatorBase;
     
     // Ajuste simples para monofásico se necessário
@@ -30,7 +30,7 @@ export class CalculationEngine {
       fator = fatorBase * 1.732;
     }
 
-    return powerCV * fator;
+    return powerCV * (fator ?? 1.529);
   }
 
   /**
