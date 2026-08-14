@@ -105,13 +105,16 @@ function CalculatorComponent() {
     const S = (100 * Math.sqrt(3) * rho * distancia * In * cosphi) / (quedaAdm * tensao);
     const caboQuedaTensao = pickCaboBySection(S);
     const caboMinimoNBR = cabos.find(c => c.mm === SECAO_MINIMA_FORCA)!;
-    const caboFinal = [caboAmpacidade, caboQuedaTensao, caboMinimoNBR].reduce((a, b) => b.mm > a.mm ? b : a);
+    const caboFinal = [caboAmpacidade, caboQuedaTensao, caboMinimoNBR].reduce((a, b) => {
+      if (!a || !b) return a || b;
+      return b.mm > a.mm ? b : a;
+    });
 
     const materials: any[] = [];
     const brands = marca === "comparar" ? ["weg", "siemens", "schneider"] : [marca];
 
     const addContator = (label: string, amps: number, baseWEG: number) => {
-      const rating = pickCeil(contatores, amps);
+      const rating = pickCeil(contatores, amps) || contatores[contatores.length - 1];
       const idx = contatores.indexOf(rating) / (contatores.length - 1);
       brands.forEach(b => {
         materials.push({
@@ -313,9 +316,9 @@ function CalculatorComponent() {
           {results && (
             <>
               <div className="specs">
-                <div className="spec"><div className="k">Relé térmico</div><div className="v"><em>{results.termico.min}–{results.termico.max} A</em></div></div>
+                <div className="spec"><div className="k">Relé térmico</div><div className="v"><em>{results.termico?.min}–{results.termico?.max} A</em></div></div>
                 <div className="spec"><div className="k">Disjuntor motor</div><div className="v"><em>{results.disjuntor} A</em></div></div>
-                <div className="spec highlight"><div className="k">Bitola adotada</div><div className="v"><em>{results.caboFinal.mm} mm²</em></div></div>
+                <div className="spec highlight"><div className="k">Bitola adotada</div><div className="v"><em>{results.caboFinal?.mm} mm²</em></div></div>
               </div>
 
               <div className="card">
