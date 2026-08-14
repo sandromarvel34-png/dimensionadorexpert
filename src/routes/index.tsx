@@ -117,7 +117,7 @@ function CalculatorComponent() {
       const pickedRating = pickCeil(contatores, amps);
       const rating = pickedRating !== undefined ? pickedRating : contatores[contatores.length - 1];
       const foundIdx = contatores.indexOf(rating);
-      const idx = (foundIdx === -1 ? contatores.length - 1 : foundIdx) / (contatores.length - 1);
+      const idx = ((foundIdx === -1 ? contatores.length - 1 : foundIdx) || 0) / (contatores.length - 1);
       brands.forEach(b => {
         const brandKey = b as keyof typeof modelosContator;
         const brandName = nomeMarca[b] || b;
