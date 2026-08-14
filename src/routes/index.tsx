@@ -120,8 +120,8 @@ function CalculatorComponent() {
       brands.forEach(b => {
         const brandKey = b as keyof typeof modelosContator;
         materials.push({
-          item: marca === "comparar" ? `${label} (${nomeMarca[b]})` : label,
-          desc: `${rating} A AC-3 · ${modelosContator[brandKey](rating)} — ${nomeMarca[b]}`,
+          item: marca === "comparar" ? `${label} (${nomeMarca[b] || b})` : label,
+          desc: `${rating} A AC-3 · ${modelosContator[brandKey](rating)} — ${nomeMarca[b] || b}`,
           qtd: quantidade, un: "un", preco: precoRef(baseWEG, idx, b)
         });
       });
@@ -160,7 +160,7 @@ function CalculatorComponent() {
       materials.push({ item: "Reator de linha", desc: "opcional", qtd: quantidade, un: "un", preco: 180 });
     }
 
-    addLinha("Relé térmico", `ajuste ${termico.min}–${termico.max} A`, 65, linhaReleTermico);
+    addLinha("Relé térmico", `ajuste ${termico?.min}–${termico?.max} A`, 65, linhaReleTermico);
     addLinha("Disjuntor motor", `${disjuntor} A`, 95, linhaDisjuntorMotor);
 
     const conds: Record<string, number> = { direta: 4, reversao: 5, estrelaTriangulo: 7, compensada: 6, softstarter: 4, inversor: 4 };
@@ -169,7 +169,7 @@ function CalculatorComponent() {
     materials.push(
       { item: "Botoeira", desc: tipoPartida === "reversao" ? "reversora" : "liga/desliga", qtd: quantidade, un: "un", preco: tipoPartida === "reversao" ? 65 : 32 },
       { item: "Sinaleiro", desc: "liga/desliga", qtd: quantidade * 2, un: "un", preco: 16 },
-      { item: "Cabo flexível", desc: `${caboFinal.mm} mm²`, qtd: metrosCabo, un: "m", preco: caboFinal.precoM },
+      { item: "Cabo flexível", desc: `${caboFinal?.mm} mm²`, qtd: metrosCabo, un: "m", preco: caboFinal?.precoM || 0 },
       { item: "Kit Trilho DIN", desc: "fixação", qtd: quantidade, un: "kit", preco: 55 },
       { item: "Bornes e terminais", desc: "identificação", qtd: quantidade, un: "kit", preco: 28 }
     );
@@ -178,9 +178,9 @@ function CalculatorComponent() {
     if (padrao === "premium") materials.push({ item: "Emergência + Fechadura", desc: "Premium", qtd: 1, un: "un", preco: 120 });
 
     const horasBase: Record<string, number> = { direta: 3, reversao: 4, estrelaTriangulo: 6, compensada: 6.5, softstarter: 4, inversor: 4.5 };
-    const hMontagem = horasBase[tipoPartida] * (1 + (quantidade - 1) * 0.6);
+    const hMontagem = (horasBase[tipoPartida] || 3) * (1 + (quantidade - 1) * 0.6);
     const hCabo = metrosCabo / 20;
-    const hAcab = { basico: 0, padrao: 1, premium: 2 }[padrao as keyof typeof paineis];
+    const hAcab = (paineis[padrao as keyof typeof paineis] ? { basico: 0, padrao: 1, premium: 2 }[padrao as keyof typeof paineis] : 1) || 0;
     const horasTotais = Math.round((hMontagem + hCabo + hAcab) * 10) / 10;
 
     setResults({
