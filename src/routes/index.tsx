@@ -2,7 +2,9 @@ import { useAppStore } from "@/lib/store";
 import { Dashboard } from "@/components/Dashboard";
 import { CalculatorWizard } from "@/components/CalculatorWizard";
 import { ResultsView } from "@/components/ResultsView";
+import { ProposalFlow } from "@/components/ProposalFlow";
 import { Toaster } from "@/components/ui/sonner";
+
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -41,7 +43,9 @@ function CalculatorComponent() {
         {view === 'dashboard' && <Dashboard />}
         {view === 'wizard' && <CalculatorWizard />}
         {view === 'results' && <ResultsView />}
+        {view === 'proposal' && <ProposalFlow />}
       </main>
+
 
       <footer className="border-t border-border/50 py-8 px-4 text-center">
         <div className="max-w-2xl mx-auto space-y-4">

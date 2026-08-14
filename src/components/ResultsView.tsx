@@ -49,8 +49,15 @@ export const ResultsView = () => {
       </div>
 
       <div className="flex justify-center pt-8">
-        <Button size="lg" className="bg-accent hover:bg-accent/90 text-black px-12 text-lg font-bold">Criar Proposta</Button>
+        <Button 
+          size="lg" 
+          className="bg-accent hover:bg-accent/90 text-black px-12 text-lg font-bold"
+          onClick={() => setView('proposal')}
+        >
+          Criar Proposta
+        </Button>
       </div>
+
     </div>
   );
 };
