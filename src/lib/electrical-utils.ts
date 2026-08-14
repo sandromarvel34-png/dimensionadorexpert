@@ -58,10 +58,6 @@ export function calculateVoltageDrop(
   voltage: number,
   phases: 1 | 3 = 3
 ): number {
-  // We use the formula from the uploaded file for 3-phase
-  // S = (100 * √3 * ρ * L * I * cosφ) / (quedaAdm * V)
-  // Rearranging for QuedaAdm (voltage drop percentage):
-  // QuedaAdm = (100 * √3 * ρ * L * I * cosφ) / (S * V)
   const rho = 0.0178; // Copper resistivity
   const cosphi = 0.86;
   const multiplier = phases === 3 ? Math.sqrt(3) : 2;
@@ -75,20 +71,24 @@ export function pickCeil(arr: number[], target: number): number {
 
 export function findSectionByAmpacity(material: Material, current: number): number {
   for (const c of CABLES) { if (c.amp >= current) return c.mm; }
-  return CABLES[CABLES.length - 1].mm;
+  const last = CABLES[CABLES.length - 1];
+  return last ? last.mm : 95;
 }
 
 export function pickThermalRelay(target: number) {
   for (const r of THERMAL_RELAYS) { if (target >= r.min && target <= r.max) return r; }
-  return THERMAL_RELAYS[THERMAL_RELAYS.length - 1];
+  const last = THERMAL_RELAYS[THERMAL_RELAYS.length - 1];
+  return last || { min: 70, max: 104 };
 }
 
 export function pickCableByAmpacity(target: number) {
   for (const c of CABLES) { if (c.amp >= target) return c; }
-  return CABLES[CABLES.length - 1];
+  const last = CABLES[CABLES.length - 1];
+  return last || { mm: 95, amp: 232, precoM: 112 };
 }
 
 export function pickCableBySection(target: number) {
   for (const c of CABLES) { if (c.mm >= target) return c; }
-  return CABLES[CABLES.length - 1];
+  const last = CABLES[CABLES.length - 1];
+  return last || { mm: 95, amp: 232, precoM: 112 };
 }
