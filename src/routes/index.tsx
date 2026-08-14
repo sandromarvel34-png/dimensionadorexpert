@@ -502,21 +502,21 @@ function CalculatorComponent() {
               <tbody>
                 <tr>
                   <td className="item">Contator</td>
-                  <td>{modelosContator.weg(pickCeil(contatores, results.In * 1.15))}</td>
-                  <td>{modelosContator.siemens(pickCeil(contatores, results.In * 1.15))}</td>
-                  <td>{modelosContator.schneider(pickCeil(contatores, results.In * 1.15))}</td>
+                  <td>{modelosContator.weg(pickCeil(contatores, results.In * 1.15) || 9)}</td>
+                  <td>{modelosContator.siemens(pickCeil(contatores, results.In * 1.15) || 9)}</td>
+                  <td>{modelosContator.schneider(pickCeil(contatores, results.In * 1.15) || 9)}</td>
                 </tr>
                 <tr>
                   <td className="item">Relé Térmico</td>
-                  <td>{linhaReleTermico.weg}</td>
-                  <td>{linhaReleTermico.siemens}</td>
-                  <td>{linhaReleTermico.schneider}</td>
+                  <td>{linhaReleTermico['weg']}</td>
+                  <td>{linhaReleTermico['siemens']}</td>
+                  <td>{linhaReleTermico['schneider']}</td>
                 </tr>
                 <tr>
                   <td className="item">Disjuntor Motor</td>
-                  <td>{linhaDisjuntorMotor.weg}</td>
-                  <td>{linhaDisjuntorMotor.siemens}</td>
-                  <td>{linhaDisjuntorMotor.schneider}</td>
+                  <td>{linhaDisjuntorMotor['weg']}</td>
+                  <td>{linhaDisjuntorMotor['siemens']}</td>
+                  <td>{linhaDisjuntorMotor['schneider']}</td>
                 </tr>
               </tbody>
             </table>
