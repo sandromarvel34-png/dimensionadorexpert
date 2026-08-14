@@ -216,10 +216,13 @@ function CalculatorComponent() {
     setHorasEstimadas(horasTotais);
     setValorHoraTabela(valorHora);
 
-    setResults({
+    const res = {
       In, termico, disjuntor, caboAmpacidade, caboQuedaTensao, caboFinal,
       materials, horasTotais, valorHora
-    });
+    };
+    setResults(res);
+    saveToHistory(res);
+    setView('results');
   };
 
   const updateMaterialPrice = (index: number, newPrice: number) => {
