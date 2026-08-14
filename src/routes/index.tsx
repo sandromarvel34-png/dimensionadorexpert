@@ -232,11 +232,11 @@ function CalculatorComponent() {
             <svg viewBox="0 0 24 24" fill="none" stroke="#F2B705" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M8 8h3M8 12h3M8 16h3M15 8v8" /><circle cx="17" cy="16" r="1.4" fill="#F2B705" stroke="none" /></svg>
           </div>
           <div>
-            <h1>Calculadora de Materiais e Orçamento</h1>
-            <span>COMANDOS ELÉTRICOS INDUSTRIAIS</span>
+            <h1>Calculadora Elétrica Pro</h1>
+            <span>Dimensione. Confira. Decida.</span>
           </div>
         </div>
-        <div className="badge">ORÇAMENTO AUTOMÁTICO</div>
+        <div className="badge">ACESSO VITALÍCIO</div>
       </header>
 
       <div className="grid">
