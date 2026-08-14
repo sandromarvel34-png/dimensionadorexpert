@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
     title: "Dimensionador Elétrico | Profissional",
     meta: [
       { name: "description", content: "Dimensionamento de condutores e comandos elétricos por ampacity e queda de tensão." },
-      { property: "og:title", content: "Dimensionador Elétrico | Profissional" },
+      { property: "og:title", content: "Dimensionador Elétrico | Comandos e Condutores" },
     ]
   })
 });
