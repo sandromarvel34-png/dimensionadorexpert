@@ -2,6 +2,25 @@
  * Electrical engineering constants and utility functions based on the uploaded reference
  */
 
+// Manufacturers data
+export const CATALOG = {
+  weg: {
+    contactor: "CWM",
+    thermal: "RW27",
+    breaker: "MPW"
+  },
+  siemens: {
+    contactor: "SIRIUS 3RT",
+    thermal: "3RU",
+    breaker: "3RV"
+  },
+  schneider: {
+    contactor: "TeSys D",
+    thermal: "LRD",
+    breaker: "GV2"
+  }
+};
+
 // Reference data for contactors (Amps)
 export const CONTACTORS = [9, 12, 18, 25, 32, 40, 50, 65, 80, 95, 105, 150, 170, 210, 250, 300];
 
@@ -43,7 +62,8 @@ export type Material = 'copper' | 'aluminum';
  */
 export function calculateMotorCurrent(cv: number, voltage: number): number {
   const factors: Record<number, number> = { 220: 2.639, 380: 1.529, 440: 1.320 };
-  return cv * (factors[voltage] || 1.529);
+  const current = cv * (factors[voltage] || 1.529);
+  return isNaN(current) || current <= 0 ? 0.001 : current; // Prevent zero/NaN
 }
 
 /**
@@ -60,7 +80,8 @@ export function calculateVoltageDrop(
   const rho = 0.0178; // Copper resistivity
   const cosphi = 0.86;
   const multiplier = phases === 3 ? Math.sqrt(3) : 2;
-  return (100 * multiplier * rho * length * current * cosphi) / (section * voltage);
+  const drop = (100 * multiplier * rho * length * current * cosphi) / (section * voltage);
+  return isFinite(drop) ? drop : 0;
 }
 
 export function pickCeil(arr: number[], target: number): number {
