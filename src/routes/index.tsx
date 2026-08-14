@@ -114,7 +114,8 @@ function CalculatorComponent() {
     const brands = marca === "comparar" ? ["weg", "siemens", "schneider"] : [marca];
 
     const addContator = (label: string, amps: number, baseWEG: number) => {
-      const rating = pickCeil(contatores, amps) || contatores[contatores.length - 1];
+      const pickedRating = pickCeil(contatores, amps);
+      const rating = pickedRating !== undefined ? pickedRating : contatores[contatores.length - 1];
       const foundIdx = contatores.indexOf(rating);
       const idx = (foundIdx === -1 ? contatores.length - 1 : foundIdx) / (contatores.length - 1);
       brands.forEach(b => {
