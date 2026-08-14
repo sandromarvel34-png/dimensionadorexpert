@@ -61,6 +61,9 @@ function CalculatorComponent() {
     valorHora: 150
   });
 
+  const [horasEstimadas, setHorasEstimadas] = useState(0);
+  const [valorHoraTabela, setValorHoraTabela] = useState(150);
+
   const [results, setResults] = useState<any>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -187,6 +190,9 @@ function CalculatorComponent() {
     const hAcab = (paineis[padrao as keyof typeof paineis] ? { basico: 0, padrao: 1, premium: 2 }[padrao as keyof typeof paineis] : 1) || 0;
     const horasTotais = Math.round((hMontagem + hCabo + hAcab) * 10) / 10;
 
+    setHorasEstimadas(horasTotais);
+    setValorHoraTabela(valorHora);
+
     setResults({
       In, termico, disjuntor, caboAmpacidade, caboQuedaTensao, caboFinal,
       materials, horasTotais, valorHora
@@ -204,10 +210,22 @@ function CalculatorComponent() {
   const fmt = (n: number) => "R$ " + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const totalMateriais = results ? results.materials.reduce((acc: number, m: any) => acc + (m.qtd * m.preco), 0) : 0;
-  const totalMaoObra = results ? results.horasTotais * results.valorHora : 0;
+  const totalMaoObra = horasEstimadas * valorHoraTabela;
 
   return (
     <div className="wrap">
+      <div className="print-only">
+        <h2>Proposta Comercial — Comandos Elétricos Industriais</h2>
+        <div className="pgrid">
+          <div><strong>Proposta nº:</strong> {formData.propNumero || "—"}</div>
+          <div><strong>Data:</strong> {formData.propData || "—"}</div>
+          <div><strong>Cliente:</strong> {formData.cliNome || "—"}</div>
+          <div><strong>CNPJ/CPF:</strong> {formData.cliDoc || "—"}</div>
+          <div><strong>Contato:</strong> {formData.cliContato || "—"}</div>
+          <div><strong>Técnico responsável:</strong> {formData.tecNome || "—"}</div>
+        </div>
+      </div>
+
       <header className="top">
         <div className="brand">
           <div className="brand-mark">
@@ -324,7 +342,11 @@ function CalculatorComponent() {
               <div className="specs">
                 <div className="spec"><div className="k">Relé térmico</div><div className="v"><em>{results.termico ? `${results.termico.min}–${results.termico.max} A` : "N/A"}</em></div></div>
                 <div className="spec"><div className="k">Disjuntor motor</div><div className="v"><em>{results.disjuntor || "N/A"} A</em></div></div>
-                <div className="spec highlight"><div className="k">Bitola adotada</div><div className="v"><em>{results.caboFinal ? `${results.caboFinal.mm} mm²` : "N/A"}</em></div></div>
+                <div className="spec"><div className="k">Bitola por ampacidade</div><div className="v"><em>{results.caboAmpacidade.mm} mm²</em></div></div>
+                <div className="spec"><div className="k">Bitola por queda de tensão</div><div className="v"><em>{results.caboQuedaTensao.mm} mm²</em></div></div>
+                <div className="spec"><div className="k">Seção mínima NBR 5410 (força)</div><div className="v"><em>{SECAO_MINIMA_FORCA} mm²</em></div></div>
+                <div className="spec highlight"><div className="k">Bitola adotada (maior das 3)</div><div className="v"><em>{results.caboFinal ? `${results.caboFinal.mm} mm²` : "N/A"}</em></div></div>
+                <div className="spec"><div className="k">Marca de referência</div><div className="v">{formData.marca === 'comparar' ? 'WEG / Siemens / Schneider' : (nomeMarca[formData.marca] || formData.marca)}</div></div>
               </div>
 
               <div className="card">
@@ -361,10 +383,28 @@ function CalculatorComponent() {
               </div>
 
               <div className="card">
-                <h3>Resumo Financeiro</h3>
+                <h3>Tempo de execução e mão de obra</h3>
+                <div className="labor-grid">
+                  <div className="field">
+                    <label>Horas estimadas</label>
+                    <input type="number" className="price-input" style={{ width: '100%' }} value={horasEstimadas} onChange={(e) => setHorasEstimadas(parseFloat(e.target.value) || 0)} min="0" step="0.5" />
+                  </div>
+                  <div className="field">
+                    <label>Valor hora (R$/h)</label>
+                    <input type="number" className="price-input" style={{ width: '100%' }} value={valorHoraTabela} onChange={(e) => setValorHoraTabela(parseFloat(e.target.value) || 0)} min="0" step="5" />
+                  </div>
+                  <div className="field">
+                    <label>Mão de obra (R$)</label>
+                    <input type="text" className="price-input" style={{ width: '100%', color: 'var(--good)' }} value={fmt(totalMaoObra)} disabled />
+                  </div>
+                </div>
+                <div className="hint">
+                  {results ? `Estimativa: ${results.horasTotais.toFixed(1)}h montagem + ... acabamento.` : "Preencha os dados e calcule."}
+                </div>
+
                 <div className="totals">
                   <div className="row"><span>Materiais</span><span>{fmt(totalMateriais)}</span></div>
-                  <div className="row"><span>Mão de obra ({results.horasTotais}h)</span><span>{fmt(totalMaoObra)}</span></div>
+                  <div className="row"><span>Mão de obra</span><span>{fmt(totalMaoObra)}</span></div>
                   <div className="grand"><span>Total geral</span><span>{fmt(totalMateriais + totalMaoObra)}</span></div>
                 </div>
               </div>
@@ -372,7 +412,20 @@ function CalculatorComponent() {
           )}
 
           <div className="disclaimer">
-            <strong>Notas técnicas:</strong> Bitola calculada por ampacidade (NBR 5410), queda de tensão e seção mínima (2,5 mm²). Valores e marcas são referências editáveis.
+            <strong>Sobre os valores e modelos:</strong>
+            <ul>
+              <li>A corrente do motor é estimada por fórmula técnica com cos φ e rendimento médios — confira sempre a placa do motor.</li>
+              <li>A bitola do cabo é calculada por três critérios — ampacidade, queda de tensão e seção mínima de 2,5 mm² para circuitos de força (Tabela 6.1 da NBR 5410) — e a maior das três é a indicada.</li>
+              <li>Os modelos WEG, Siemens e Schneider indicados seguem a nomenclatura pública das linhas CWM, SIRIUS (3RT) e TeSys (LC1D/LC1E/LC1F). Para correntes muito altas ou linhas específicas, o código exato deve ser confirmado no catálogo do fabricante antes da compra.</li>
+              <li>Preços de materiais e o valor da hora técnica são referências de mercado, totalmente editáveis — ajuste conforme seu fornecedor, região e o tempo real observado em campo.</li>
+            </ul>
+          </div>
+          <div id="printFooter" className="print-only">
+            <div className="local">{formData.propLocal}, {formData.propData}</div>
+            <div className="assinaturas">
+              <div><div className="linha">&nbsp;</div><span>{formData.tecNome || "—"}</span><br />Técnico Responsável</div>
+              <div><div className="linha">&nbsp;</div><span>{formData.cliNome || "—"}</span><br />Cliente</div>
+            </div>
           </div>
         </div>
       </div>
