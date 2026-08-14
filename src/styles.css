@@ -18,6 +18,13 @@
   --primary: #F2B705;
 }
 
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+}
+
+
 * {
   box-sizing: border-box;
 }
