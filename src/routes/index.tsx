@@ -588,8 +588,6 @@ function CalculatorComponent() {
               <div><div className="linha">&nbsp;</div><span>{formData.cliNome || "—"}</span><br />Cliente</div>
             </div>
           </div>
-        </div>
-      )}
     </div>
   );
 }
