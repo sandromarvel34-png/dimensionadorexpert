@@ -424,7 +424,7 @@ function CalculatorComponent() {
             <div className="local">{formData.propLocal}, {formData.propData}</div>
             <div className="assinaturas">
               <div><div className="linha">&nbsp;</div><span>{formData.tecNome || "—"}</span><br />Técnico Responsável</div>
-              <div><div class="linha">&nbsp;</div><span>{formData.cliNome || "—"}</span><br />Cliente</div>
+              <div><div className="linha">&nbsp;</div><span>{formData.cliNome || "—"}</span><br />Cliente</div>
             </div>
           </div>
         </div>
