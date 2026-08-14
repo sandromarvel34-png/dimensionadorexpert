@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
 });
 
 function CalculatorComponent() {
-  const { view } = useAppStore();
+  const { view, setView } = useAppStore();
 
   return (
     <div className="min-h-screen bg-bg text-text selection:bg-accent/30 selection:text-white font-sans">
