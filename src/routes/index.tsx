@@ -571,7 +571,7 @@ function CalculatorComponent() {
               <div><div className="linha">&nbsp;</div><span>{formData.tecNome || "—"}</span><br />Técnico Responsável</div>
               <div><div className="linha">&nbsp;</div><span>{formData.cliNome || "—"}</span><br />Cliente</div>
             </div>
-          </div>
+        </div>
       </div>
     </div>
   );
