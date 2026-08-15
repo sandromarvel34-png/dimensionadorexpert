@@ -140,7 +140,7 @@ export class CalculationEngine {
   static performFullCalculation(inputs: CalculationInputs): CalculationResults {
     const pf = inputs.powerFactor || this.COS_PHI_DEFAULT;
     const eff = inputs.efficiency || this.EFFICIENCY_DEFAULT;
-    const fs = inputs.serviceFactor || 1.0;
+    const fs = inputs.serviceFactor ?? 1.0;
 
     let In: number;
     
