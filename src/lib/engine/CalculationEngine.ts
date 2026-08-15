@@ -177,6 +177,7 @@ export class CalculationEngine {
     // Contator: In (corrente nominal do motor em AC-3)
     // Relé Térmico: In (ajuste na corrente nominal)
     // Dimensionamento dos dispositivos:
+    // Disjuntor: In * 1.25 * FS (proteção contra sobrecarga/partida conforme NBR 5410)
     const breaker = findCompatibleProduct('disjuntor', In * 1.25 * fs, mfr) || null;
     
     // Lista de contatores dependendo do tipo de partida

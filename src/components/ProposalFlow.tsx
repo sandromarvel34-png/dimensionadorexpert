@@ -170,7 +170,7 @@ export const ProposalFlow = () => {
 
               {/* Client Info in PDF */}
               {(clientData.name || clientData.email) && (
-                <div className="mb-8 grid grid-cols-2 gap-8 bg-muted/30 p-5 rounded-xl border border-border">
+                <div className="mb-6 grid grid-cols-2 gap-8 bg-muted/30 p-4 rounded-xl border border-border print:mb-4">
                   <div>
                     <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-1">Cliente</p>
                     <p className="font-bold text-foreground text-lg">{clientData.name || '—'}</p>
@@ -185,7 +185,7 @@ export const ProposalFlow = () => {
               )}
 
               {/* Technical Data Table */}
-              <div className="mb-8">
+              <div className="mb-6 print:mb-4">
                 <div className="flex justify-between items-end mb-4">
                   <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em]">Dados Técnicos da Carga</h3>
                   <span className="text-[9px] font-bold text-muted-foreground uppercase">
@@ -241,7 +241,7 @@ export const ProposalFlow = () => {
               </div>
 
               {/* Materials Table */}
-              <div className="mb-8">
+              <div className="mb-6 print:mb-4">
                 <div className="flex justify-between items-end mb-4">
                   <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em]">Lista de Materiais e Equipamentos</h3>
                   <button onClick={addItem} className="text-xs font-bold text-primary hover:underline no-print flex items-center gap-1">
@@ -287,11 +287,11 @@ export const ProposalFlow = () => {
               </div>
 
               {/* Labor and Totals */}
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-2 gap-6 print:gap-4">
                 <div className="space-y-6 print:space-y-4">
                   <div>
                     <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em] mb-4">Mão de Obra e Serviços</h3>
-                    <div className="space-y-3 p-4 bg-muted/30 rounded-xl border border-border">
+                    <div className="space-y-2 p-3 bg-muted/30 rounded-xl border border-border">
                       <div className="flex justify-between items-center no-print">
                         <Label className="text-[10px] uppercase font-bold text-muted-foreground">Horas Estimadas</Label>
                         <Input type="number" className="w-20 h-8 text-right" value={labor.hours} onChange={e => setLabor({...labor, hours: parseFloat(e.target.value) || 0})} />
@@ -308,7 +308,7 @@ export const ProposalFlow = () => {
                   </div>
                 </div>
 
-                <div className="bg-primary/5 p-6 rounded-2xl border border-primary/20 flex flex-col justify-between">
+                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/20 flex flex-col justify-between">
                   <div className="space-y-3">
                     <div className="flex justify-between text-xs font-bold text-muted-foreground uppercase tracking-widest">
                       <span>Subtotal Materiais</span>
