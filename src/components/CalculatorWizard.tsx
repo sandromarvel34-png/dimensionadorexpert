@@ -498,7 +498,7 @@ export const CalculatorWizard = () => {
                             Fator de Serviço (FS)
                             <Info className="w-3 h-3 text-muted-foreground/50" />
                           </Label>
-                          <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor || "1.0"} className="h-10 bg-background border-border" required />
+                          <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor?.toString() || "1.0"} className="h-10 bg-background border-border" required />
                           <p className="text-[9px] text-muted-foreground italic">Padrão: 1.0 (verifique a placa do motor)</p>
                         </div>
                       </div>
