@@ -89,7 +89,7 @@ export const ProposalFlow = () => {
       if (contactor) {
         initialItems.push({ 
           id: '3', 
-          desc: count > 1 ? `Contator de Potência ${contactor.model} (Conjunto c/ ${count}) - ${contactor.description}` : `Contator de Potência ${contactor.model} - ${contactor.description}`, 
+          desc: count > 1 ? `Contator de Potência ${contactor.model} (Conjunto c/ ${count})` : `Contator de Potência ${contactor.model}`, 
           qtd: count, 
           unit: 'un', 
           price: 0 
@@ -100,7 +100,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.thermalRelay) {
       initialItems.push({ 
         id: '4', 
-        desc: `Relé Térmico de Sobrecarga ${currentResults.protections.thermalRelay.model} - ${currentResults.protections.thermalRelay.description}`, 
+        desc: `Relé Térmico de Sobrecarga ${currentResults.protections.thermalRelay.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: 0 
@@ -110,7 +110,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.timerRelay) {
       initialItems.push({ 
         id: '5', 
-        desc: `Relé de Tempo Eletrônico ${currentResults.protections.timerRelay.model} - ${currentResults.protections.timerRelay.description}`, 
+        desc: `Relé de Tempo Eletrônico ${currentResults.protections.timerRelay.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: 0 
