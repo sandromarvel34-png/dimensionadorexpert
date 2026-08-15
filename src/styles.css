@@ -3,6 +3,32 @@
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --color-background: #F8FAFC;
+  --color-foreground: #0F172A;
+
+  --color-primary: #2563EB;
+  --color-primary-foreground: #FFFFFF;
+
+  --color-secondary: #FFFFFF;
+  --color-secondary-foreground: #0F172A;
+
+  --color-muted: #F8FAFC;
+  --color-muted-foreground: #64748B;
+
+  --color-accent: #F8FAFC;
+  --color-accent-foreground: #0F172A;
+
+  --color-destructive: #DC2626;
+  --color-destructive-foreground: #FFFFFF;
+
+  --color-border: #E2E8F0;
+  --color-input: #E2E8F0;
+  --color-ring: #2563EB;
+
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
 }
 
 @layer base {
@@ -42,12 +68,19 @@
 
 @layer components {
   .btn-primary {
-    @apply h-11 px-6 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold rounded-lg transition-all;
+    @apply h-11 px-6 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold rounded-[10px] transition-all flex items-center justify-center gap-2;
   }
   .btn-secondary {
-    @apply h-11 px-6 bg-white border border-[var(--border)] text-[var(--text-main)] hover:bg-[var(--bg)] font-medium rounded-lg transition-all;
+    @apply h-11 px-6 bg-white border border-[var(--border)] text-[var(--text-main)] hover:bg-[var(--bg)] font-medium rounded-[10px] transition-all flex items-center justify-center gap-2;
   }
   .card-panel {
-    @apply bg-[var(--panel)] border border-[var(--border)] rounded-xl p-6 shadow-sm;
+    @apply bg-[var(--panel)] border border-[var(--border)] rounded-[14px] p-8 shadow-[0_1px_3px_0_rgba(0,0,0,0.02),0_1px_2px_-1px_rgba(0,0,0,0.02)];
   }
+}
+
+/* Print Styles */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+  .card-panel { border: none !important; shadow: none !important; }
 }
