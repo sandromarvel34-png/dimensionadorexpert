@@ -482,11 +482,22 @@ export const CalculatorWizard = () => {
                         Fonte: {selectedMotor.catalog_reference || 'Catálogo Oficial WEG'}
                       </div>
                     </div>
+                    <div className="mt-4 p-4 bg-background/50 border border-border rounded-lg space-y-3">
+                      <Label className="text-foreground font-semibold text-xs">Ajuste de Motor</Label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <Label className="text-[10px] text-muted-foreground uppercase font-bold">Fator de Serviço (FS)</Label>
+                          <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-9" required />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
-            )}
-          </div>
+            ) : (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {/* ... rest of catalog filters ... */}
 
           <div className="pt-6 border-t border-border">
             <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6">Dados da Instalação</h3>
