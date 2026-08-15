@@ -128,7 +128,7 @@ export class CalculationEngine {
     }
 
     // Caso nenhuma atenda (raro com 150mm²), retornamos a maior disponível
-    const maxSection = standardSections[standardSections.length - 1];
+    const maxSection = standardSections[standardSections.length - 1] as number;
     const maxDropVolts = (k * this.RHO_COPPER * distance * current * pf) / maxSection;
     return { section: maxSection, actualDrop: (maxDropVolts / voltage) * 100 };
   }
