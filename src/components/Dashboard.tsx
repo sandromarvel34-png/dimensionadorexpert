@@ -15,16 +15,16 @@ export const Dashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Header Eyebrow & Title */}
-      <div className="mb-10 text-center sm:text-left">
-        <p className="text-sm font-medium text-blue-600 mb-2 uppercase tracking-widest">Dimensionamento Elétrico</p>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-semibold text-slate-900">Dimensione seus circuitos de motores</h1>
-            <p className="text-slate-500">Informe os dados técnicos para obter uma solução completa.</p>
+      <div className="mb-12">
+        <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Dimensionamento Elétrico</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold text-foreground tracking-tight">Painel de Dimensionamento</h1>
+            <p className="text-muted-foreground text-lg">Gerencie seus projetos e realize novos cálculos técnicos com precisão.</p>
           </div>
           <button 
             onClick={() => setView('wizard')}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary"
           >
             + Novo dimensionamento
           </button>
@@ -34,36 +34,39 @@ export const Dashboard = () => {
       {/* Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
         {metrics.map((m, i) => (
-          <div key={i} className="card-panel py-5 px-6">
-            <p className="text-metadata mb-1 uppercase">{m.label}</p>
-            <p className="text-2xl font-semibold text-slate-900">{m.value}</p>
+          <div key={i} className="card-panel">
+            <p className="text-label uppercase mb-2">{m.label}</p>
+            <p className="text-3xl font-bold text-foreground">{m.value}</p>
           </div>
         ))}
       </div>
 
       {/* History */}
       <div className="card-panel">
-        <h2 className="text-card-title mb-6">Últimos Dimensionamentos</h2>
+        <h2 className="text-card-title mb-8">Últimos Projetos</h2>
         {history.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-slate-100 rounded-xl">
-            <p className="text-slate-400">Você ainda não realizou nenhum dimensionamento.</p>
+          <div className="text-center py-20 border-2 border-dashed border-border rounded-xl">
+            <p className="text-muted-foreground">Você ainda não realizou nenhum dimensionamento.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {history.slice(0, 5).map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-4 border border-slate-100 rounded-lg hover:border-blue-200 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-                    <Zap className="w-5 h-5" />
+              <div key={item.id} className="flex items-center justify-between p-5 border border-border rounded-xl hover:border-primary transition-all group">
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                    <Zap className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-900">Motor {item.power || item.potencia} {item.powerUnit || item.unidade}</p>
-                    <p className="text-metadata">{item.voltage || item.tensao}V • {item.phase || item.sistema} • {item.starterType || item.partida}</p>
+                    <p className="font-semibold text-foreground text-lg">Motor {item.power || item.potencia} {item.powerUnit || item.unidade}</p>
+                    <p className="text-metadata text-sm">{item.voltage || item.tensao}V • {item.phase || item.sistema} • {item.starterType || item.partida}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-6">
-                  <p className="font-semibold text-slate-700">{item.finalCableSection || item.section} mm²</p>
-                  <button onClick={() => openHistoryItem(item)} className="text-blue-600 font-medium hover:underline">Abrir</button>
+                <div className="flex items-center gap-8">
+                  <div className="text-right">
+                    <p className="font-bold text-foreground">{item.finalCableSection || item.section} mm²</p>
+                    <p className="text-metadata text-[10px] uppercase">Condutor</p>
+                  </div>
+                  <button onClick={() => openHistoryItem(item)} className="text-primary font-bold hover:underline">Abrir</button>
                 </div>
               </div>
             ))}

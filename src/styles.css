@@ -2,14 +2,16 @@
 
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
   --color-background: #F8FAFC;
   --color-foreground: #0F172A;
-
+  
+  --color-card: #FFFFFF;
+  --color-card-foreground: #0F172A;
+  
   --color-primary: #2563EB;
   --color-primary-foreground: #FFFFFF;
-
+  
   --color-secondary: #FFFFFF;
   --color-secondary-foreground: #0F172A;
 
@@ -23,7 +25,7 @@
   --color-destructive-foreground: #FFFFFF;
 
   --color-border: #E2E8F0;
-  --color-input: #E2E8F0;
+  --color-input: #CBD5E1;
   --color-ring: #2563EB;
 
   --radius-lg: 14px;
@@ -32,145 +34,85 @@
 }
 
 @layer base {
-  :root {
-    --bg: #F8FAFC;
-    --panel: #FFFFFF;
-    --text-main: #0F172A;
-    --text-muted: #64748B;
-    --border: #E2E8F0;
-    --accent: #2563EB;
-    --accent-hover: #1D4ED8;
-    --green: #16A34A;
-    --yellow: #F59E0B;
-    --red: #DC2626;
-  }
-
   body {
-    background-color: var(--bg);
-    color: var(--text-main);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: var(--text-main);
     font-weight: 600;
   }
-
-  /* Typography Scale */
-  .text-metadata { font-size: 12px; color: var(--text-muted); }
-  .text-label { font-size: 14px; color: var(--text-muted); font-weight: 500; }
-  .text-body { font-size: 16px; color: var(--text-main); }
-  .text-card-title { font-size: 18px; font-weight: 600; }
-  .text-page-title { font-size: 32px; font-weight: 600; }
-  .text-result-value { font-size: 40px; font-weight: 700; }
 }
 
 @layer components {
+  /* Buttons */
   .btn-primary {
-    @apply h-11 px-6 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold rounded-[10px] transition-all flex items-center justify-center gap-2;
+    @apply h-12 px-6 bg-[var(--color-primary)] text-[var(--color-primary-foreground)] font-semibold rounded-[10px] transition-all duration-200 hover:bg-[#1D4ED8] flex items-center justify-center gap-2;
   }
   .btn-secondary {
-    @apply h-11 px-6 bg-white border border-[var(--border)] text-[var(--text-main)] hover:bg-[var(--bg)] font-medium rounded-[10px] transition-all flex items-center justify-center gap-2;
+    @apply h-12 px-6 bg-white border border-[var(--color-border)] text-[var(--color-foreground)] font-medium rounded-[10px] transition-all duration-200 hover:bg-[var(--color-background)] flex items-center justify-center gap-2;
   }
+  .btn-ghost {
+    @apply h-12 px-4 text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] transition-all duration-200 flex items-center justify-center;
+  }
+
+  /* Cards */
   .card-panel {
-    @apply bg-[var(--panel)] border border-[var(--border)] rounded-[14px] p-8 shadow-[0_1px_3px_0_rgba(0,0,0,0.02),0_1px_2px_-1px_rgba(0,0,0,0.02)];
+    @apply bg-[var(--color-card)] border border-[var(--color-border)] rounded-[14px] p-6 shadow-sm;
   }
+
+  /* Typography Scale */
+  .text-metadata { font-size: 12px; color: var(--color-muted-foreground); font-weight: 400; }
+  .text-label { font-size: 14px; color: var(--color-muted-foreground); font-weight: 500; }
+  .text-body { font-size: 16px; color: var(--color-foreground); }
+  .text-card-title { font-size: 18px; font-weight: 600; }
+  .text-page-title { font-size: 32px; font-weight: 600; }
+  .text-result-value { font-size: 40px; font-weight: 700; color: var(--color-primary); }
 }
 
 /* Print Styles */
 @media print {
-  @page {
-    size: A4;
-    margin: 1cm;
+  @page { 
+    size: A4; 
+    margin: 1cm !important; 
   }
   
-  body {
-    background: white !important;
-    font-size: 8pt !important;
-    color: #000 !important;
+  body { 
+    background: white !important; 
+    font-size: 8pt !important; 
+    color: #000 !important; 
+    margin: 0 !important; 
+    padding: 0 !important;
   }
-
-  .no-print {
-    display: none !important;
-  }
-
-  .card-panel {
-    border: 1px solid #f1f5f9 !important;
-    box-shadow: none !important;
-    padding: 0.75rem !important;
-    margin-bottom: 0.75rem !important;
-    page-break-inside: avoid;
+  
+  .print\:p-0 { padding: 0 !important; }
+  .print\:m-0 { margin: 0 !important; }
+  .print\:shadow-none { box-shadow: none !important; }
+  .print\:border-0 { border: 0 !important; }
+  .print\:hidden { display: none !important; }
+  
+  .card-panel { 
+    border: 1px solid #E2E8F0 !important; 
+    box-shadow: none !important; 
+    padding: 1rem !important;
     border-radius: 8px !important;
   }
-
-  /* Force grid layout in print for specific containers */
-  .print\:block {
-    display: block !important;
-  }
-
-  /* Maintain grid structure where needed */
-  .grid-cols-12, .grid-cols-4, .grid-cols-2 {
-    display: grid !important;
-  }
-
+  
+  /* Force single page layout */
+  .max-w-6xl { max-width: 100% !important; }
+  h1 { font-size: 16pt !important; margin-bottom: 0.5rem !important; }
+  h2 { font-size: 12pt !important; margin-bottom: 0.25rem !important; }
+  h3 { font-size: 9pt !important; margin-bottom: 0.25rem !important; }
+  p, span, td, th { font-size: 8pt !important; line-height: 1.2 !important; }
+  
+  /* Compact tables */
+  table td, table th { padding: 4px 8px !important; }
+  
+  /* Grid adjustments for print */
+  .grid { display: grid !important; gap: 0.5rem !important; }
   .grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
   .grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
-
-  /* Stack columns that would be too narrow */
-  .lg\:grid-cols-3 {
-    display: block !important;
-  }
-
-  .lg\:col-span-2 {
-    width: 100% !important;
-  }
-
-  .space-y-8, .space-y-6, .py-8 {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .space-y-4 > * + * {
-    margin-top: 0.5rem !important;
-  }
-
-  h1 { font-size: 16pt !important; margin-bottom: 0.5rem !important; border-bottom: 2px solid #2563EB; padding-bottom: 0.25rem; }
-  h3 { font-size: 10pt !important; margin-bottom: 0.5rem !important; color: #1e293b; }
-  
-  input, textarea, select {
-    border: none !important;
-    border-bottom: 1px solid #f1f5f9 !important;
-    padding: 0 !important;
-    height: auto !important;
-    font-size: 9pt !important;
-    background: transparent !important;
-    appearance: none !important;
-    color: #000 !important;
-  }
-
-  .text-label { font-size: 7pt !important; color: #64748b !important; }
-  
-  .btn-primary, .btn-secondary, button {
-    display: none !important;
-  }
-
-  .sticky {
-    position: static !important;
-  }
-
-  .max-w-7xl {
-    max-width: 100% !important;
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
-  .text-result-value, .text-4xl { font-size: 20pt !important; color: #2563EB !important; }
-  
-  /* Ensure financial summary stays visible and compact */
-  .sticky.top-24 {
-    border: 2px solid #2563EB !important;
-    margin-top: 1rem !important;
-  }
 }
+

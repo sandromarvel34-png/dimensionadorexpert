@@ -53,31 +53,31 @@ export const CalculatorWizard = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold text-slate-900">Novo Dimensionamento</h2>
-          <p className="text-slate-500">Preencha os dados técnicos do motor e da instalação.</p>
+    <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="mb-10 flex items-center justify-between">
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold text-foreground tracking-tight">Novo Dimensionamento</h2>
+          <p className="text-muted-foreground text-lg">Informe os parâmetros técnicos da carga e instalação.</p>
         </div>
         <button 
           onClick={() => setView('dashboard')}
-          className="btn-secondary flex items-center gap-2"
+          className="btn-secondary"
         >
-          <ArrowLeft className="w-4 h-4" /> Voltar
+          <ArrowLeft className="w-5 h-5" /> Voltar
         </button>
       </div>
 
-      <form onSubmit={handleCalculate} className="card-panel shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+      <form onSubmit={handleCalculate} className="card-panel">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
           <div className="space-y-2">
-            <Label className="text-label uppercase tracking-wider">Potência do motor</Label>
+            <Label className="text-label uppercase tracking-widest text-[11px]">Potência do motor</Label>
             <div className="flex gap-2">
-              <Input name="power" type="number" step="0.1" defaultValue="5" className="h-11 border-slate-200" required />
+              <Input name="power" type="number" step="0.1" defaultValue="5" required />
               <Select name="powerUnit" defaultValue="cv">
-                <SelectTrigger className="h-11 w-24 border-slate-200">
+                <SelectTrigger className="w-28">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[100px]">
+                <SelectContent position="popper">
                   <SelectItem value="cv">CV</SelectItem>
                   <SelectItem value="hp">HP</SelectItem>
                   <SelectItem value="kW">kW</SelectItem>
@@ -87,12 +87,12 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2 relative">
-            <Label className="text-label uppercase tracking-wider">Tensão</Label>
+            <Label className="text-label uppercase tracking-widest text-[11px]">Tensão (V)</Label>
             <Select name="voltage" defaultValue="220">
-              <SelectTrigger className="h-11 border-slate-200">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
+              <SelectContent position="popper">
                 <SelectItem value="220">220 V</SelectItem>
                 <SelectItem value="380">380 V</SelectItem>
                 <SelectItem value="440">440 V</SelectItem>
@@ -101,12 +101,12 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2 relative">
-            <Label className="text-label uppercase tracking-wider">Sistema</Label>
+            <Label className="text-label uppercase tracking-widest text-[11px]">Sistema</Label>
             <Select name="phase" defaultValue="trifasico">
-              <SelectTrigger className="h-11 border-slate-200">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
+              <SelectContent position="popper">
                 <SelectItem value="monofasico">Monofásico</SelectItem>
                 <SelectItem value="trifasico">Trifásico</SelectItem>
               </SelectContent>
@@ -114,17 +114,17 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-label uppercase tracking-wider">Distância (metros)</Label>
-            <Input name="distance" type="number" defaultValue="5" className="h-11 border-slate-200" required />
+            <Label className="text-label uppercase tracking-widest text-[11px]">Distância (metros)</Label>
+            <Input name="distance" type="number" defaultValue="5" required />
           </div>
 
           <div className="space-y-2 relative">
-            <Label className="text-label uppercase tracking-wider">Tipo de partida</Label>
+            <Label className="text-label uppercase tracking-widest text-[11px]">Tipo de partida</Label>
             <Select name="starterType" defaultValue="direta">
-              <SelectTrigger className="h-11 border-slate-200">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[200px]">
+              <SelectContent position="popper">
                 <SelectItem value="direta">Direta</SelectItem>
                 <SelectItem value="reversao">Reversão</SelectItem>
                 <SelectItem value="estrelaTriangulo">Estrela-Triângulo</SelectItem>
@@ -135,12 +135,12 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2 relative">
-            <Label className="text-label uppercase tracking-wider">Fabricante Preferencial</Label>
+            <Label className="text-label uppercase tracking-widest text-[11px]">Fabricante Preferencial</Label>
             <Select name="manufacturer" defaultValue="WEG">
-              <SelectTrigger className="h-11 border-slate-200">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
+              <SelectContent position="popper">
                 <SelectItem value="WEG">WEG</SelectItem>
                 <SelectItem value="Schneider">Schneider</SelectItem>
                 <SelectItem value="Siemens">Siemens</SelectItem>
@@ -149,16 +149,16 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-label uppercase tracking-wider">Queda de tensão admissível (%)</Label>
-            <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue="2" className="h-11 border-slate-200" required />
+            <Label className="text-label uppercase tracking-widest text-[11px]">Queda Admissível (%)</Label>
+            <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue="2" required />
           </div>
           <div className="space-y-2 relative">
-            <Label className="text-label uppercase tracking-wider">Agrupamento (Fator)</Label>
+            <Label className="text-label uppercase tracking-widest text-[11px]">Agrupamento</Label>
             <Select name="groupingFactor" defaultValue="1.0">
-              <SelectTrigger className="h-11 border-slate-200">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
+              <SelectContent position="popper">
                 <SelectItem value="1.0">1 Circuito (1.00)</SelectItem>
                 <SelectItem value="0.8">2 Circuitos (0.80)</SelectItem>
                 <SelectItem value="0.7">3 Circuitos (0.70)</SelectItem>
@@ -168,12 +168,12 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2 relative">
-            <Label className="text-label uppercase tracking-wider">Temperatura (Fator)</Label>
+            <Label className="text-label uppercase tracking-widest text-[11px]">Temperatura</Label>
             <Select name="tempFactor" defaultValue="1.0">
-              <SelectTrigger className="h-11 border-slate-200">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
+              <SelectContent position="popper">
                 <SelectItem value="1.06">25°C (1.06)</SelectItem>
                 <SelectItem value="1.0">30°C (1.00)</SelectItem>
                 <SelectItem value="0.94">35°C (0.94)</SelectItem>
@@ -182,23 +182,23 @@ export const CalculatorWizard = () => {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-label uppercase tracking-wider">Fator de Potência (cos φ)</Label>
-            <Input name="powerFactor" type="number" step="0.01" defaultValue="0.86" className="h-11 border-slate-200" required />
+            <Label className="text-label uppercase tracking-widest text-[11px]">Fator de Potência (cos φ)</Label>
+            <Input name="powerFactor" type="number" step="0.01" defaultValue="0.86" required />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-label uppercase tracking-wider">Fator de Serviço (FS)</Label>
-            <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-11 border-slate-200" required />
+            <Label className="text-label uppercase tracking-widest text-[11px]">Fator de Serviço (FS)</Label>
+            <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" required />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-label uppercase tracking-wider">Rendimento (η)</Label>
-            <Input name="efficiency" type="number" step="0.01" defaultValue="0.85" className="h-11 border-slate-200" required />
+            <Label className="text-label uppercase tracking-widest text-[11px]">Rendimento (η)</Label>
+            <Input name="efficiency" type="number" step="0.01" defaultValue="0.85" required />
           </div>
         </div>
 
         <div className="mt-10 flex justify-end">
-          <button type="submit" className="btn-primary w-full sm:w-auto px-10">
+          <button type="submit" className="btn-primary px-12">
             Calcular Dimensionamento →
           </button>
         </div>
