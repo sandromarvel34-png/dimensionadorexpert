@@ -14,7 +14,7 @@ export const getMotorCatalogFilters = createServerFn({ method: "GET" })
 
 export const getMotorsByFilter = createServerFn({ method: "POST" })
   .inputValidator((data: any) => data)
-  .handler(async ({ data }) => {
+  .handler(async ({ data }: { data: any }) => {
     const { line, speed_type, poles, power_cv, voltage } = data;
     
     let query = supabase
