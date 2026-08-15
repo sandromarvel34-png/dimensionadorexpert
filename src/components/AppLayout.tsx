@@ -1,5 +1,6 @@
 import { useAppStore } from "@/lib/store";
 import { Zap, LayoutDashboard, FileText, Settings, User } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Dashboard } from "./Dashboard";
 import { CalculatorWizard } from "./CalculatorWizard";
 import { ResultsView } from "./ResultsView";
