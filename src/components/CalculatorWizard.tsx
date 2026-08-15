@@ -18,19 +18,19 @@ import { cn } from '@/lib/utils';
 import { getMotorCatalogFilters, getMotorsByFilter } from '@/lib/catalog/motors.functions';
 
 export const CalculatorWizard = () => {
-  const { setView, setCalculation } = useAppStore();
+  const { setView, setCalculation, currentInputs } = useAppStore();
   const [isCalculating, setIsCalculating] = useState(false);
-  const [dataSource, setDataSource] = useState<'manual' | 'catalog'>('manual');
+  const [dataSource, setDataSource] = useState<'manual' | 'catalog'>(currentInputs?.dataSource || 'manual');
   
   // Catalog selection state
   const [filters, setFilters] = useState<any[]>([]);
-  const [selectedLine, setSelectedLine] = useState<string>('');
-  const [selectedType, setSelectedType] = useState<string>('');
-  const [selectedPoles, setSelectedPoles] = useState<string>('');
-  const [selectedPower, setSelectedPower] = useState<string>('');
-  const [selectedVoltage, setSelectedVoltage] = useState<string>('');
+  const [selectedLine, setSelectedLine] = useState<string>(currentInputs?.motorCatalogData?.line || '');
+  const [selectedType, setSelectedType] = useState<string>(currentInputs?.motorCatalogData?.speedType || '');
+  const [selectedPoles, setSelectedPoles] = useState<string>(currentInputs?.motorCatalogData?.poles?.toString() || '');
+  const [selectedPower, setSelectedPower] = useState<string>(currentInputs?.motorCatalogData?.power?.toString() || '');
+  const [selectedVoltage, setSelectedVoltage] = useState<string>(currentInputs?.motorCatalogData?.voltage?.toString() || '');
   const [availableMotors, setAvailableMotors] = useState<any[]>([]);
-  const [selectedMotorId, setSelectedMotorId] = useState<string>('');
+  const [selectedMotorId, setSelectedMotorId] = useState<string>(currentInputs?.motorCatalogData?.id || '');
   const availableLines = useMemo(() => Array.from(new Set(filters.map(f => f.line))), [filters]);
   const availableTypes = useMemo(() => Array.from(new Set(filters.filter(f => f.line === selectedLine).map(f => f.speed_type))), [filters, selectedLine]);
   const availablePoles = useMemo(() => Array.from(new Set(filters.filter(f => f.line === selectedLine && (!selectedType || selectedType === '_all' || f.speed_type === selectedType)).map(f => f.poles))), [filters, selectedLine, selectedType]);
@@ -269,8 +269,8 @@ export const CalculatorWizard = () => {
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Potência do motor</Label>
                     <div className="flex gap-2">
-                      <Input name="power" type="number" step="0.1" defaultValue="5" className="h-12 text-base" required />
-                      <Select name="powerUnit" defaultValue="cv">
+                      <Input name="power" type="number" step="0.1" defaultValue={currentInputs?.power || "5"} className="h-12 text-base" required />
+                      <Select name="powerUnit" defaultValue={currentInputs?.powerUnit || "cv"}>
                         <SelectTrigger className="w-32 h-12">
                           <SelectValue />
                         </SelectTrigger>
@@ -285,7 +285,7 @@ export const CalculatorWizard = () => {
 
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Tensão de alimentação</Label>
-                    <Select name="voltage" defaultValue="220">
+                    <Select name="voltage" defaultValue={currentInputs?.voltage?.toString() || "220"}>
                       <SelectTrigger className="h-12">
                         <SelectValue />
                       </SelectTrigger>
@@ -302,13 +302,13 @@ export const CalculatorWizard = () => {
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Fator de Serviço (FS)</Label>
                     <div className="relative">
-                      <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-12 text-base" required />
+                      <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor || "1.0"} className="h-12 text-base" required />
                       <p className="mt-1 text-[10px] text-muted-foreground">Multiplicador de carga máxima contínua (ex: 1.15)</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Sistema</Label>
-                    <Select name="phase" defaultValue="trifasico">
+                    <Select name="phase" defaultValue={currentInputs?.phase || "trifasico"}>
                       <SelectTrigger className="h-12">
                         <SelectValue />
                       </SelectTrigger>
@@ -326,11 +326,11 @@ export const CalculatorWizard = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">cos φ</Label>
-                        <Input name="powerFactor" type="number" step="0.01" placeholder="Ex: 0.86" className="h-11" required />
+                        <Input name="powerFactor" type="number" step="0.01" defaultValue={currentInputs?.powerFactor || ""} placeholder="Ex: 0.86" className="h-11" required={dataSource === 'manual'} />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
-                        <Input name="efficiency" type="number" step="0.01" placeholder="Ex: 0.85" className="h-11" required />
+                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency || ""} placeholder="Ex: 0.85" className="h-11" required={dataSource === 'manual'} />
                       </div>
                     </div>
                   </div>
@@ -496,7 +496,7 @@ export const CalculatorWizard = () => {
                             Fator de Serviço (FS)
                             <Info className="w-3 h-3 text-muted-foreground/50" />
                           </Label>
-                          <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-10 bg-background border-border" required />
+                          <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor || "1.0"} className="h-10 bg-background border-border" required />
                           <p className="text-[9px] text-muted-foreground italic">Padrão: 1.0 (verifique a placa do motor)</p>
                         </div>
                       </div>
@@ -513,14 +513,14 @@ export const CalculatorWizard = () => {
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Distância até a alimentação</Label>
                 <div className="relative">
-                  <Input name="distance" type="number" defaultValue="5" className="h-12 pr-16 text-base" required />
+                  <Input name="distance" type="number" defaultValue={currentInputs?.distance || "5"} className="h-12 pr-16 text-base" required />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">metros</span>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Tipo de partida</Label>
-                <Select name="starterType" defaultValue="direta">
+                <Select name="starterType" defaultValue={currentInputs?.starterType || "direta"}>
                   <SelectTrigger className="h-12">
                     <SelectValue />
                   </SelectTrigger>
@@ -537,7 +537,7 @@ export const CalculatorWizard = () => {
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Queda de tensão admissível</Label>
                 <div className="relative">
-                  <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue="2" className="h-12 pr-12 text-base" required />
+                  <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue={currentInputs?.maxVoltageDrop || "2"} className="h-12 pr-12 text-base" required />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">%</span>
                 </div>
               </div>
@@ -546,7 +546,7 @@ export const CalculatorWizard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Fabricante dos Dispositivos</Label>
-                <Select name="manufacturer" defaultValue="WEG">
+                <Select name="manufacturer" defaultValue={currentInputs?.preferredManufacturer || "WEG"}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
@@ -560,7 +560,7 @@ export const CalculatorWizard = () => {
               </div>
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Método de Agrupamento</Label>
-                <Select name="groupingType" defaultValue="bundle">
+                <Select name="groupingType" defaultValue={Object.keys(CalculationEngine.GROUPING_FACTORS).find(key => CalculationEngine.GROUPING_FACTORS[key] === currentInputs?.groupingFactor) || "bundle"}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
@@ -578,7 +578,7 @@ export const CalculatorWizard = () => {
               </div>
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Temperatura Ambiente</Label>
-                <Select name="ambientTemp" defaultValue="30">
+                <Select name="ambientTemp" defaultValue={Object.keys(CalculationEngine.TEMPERATURE_FACTORS).find(key => CalculationEngine.TEMPERATURE_FACTORS[key] === currentInputs?.ambientTempFactor) || "30"}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>

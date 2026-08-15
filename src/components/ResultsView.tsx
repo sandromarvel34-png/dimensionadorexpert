@@ -13,7 +13,10 @@ export const ResultsView = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8">
         <div className="space-y-3">
           <button 
-            onClick={() => setView('wizard')}
+            onClick={() => {
+              // Current inputs are already in store, just change view
+              setView('wizard');
+            }}
             className="btn-ghost px-0 h-auto gap-2 text-sm font-semibold"
           >
             <ArrowLeft className="w-4 h-4" /> Voltar ao formulário
