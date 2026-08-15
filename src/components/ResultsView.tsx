@@ -42,26 +42,39 @@ export const ResultsView = () => {
       {/* Main Stats Card */}
       <div className="card-panel">
         <h3 className="text-label uppercase tracking-widest mb-6">Resumo Técnico</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           <div className="space-y-1">
-            <p className="text-metadata uppercase">Corrente Nominal</p>
+            <p className="text-metadata uppercase">Corrente Nominal (In)</p>
             <p className="text-3xl font-bold text-slate-900">{currentResults.nominalCurrent.toFixed(1)} <span className="text-lg font-medium text-slate-400">A</span></p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-metadata uppercase">Por Ampacidade</p>
-            <p className="text-3xl font-bold text-slate-900">{currentResults.cableByAmpacity} <span className="text-lg font-medium text-slate-400">mm²</span></p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-metadata uppercase">Por Queda de Tensão</p>
-            <p className="text-3xl font-bold text-slate-900">{currentResults.cableByVoltageDrop} <span className="text-lg font-medium text-slate-400">mm²</span></p>
           </div>
           <div className="space-y-1">
             <p className="text-metadata uppercase">Queda Calculada</p>
             <p className="text-3xl font-bold text-slate-900">{currentResults.voltageDropCalculated ? currentResults.voltageDropCalculated.toFixed(2) : '0.00'} <span className="text-lg font-medium text-slate-400">%</span></p>
           </div>
-          <div className="space-y-1">
-            <p className="text-metadata uppercase">Seção Final (Maior)</p>
-            <p className="text-3xl font-bold text-blue-600">{currentResults.finalCableSection} <span className="text-lg font-medium text-blue-300">mm²</span></p>
+          <div className="space-y-1 bg-blue-50/50 p-4 rounded-xl border border-blue-100 lg:col-span-2">
+            <p className="text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-1">Resultado Final (NBR 5410)</p>
+            <div className="flex items-baseline gap-2">
+              <p className="text-4xl font-black text-blue-600">{currentResults.finalCableSection}</p>
+              <span className="text-xl font-bold text-blue-400">mm²</span>
+            </div>
+            <p className="text-xs text-blue-500 mt-1 font-medium">
+              Critério Dominante: {currentResults.limitingCriterion === 'ampacity' ? 'Capacidade de Corrente' : 'Queda de Tensão'}
+            </p>
+          </div>
+        </div>
+        
+        <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-[10px] text-slate-400 uppercase font-bold">Por Ampacidade</p>
+            <p className="text-lg font-semibold text-slate-600">{currentResults.cableByAmpacity} mm²</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-slate-400 uppercase font-bold">Por Distância</p>
+            <p className="text-lg font-semibold text-slate-600">{currentResults.cableByVoltageDrop} mm²</p>
+          </div>
+          <div className="col-span-2 md:col-span-1">
+            <p className="text-[10px] text-slate-400 uppercase font-bold">Seção Mínima</p>
+            <p className="text-lg font-semibold text-slate-600">2.5 mm²</p>
           </div>
         </div>
       </div>

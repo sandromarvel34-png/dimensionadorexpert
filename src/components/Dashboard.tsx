@@ -4,7 +4,7 @@ import { Zap, LayoutDashboard, FileText, Settings } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Dashboard = () => {
-  const { setView, history } = useAppStore();
+  const { setView, history, openHistoryItem } = useAppStore();
 
   const metrics = [
     { label: "Dimensionamentos", value: history.length || "0" },
@@ -63,7 +63,7 @@ export const Dashboard = () => {
                 </div>
                 <div className="flex items-center gap-6">
                   <p className="font-semibold text-slate-700">{item.finalCableSection || item.section} mm²</p>
-                  <button onClick={() => setView('results')} className="text-blue-600 font-medium hover:underline">Abrir</button>
+                  <button onClick={() => openHistoryItem(item)} className="text-blue-600 font-medium hover:underline">Abrir</button>
                 </div>
               </div>
             ))}

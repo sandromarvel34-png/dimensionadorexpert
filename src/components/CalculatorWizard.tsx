@@ -30,6 +30,8 @@ export const CalculatorWizard = () => {
       starterType: formData.get('starterType') as any,
       maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
       preferredManufacturer: formData.get('manufacturer') as string || undefined,
+      groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
+      ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
       quantity: 1
     };
 
@@ -146,6 +148,35 @@ export const CalculatorWizard = () => {
           <div className="space-y-2">
             <Label className="text-label uppercase tracking-wider">Queda de tensão admissível (%)</Label>
             <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue="4" className="h-11 border-slate-200" required />
+          </div>
+          <div className="space-y-2 relative">
+            <Label className="text-label uppercase tracking-wider">Agrupamento (Fator)</Label>
+            <Select name="groupingFactor" defaultValue="1.0">
+              <SelectTrigger className="h-11 border-slate-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
+                <SelectItem value="1.0">1 Circuito (1.00)</SelectItem>
+                <SelectItem value="0.8">2 Circuitos (0.80)</SelectItem>
+                <SelectItem value="0.7">3 Circuitos (0.70)</SelectItem>
+                <SelectItem value="0.65">4 Circuitos (0.65)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2 relative">
+            <Label className="text-label uppercase tracking-wider">Temperatura (Fator)</Label>
+            <Select name="tempFactor" defaultValue="1.0">
+              <SelectTrigger className="h-11 border-slate-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
+                <SelectItem value="1.06">25°C (1.06)</SelectItem>
+                <SelectItem value="1.0">30°C (1.00)</SelectItem>
+                <SelectItem value="0.94">35°C (0.94)</SelectItem>
+                <SelectItem value="0.87">40°C (0.87)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

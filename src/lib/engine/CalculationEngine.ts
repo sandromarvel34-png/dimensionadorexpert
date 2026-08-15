@@ -80,14 +80,20 @@ export class CalculationEngine {
   static performFullCalculation(inputs: CalculationInputs): CalculationResults {
     const In = this.calculateNominalCurrent(inputs.power, inputs.powerUnit, inputs.voltage, inputs.phase);
     
-    const secAmp = this.getSectionByAmpacity(In * 1.25);
+    // Fatores de correção (Default 1.0 se não informados)
+    const fGroup = inputs.groupingFactor || 1.0;
+    const fTemp = inputs.ambientTempFactor || 1.0;
+    
+    // Corrente de projeto corrigida (Ib) para dimensionamento de cabos
+    // Ib = In / (f1 * f2)
+    const correctedCurrent = (In * 1.25) / (fGroup * fTemp);
+
+    const secAmp = this.getSectionByAmpacity(correctedCurrent);
     const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop);
     
     // O dimensionamento final DEVE ser a maior bitola entre ampacidade e queda de tensão
-    // Também respeitando a seção mínima de 2,5mm² para circuitos de motores (força)
     const finalSection = Math.max(secAmp, dropResult.section, this.SECAO_MINIMA_FORCA);
     
-    // O critério dominante é aquele que resultou na maior bitola (ou ampacidade se forem iguais)
     const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
 
     const mfr = inputs.preferredManufacturer;
@@ -109,6 +115,13 @@ export class CalculationEngine {
         version: '2004',
         section: 'Tabela 6.1',
         description: 'Seção mínima para circuitos de força: 2,5 mm².'
+      },
+      {
+        id: 'ref3',
+        standardName: 'ABNT NBR 5410',
+        version: '2004',
+        section: '6.2.5.5',
+        description: `Fatores de correção aplicados: Agrupamento (${fGroup}) e Temperatura (${fTemp}).`
       }
     ];
 

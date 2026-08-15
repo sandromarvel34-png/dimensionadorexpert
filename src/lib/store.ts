@@ -13,6 +13,7 @@ interface AppState {
   setStep: (step: number) => void;
   setCalculation: (inputs: CalculationInputs, results: CalculationResults) => void;
   addToHistory: (item: any) => void;
+  openHistoryItem: (item: any) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -37,8 +38,16 @@ export const useAppStore = create<AppState>()(
         set((state) => ({ 
           currentInputs: inputs, 
           currentResults: results,
+          view: 'results',
           history: [historyItem, ...state.history].slice(0, 50)
         }));
+      },
+      openHistoryItem: (item) => {
+        set({ 
+          currentInputs: item, 
+          currentResults: item, // item already contains results flattened
+          view: 'results' 
+        });
       },
       addToHistory: (item) => set((state) => ({ 
         history: [item, ...state.history].slice(0, 50) 
