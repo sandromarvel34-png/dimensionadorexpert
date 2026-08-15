@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { CalculationInputs } from '@/types';
 import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { ArrowLeft, Loader2, Database, ClipboardList, Info, CheckCircle2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { getMotorCatalogFilters, getMotorsByFilter } from '@/lib/catalog/motors.functions';
 
