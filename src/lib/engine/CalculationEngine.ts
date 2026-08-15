@@ -68,16 +68,18 @@ export class CalculationEngine {
 
   /**
    * Critério 2: Queda de Tensão
-   * Baseado na fórmula do arquivo de referência (Trifásico)
+   * Baseado na fórmula do arquivo de referência
    */
   static getSectionByVoltageDrop(
     current: number, 
     distance: number, 
     voltage: number, 
     maxDropPercent: number,
-    pf: number = 0.86
+    pf: number = 0.86,
+    phase: string = 'trifasico'
   ): { section: number; actualDrop: number } {
-    const S = (100 * Math.sqrt(3) * this.RHO_COPPER * distance * current * pf) / (maxDropPercent * voltage);
+    const k = phase === 'trifasico' ? Math.sqrt(3) : 2;
+    const S = (100 * k * this.RHO_COPPER * distance * current * pf) / (maxDropPercent * voltage);
     
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150];
     const pickedSection = standardSections.find(sec => sec >= S) || 95;
@@ -117,14 +119,14 @@ export class CalculationEngine {
     const correctedCurrent = (In * 1.25 * fs) / (fGroup * fTemp);
 
     const secAmp = this.getSectionByAmpacity(correctedCurrent);
-    const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf);
+    const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     
     // O dimensionamento final DEVE ser a maior bitola entre ampacidade e queda de tensão
     const finalSection = Math.max(secAmp, dropResult.section, this.SECAO_MINIMA_FORCA);
     
     const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
 
-    const mfr = inputs.preferredManufacturer;
+    const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
     // Dimensionamento dos dispositivos:
     // Disjuntor: In * 1.25 (proteção contra sobrecarga/partida)
     // Contator: In (corrente nominal do motor em AC-3)
@@ -182,6 +184,12 @@ export class CalculationEngine {
       }
     ];
 
+    // Componentes adicionais: Relé de tempo para Estrela-Triângulo
+    let timerRelay: ManufacturerProduct | null = null;
+    if (inputs.starterType === 'estrelaTriangulo') {
+      timerRelay = findCompatibleProduct('releTempo', 0, mfr) || null;
+    }
+
     return {
       nominalCurrent: In,
       cableByAmpacity: secAmp,
@@ -192,7 +200,8 @@ export class CalculationEngine {
       protections: {
         breaker,
         contactor: contactors.length > 0 ? contactors : null,
-        thermalRelay
+        thermalRelay,
+        timerRelay
       },
       references: refs
     };
