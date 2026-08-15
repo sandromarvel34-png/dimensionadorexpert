@@ -183,12 +183,12 @@ export class CalculationEngine {
     const diazedFuse = findCompatibleProduct('fusivel', In * 1.5, mfr) || null;
     const nhFuse = findCompatibleProduct('fusivel', In * 1.5, mfr) || null;
     
-    let softStarter = null;
-    let inverter = null;
+    let softStarter: ManufacturerProduct | null = null;
+    let inverter: ManufacturerProduct | null = null;
     if (inputs.starterType === 'softStarter') {
-      softStarter = findCompatibleProduct('contator', In * fs, mfr);
+      softStarter = findCompatibleProduct('contator', In * fs, mfr) || null;
     } else if (inputs.starterType === 'inversor') {
-      inverter = findCompatibleProduct('contator', In * fs, mfr);
+      inverter = findCompatibleProduct('contator', In * fs, mfr) || null;
     }
     
     // Lista de contatores dependendo do tipo de partida
