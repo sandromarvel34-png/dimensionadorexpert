@@ -8,38 +8,28 @@ export const ResultsView = () => {
   if (!currentResults || !currentInputs) return null;
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+    <div className="max-w-6xl mx-auto px-6 py-12 space-y-10">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <div className="space-y-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8">
+        <div className="space-y-3">
           <button 
             onClick={() => setView('wizard')}
-            className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors mb-2"
+            className="btn-ghost px-0 h-auto gap-2 text-sm font-semibold"
           >
-            <ArrowLeft className="w-4 h-4" /> Voltar
+            <ArrowLeft className="w-4 h-4" /> Voltar ao formulário
           </button>
-          <h1 className="text-3xl font-semibold text-slate-900">Resultado do Dimensionamento</h1>
-          <div className="flex flex-wrap gap-x-3 text-metadata font-medium uppercase tracking-wider">
-            <span>{currentInputs.power} {currentInputs.powerUnit}</span>
-            <span className="text-slate-300">•</span>
-            <span>{currentInputs.voltage} V</span>
-            <span className="text-slate-300">•</span>
-            <span>{currentInputs.phase}</span>
-            <span className="text-slate-300">•</span>
-            <span>{currentInputs.distance} m</span>
-            <span className="text-slate-300">•</span>
-            <span>Partida {currentInputs.starterType}</span>
-            <span className="text-slate-300">•</span>
-            <span>FS {currentInputs.serviceFactor || '1.0'}</span>
-            <span className="text-slate-300">•</span>
-            <span>cos φ {currentInputs.powerFactor || '0.86'}</span>
-            <span className="text-slate-300">•</span>
-            <span>η {currentInputs.efficiency || '0.85'}</span>
+          <h1 className="text-4xl font-bold text-foreground tracking-tight">Resultado do Dimensionamento</h1>
+          <div className="flex flex-wrap gap-x-4 text-metadata font-semibold uppercase tracking-widest text-[10px]">
+            <span className="bg-muted px-2 py-1 rounded">{currentInputs.power} {currentInputs.powerUnit}</span>
+            <span className="bg-muted px-2 py-1 rounded">{currentInputs.voltage} V</span>
+            <span className="bg-muted px-2 py-1 rounded">{currentInputs.phase}</span>
+            <span className="bg-muted px-2 py-1 rounded">{currentInputs.distance} m</span>
+            <span className="bg-muted px-2 py-1 rounded">Partida {currentInputs.starterType}</span>
           </div>
         </div>
         <button 
           onClick={() => setView('proposal')}
-          className="btn-primary flex items-center gap-2"
+          className="btn-primary"
         >
           Criar Proposta →
         </button>
@@ -48,39 +38,39 @@ export const ResultsView = () => {
       {/* Main Stats Card */}
       <div className="card-panel">
         <h3 className="text-label uppercase tracking-widest mb-6">Resumo Técnico</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          <div className="space-y-1">
-            <p className="text-metadata uppercase">Corrente Nominal (In)</p>
-            <p className="text-3xl font-bold text-slate-900">{currentResults.nominalCurrent.toFixed(1)} <span className="text-lg font-medium text-slate-400">A</span></p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+          <div className="space-y-2">
+            <p className="text-label uppercase tracking-widest text-[10px]">Corrente Nominal (In)</p>
+            <p className="text-4xl font-bold text-foreground">{currentResults.nominalCurrent.toFixed(1)} <span className="text-lg font-medium text-muted-foreground">A</span></p>
           </div>
-          <div className="space-y-1">
-            <p className="text-metadata uppercase">Queda Calculada</p>
-            <p className="text-3xl font-bold text-slate-900">{currentResults.voltageDropCalculated ? currentResults.voltageDropCalculated.toFixed(2) : '0.00'} <span className="text-lg font-medium text-slate-400">%</span></p>
+          <div className="space-y-2">
+            <p className="text-label uppercase tracking-widest text-[10px]">Queda Calculada</p>
+            <p className="text-4xl font-bold text-foreground">{currentResults.voltageDropCalculated ? currentResults.voltageDropCalculated.toFixed(2) : '0.00'} <span className="text-lg font-medium text-muted-foreground">%</span></p>
           </div>
-          <div className="space-y-1 bg-blue-50/50 p-4 rounded-xl border border-blue-100 lg:col-span-2">
-            <p className="text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-1">Resultado Final (NBR 5410)</p>
+          <div className="space-y-2 bg-primary/5 p-5 rounded-2xl border border-primary/10 lg:col-span-2">
+            <p className="text-primary text-[10px] font-bold uppercase tracking-widest mb-1">Resultado Final (NBR 5410)</p>
             <div className="flex items-baseline gap-2">
-              <p className="text-4xl font-black text-blue-600">{currentResults.finalCableSection}</p>
-              <span className="text-xl font-bold text-blue-400">mm²</span>
+              <p className="text-result-value">{currentResults.finalCableSection}</p>
+              <span className="text-2xl font-bold text-primary/60">mm²</span>
             </div>
-            <p className="text-xs text-blue-500 mt-1 font-medium">
+            <p className="text-xs text-primary/80 mt-2 font-semibold">
               Critério Dominante: {currentResults.limitingCriterion === 'ampacity' ? 'Capacidade de Corrente' : 'Queda de Tensão'}
             </p>
           </div>
         </div>
         
-        <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+        <div className="mt-8 pt-8 border-t border-border grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
           <div>
-            <p className="text-[10px] text-slate-400 uppercase font-bold">Por Ampacidade</p>
-            <p className="text-lg font-semibold text-slate-600">{currentResults.cableByAmpacity} mm²</p>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Por Ampacidade</p>
+            <p className="text-xl font-bold text-foreground">{currentResults.cableByAmpacity} mm²</p>
           </div>
           <div>
-            <p className="text-[10px] text-slate-400 uppercase font-bold">Por Distância</p>
-            <p className="text-lg font-semibold text-slate-600">{currentResults.cableByVoltageDrop} mm²</p>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Por Distância</p>
+            <p className="text-xl font-bold text-foreground">{currentResults.cableByVoltageDrop} mm²</p>
           </div>
           <div className="col-span-2 md:col-span-1">
-            <p className="text-[10px] text-slate-400 uppercase font-bold">Seção Mínima</p>
-            <p className="text-lg font-semibold text-slate-600">2.5 mm²</p>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Seção Mínima</p>
+            <p className="text-xl font-bold text-foreground">2.5 mm²</p>
           </div>
         </div>
       </div>
@@ -90,38 +80,41 @@ export const ResultsView = () => {
         <h3 className="text-card-title">Componentes Dimensionados</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           {/* Cable */}
-          <div className="card-panel flex flex-col justify-between h-40 hover:border-blue-200 transition-colors">
-            <p className="text-metadata uppercase">Condutor</p>
+          <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
+            <p className="text-label uppercase tracking-widest text-[10px]">Condutor</p>
             <div>
-              <p className="text-2xl font-bold text-slate-900">{currentResults.finalCableSection} mm²</p>
-              <p className="text-metadata mt-1">Cobre • PVC</p>
+              <p className="text-2xl font-bold text-foreground">{currentResults.finalCableSection} mm²</p>
+              <p className="text-metadata font-semibold mt-1">Cobre • PVC 70°C</p>
             </div>
           </div>
 
           {/* Breaker */}
-          <div className="card-panel flex flex-col justify-between h-40 hover:border-blue-200 transition-colors">
-            <p className="text-metadata uppercase">Disjuntor</p>
+          <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
+            <p className="text-label uppercase tracking-widest text-[10px]">Disjuntor</p>
             <div>
-              <p className="text-xl font-bold text-slate-900">{currentResults.protections.breaker?.model || '—'}</p>
-              <p className="text-metadata mt-1">{currentResults.protections.breaker?.manufacturer || '—'} • {currentResults.protections.breaker?.nominalCurrent ? `${currentResults.protections.breaker.nominalCurrent} A` : 'Não encontrado'}</p>
+              <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.breaker?.model || '—'}</p>
+              <p className="text-metadata font-semibold text-primary">{currentResults.protections.breaker?.manufacturer || '—'}</p>
+              <p className="text-metadata mt-1">{currentResults.protections.breaker?.nominalCurrent ? `${currentResults.protections.breaker.nominalCurrent} A` : 'Não encontrado'}</p>
             </div>
           </div>
 
           {/* Contactor */}
-          <div className="card-panel flex flex-col justify-between h-40 hover:border-blue-200 transition-colors">
-            <p className="text-metadata uppercase">Contator</p>
+          <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
+            <p className="text-label uppercase tracking-widest text-[10px]">Contator</p>
             <div>
-              <p className="text-xl font-bold text-slate-900">{currentResults.protections.contactor?.[0]?.model || '—'}</p>
-              <p className="text-metadata mt-1">{currentResults.protections.contactor?.[0]?.manufacturer || '—'} • {currentResults.protections.contactor?.[0]?.nominalCurrent ? `${currentResults.protections.contactor[0].nominalCurrent} A` : 'Não encontrado'}</p>
+              <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.contactor?.[0]?.model || '—'}</p>
+              <p className="text-metadata font-semibold text-primary">{currentResults.protections.contactor?.[0]?.manufacturer || '—'}</p>
+              <p className="text-metadata mt-1">{currentResults.protections.contactor?.[0]?.nominalCurrent ? `${currentResults.protections.contactor[0].nominalCurrent} A (AC-3)` : 'Não encontrado'}</p>
             </div>
           </div>
 
           {/* Thermal Relay */}
-          <div className="card-panel flex flex-col justify-between h-40 hover:border-blue-200 transition-colors">
-            <p className="text-metadata uppercase">Relé Térmico</p>
+          <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
+            <p className="text-label uppercase tracking-widest text-[10px]">Relé Térmico</p>
             <div>
-              <p className="text-xl font-bold text-slate-900">{currentResults.protections.thermalRelay?.model || '—'}</p>
-              <p className="text-metadata mt-1">WEG • {currentResults.protections.thermalRelay?.adjustmentRange ? `${currentResults.protections.thermalRelay.adjustmentRange.min}–${currentResults.protections.thermalRelay.adjustmentRange.max} A` : 'Não encontrado'}</p>
+              <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.thermalRelay?.model || '—'}</p>
+              <p className="text-metadata font-semibold text-primary">{currentResults.protections.thermalRelay?.manufacturer || '—'}</p>
+              <p className="text-metadata mt-1">{currentResults.protections.thermalRelay?.adjustmentRange ? `Faixa: ${currentResults.protections.thermalRelay.adjustmentRange.min}–${currentResults.protections.thermalRelay.adjustmentRange.max} A` : 'Não encontrado'}</p>
             </div>
           </div>
         </div>
@@ -130,7 +123,7 @@ export const ResultsView = () => {
       <div className="flex flex-col items-center gap-6 pt-10">
         <button 
           onClick={() => setView('proposal')}
-          className="btn-primary w-full sm:w-80 h-14 text-lg shadow-xl shadow-blue-100"
+          className="btn-primary w-full sm:w-80 h-16 text-xl shadow-xl shadow-primary/10"
         >
           Criar Proposta Comercial →
         </button>
