@@ -57,12 +57,12 @@ export const Dashboard = () => {
                     <Zap className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-medium text-slate-900">Motor {item.potencia} {item.unidade}</p>
-                    <p className="text-metadata">{item.tensao}V • {item.sistema} • {item.partida}</p>
+                    <p className="font-medium text-slate-900">Motor {item.power || item.potencia} {item.powerUnit || item.unidade}</p>
+                    <p className="text-metadata">{item.voltage || item.tensao}V • {item.phase || item.sistema} • {item.starterType || item.partida}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-6">
-                  <p className="font-semibold text-slate-700">{item.section} mm²</p>
+                  <p className="font-semibold text-slate-700">{item.finalCableSection || item.section} mm²</p>
                   <button onClick={() => setView('results')} className="text-blue-600 font-medium hover:underline">Abrir</button>
                 </div>
               </div>
