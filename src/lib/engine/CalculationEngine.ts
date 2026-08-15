@@ -179,6 +179,17 @@ export class CalculationEngine {
     // Dimensionamento dos dispositivos:
     // Disjuntor: In * 1.25 * FS (proteção contra sobrecarga/partida conforme NBR 5410)
     const breaker = findCompatibleProduct('disjuntor', In * 1.25 * fs, mfr) || null;
+    const motorBreaker = findCompatibleProduct('disjuntorMotor', In * fs, mfr) || null;
+    const diazedFuse = findCompatibleProduct('fusivel', In * 1.5, mfr) || null;
+    const nhFuse = findCompatibleProduct('fusivel', In * 1.5, mfr) || null;
+    
+    let softStarter = null;
+    let inverter = null;
+    if (inputs.starterType === 'softStarter') {
+      softStarter = findCompatibleProduct('contator', In * fs, mfr);
+    } else if (inputs.starterType === 'inversor') {
+      inverter = findCompatibleProduct('contator', In * fs, mfr);
+    }
     
     // Lista de contatores dependendo do tipo de partida
     let contactors: ManufacturerProduct[] = [];
@@ -245,9 +256,14 @@ export class CalculationEngine {
       limitingCriterion,
       protections: {
         breaker,
+        motorBreaker,
+        diazedFuse,
+        nhFuse,
         contactor: contactors.length > 0 ? contactors : null,
         thermalRelay,
-        timerRelay
+        timerRelay,
+        softStarter,
+        inverter
       },
       references: refs
     };

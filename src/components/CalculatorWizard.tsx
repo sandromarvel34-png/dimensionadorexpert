@@ -305,7 +305,7 @@ export const CalculatorWizard = () => {
                     <Label className="text-foreground font-semibold">Fator de Serviço (FS)</Label>
                     <div className="relative">
                       <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor?.toString() || "1.0"} className="h-12 text-base" required />
-                      <p className="mt-1 text-[10px] text-muted-foreground">Multiplicador de carga máxima contínua (ex: 1.15)</p>
+                      <p className="mt-1 text-[10px] text-slate-500 font-medium">Multiplicador de carga máxima contínua (ex: 1.15)</p>
                     </div>
                   </div>
                   <div className="space-y-3">
