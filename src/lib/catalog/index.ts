@@ -16,11 +16,17 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'schneider-acti9-c6', manufacturer: 'Schneider', category: 'disjuntor', model: 'iC60N-C6', commercialCode: 'A9F74106', description: 'Mini disjuntor Acti9 iC60N Curva C, 6A', nominalCurrent: 6, voltage: 440, price: 55.00 },
   { id: 'schneider-acti9-c16', manufacturer: 'Schneider', category: 'disjuntor', model: 'iC60N-C16', commercialCode: 'A9F74116', description: 'Mini disjuntor Acti9 iC60N Curva C, 16A', nominalCurrent: 16, voltage: 440, price: 65.00 },
   { id: 'schneider-acti9-c32', manufacturer: 'Schneider', category: 'disjuntor', model: 'iC60N-C32', commercialCode: 'A9F74132', description: 'Mini disjuntor Acti9 iC60N Curva C, 32A', nominalCurrent: 32, voltage: 440, price: 85.00 },
+  { id: 'schneider-acti9-c40', manufacturer: 'Schneider', category: 'disjuntor', model: 'iC60N-C40', commercialCode: 'A9F74140', description: 'Mini disjuntor Acti9 iC60N Curva C, 40A', nominalCurrent: 40, voltage: 440, price: 95.00 },
+  { id: 'schneider-acti9-c63', manufacturer: 'Schneider', category: 'disjuntor', model: 'iC60N-C63', commercialCode: 'A9F74163', description: 'Mini disjuntor Acti9 iC60N Curva C, 63A', nominalCurrent: 63, voltage: 440, price: 125.00 },
+
 
   // Disjuntores Siemens 5SY
   { id: 'siemens-5sy-c6', manufacturer: 'Siemens', category: 'disjuntor', model: '5SY6106-7', commercialCode: '5SY6106-7', description: 'Mini disjuntor 5SY6 Curva C, 6A', nominalCurrent: 6, voltage: 440, price: 48.00 },
   { id: 'siemens-5sy-c16', manufacturer: 'Siemens', category: 'disjuntor', model: '5SY6116-7', commercialCode: '5SY6116-7', description: 'Mini disjuntor 5SY6 Curva C, 16A', nominalCurrent: 16, voltage: 440, price: 58.00 },
   { id: 'siemens-5sy-c32', manufacturer: 'Siemens', category: 'disjuntor', model: '5SY6132-7', commercialCode: '5SY6132-7', description: 'Mini disjuntor 5SY6 Curva C, 32A', nominalCurrent: 32, voltage: 440, price: 78.00 },
+  { id: 'siemens-5sy-c40', manufacturer: 'Siemens', category: 'disjuntor', model: '5SY6140-7', commercialCode: '5SY6140-7', description: 'Mini disjuntor 5SY6 Curva C, 40A', nominalCurrent: 40, voltage: 440, price: 88.00 },
+  { id: 'siemens-5sy-c63', manufacturer: 'Siemens', category: 'disjuntor', model: '5SY6163-7', commercialCode: '5SY6163-7', description: 'Mini disjuntor 5SY6 Curva C, 63A', nominalCurrent: 63, voltage: 440, price: 115.00 },
+
 
   // Contatores WEG CWM
   { id: 'weg-cwm9', manufacturer: 'WEG', category: 'contator', model: 'CWM9', commercialCode: '10045412', description: 'Contator de potência CWM, 9A, AC-3', nominalCurrent: 9, voltage: 690, price: 85.00 },
