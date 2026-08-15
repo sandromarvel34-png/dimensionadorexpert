@@ -538,10 +538,19 @@ export const CalculatorWizard = () => {
 
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Queda de tensão admissível</Label>
-                <div className="relative">
-                  <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue={currentInputs?.maxVoltageDrop || "2"} className="h-12 pr-12 text-base" required />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">%</span>
-                </div>
+                <Select name="maxVoltageDrop" defaultValue={currentInputs?.maxVoltageDrop?.toString() || "2"}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="1">1%</SelectItem>
+                    <SelectItem value="2">2%</SelectItem>
+                    <SelectItem value="3">3%</SelectItem>
+                    <SelectItem value="4">4%</SelectItem>
+                    <SelectItem value="5">5%</SelectItem>
+                    <SelectItem value="7">7%</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

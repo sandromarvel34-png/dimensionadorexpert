@@ -9,8 +9,8 @@ import { findCompatibleProduct } from '../catalog';
 export class CalculationEngine {
   // Constantes físicas (Referência: NBR 5410)
   private static readonly RHO_COPPER = 0.0178; // Ω·mm²/m a 20°C
-  private static readonly COS_PHI_DEFAULT = 0.86;
-  private static readonly EFFICIENCY_DEFAULT = 0.85;
+  private static readonly COS_PHI_DEFAULT = 0.85;
+  private static readonly EFFICIENCY_DEFAULT = 0.90;
   private static readonly SECAO_MINIMA_FORCA = 2.5;
 
   // Tabelas de Fatores NBR 5410
@@ -110,19 +110,25 @@ export class CalculationEngine {
     distance: number, 
     voltage: number, 
     maxDropPercent: number,
-    pf: number = 0.86,
+    pf: number = 0.85,
     phase: string = 'trifasico'
   ): { section: number; actualDrop: number } {
     const k = phase === 'trifasico' ? Math.sqrt(3) : 2;
-    const S = (100 * k * this.RHO_COPPER * distance * current * pf) / (maxDropPercent * voltage);
-    
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150];
-    const pickedSection = standardSections.find(sec => sec >= S) || 95;
     
-    const actualDropVolts = (Math.sqrt(3) * this.RHO_COPPER * distance * current * pf) / pickedSection;
-    const actualDropPercent = (actualDropVolts / voltage) * 100;
+    // Iteramos pelas bitolas padrão para encontrar a primeira que atenda à queda máxima
+    for (const section of standardSections) {
+      const actualDropVolts = (k * this.RHO_COPPER * distance * current * pf) / section;
+      const actualDropPercent = (actualDropVolts / voltage) * 100;
+      
+      if (actualDropPercent <= maxDropPercent) {
+        return { section, actualDrop: actualDropPercent };
+      }
+    }
 
-    return { section: pickedSection, actualDrop: actualDropPercent };
+    const lastSection = standardSections[standardSections.length - 1];
+    const finalDrop = (k * this.RHO_COPPER * distance * current * pf) / lastSection / voltage * 100;
+    return { section: lastSection, actualDrop: finalDrop };
   }
 
   static performFullCalculation(inputs: CalculationInputs): CalculationResults {
