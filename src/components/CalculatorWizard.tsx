@@ -328,11 +328,11 @@ export const CalculatorWizard = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">cos φ</Label>
-                        <Input name="powerFactor" type="number" step="0.01" defaultValue={currentInputs?.powerFactor || ""} placeholder="Ex: 0.86" className="h-11" required={dataSource === 'manual'} />
+                        <Input name="powerFactor" type="number" step="0.01" defaultValue={currentInputs?.powerFactor || "0.85"} placeholder="Ex: 0.85" className="h-11" required={dataSource === 'manual'} />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
-                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency || ""} placeholder="Ex: 0.85" className="h-11" required={dataSource === 'manual'} />
+                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency || "0.9"} placeholder="Ex: 0.90" className="h-11" required={dataSource === 'manual'} />
                       </div>
                     </div>
                   </div>
@@ -538,10 +538,19 @@ export const CalculatorWizard = () => {
 
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Queda de tensão admissível</Label>
-                <div className="relative">
-                  <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue={currentInputs?.maxVoltageDrop || "2"} className="h-12 pr-12 text-base" required />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">%</span>
-                </div>
+                <Select name="maxVoltageDrop" defaultValue={currentInputs?.maxVoltageDrop?.toString() || "2"}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="1">1%</SelectItem>
+                    <SelectItem value="2">2%</SelectItem>
+                    <SelectItem value="3">3%</SelectItem>
+                    <SelectItem value="4">4%</SelectItem>
+                    <SelectItem value="5">5%</SelectItem>
+                    <SelectItem value="7">7%</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -567,16 +576,16 @@ export const CalculatorWizard = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    <SelectItem value="bundle">Circuitos agrupados</SelectItem>
-                    <SelectItem value="layer_wall">Instalados sobre parede</SelectItem>
-                    <SelectItem value="layer_floor">Instalados no piso</SelectItem>
+                    <SelectItem value="bundle">Em feixe (ao ar livre ou em conduto)</SelectItem>
+                    <SelectItem value="layer_wall">Em camada sobre a parede</SelectItem>
+                    <SelectItem value="layer_floor">Em camada no piso</SelectItem>
                     <SelectItem value="tray_perforated">Em bandeja perfurada</SelectItem>
                     <SelectItem value="tray_unperforated">Em bandeja não perfurada</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-3">
-                <Label className="text-foreground font-semibold">Número de Circuitos</Label>
+                <Label className="text-foreground font-semibold">Número de Circuitos Agrupados</Label>
                 <Select name="groupingCount" defaultValue={currentInputs?.groupingCount?.toString() || "1"}>
                   <SelectTrigger className="h-11">
                     <SelectValue />

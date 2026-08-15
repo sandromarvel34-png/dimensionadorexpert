@@ -174,11 +174,12 @@ export const findCompatibleProduct = (
 
   if (category === 'releTermico') {
     // Para relé térmico, a corrente deve estar DENTRO da faixa de ajuste
+    // Procuramos o relé cuja faixa de ajuste contém a corrente nominal (ajuste)
     return filtered.find(p => 
       p.adjustmentRange && 
       current >= p.adjustmentRange.min && 
       current <= p.adjustmentRange.max
-    );
+    ) || filtered.find(p => p.nominalCurrent && p.nominalCurrent >= current); // Fallback caso a faixa não esteja preenchida perfeitamente
   } else if (category === 'releTempo') {
     // Relé de tempo geralmente não depende de corrente nominal para proteção, apenas presença
     return filtered[0];
