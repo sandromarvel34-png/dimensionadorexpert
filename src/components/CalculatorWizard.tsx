@@ -31,6 +31,20 @@ export const CalculatorWizard = () => {
   const [selectedVoltage, setSelectedVoltage] = useState<string>('');
   const [availableMotors, setAvailableMotors] = useState<any[]>([]);
   const [selectedMotorId, setSelectedMotorId] = useState<string>('');
+  const availableLines = useMemo(() => Array.from(new Set(filters.map(f => f.line))), [filters]);
+  const availableTypes = useMemo(() => Array.from(new Set(filters.filter(f => f.line === selectedLine).map(f => f.speed_type))), [filters, selectedLine]);
+  const availablePoles = useMemo(() => Array.from(new Set(filters.filter(f => f.line === selectedLine && (!selectedType || selectedType === '_all' || f.speed_type === selectedType)).map(f => f.poles))), [filters, selectedLine, selectedType]);
+  const availablePowers = useMemo(() => Array.from(new Set(filters.filter(f => 
+    f.line === selectedLine && 
+    (!selectedType || selectedType === '_all' || f.speed_type === selectedType) &&
+    (!selectedPoles || selectedPoles === '_all' || f.poles === selectedPoles)
+  ).map(f => f.power_cv))).sort((a,b) => a-b), [filters, selectedLine, selectedType, selectedPoles]);
+  const availableVoltages = useMemo(() => Array.from(new Set(filters.filter(f => 
+    f.line === selectedLine && 
+    (!selectedType || selectedType === '_all' || f.speed_type === selectedType) &&
+    (!selectedPoles || selectedPoles === '_all' || f.poles === selectedPoles) &&
+    (!selectedPower || selectedPower === '_all' || f.power_cv.toString() === selectedPower)
+  ).map(f => f.voltage))).sort((a,b) => a-b), [filters, selectedLine, selectedType, selectedPoles, selectedPower]);
 
   useEffect(() => {
     const loadFilters = async () => {
@@ -51,10 +65,10 @@ export const CalculatorWizard = () => {
           const motors = await getMotorsByFilter({
             data: {
               line: selectedLine,
-              speed_type: selectedType || undefined,
-              poles: selectedPoles || undefined,
-              power_cv: selectedPower ? parseFloat(selectedPower) : undefined,
-              voltage: selectedVoltage ? parseFloat(selectedVoltage) : undefined
+              speed_type: (selectedType && selectedType !== '_all') ? selectedType : undefined,
+              poles: (selectedPoles && selectedPoles !== '_all') ? selectedPoles : undefined,
+              power_cv: (selectedPower && selectedPower !== '_all') ? parseFloat(selectedPower) : undefined,
+              voltage: (selectedVoltage && selectedVoltage !== '_all') ? parseFloat(selectedVoltage) : undefined
             }
           });
           setAvailableMotors(motors);
