@@ -1,5 +1,3 @@
-import { MotorPhase, PowerUnit, StarterType, CalculationInputs } from '@/types';
-import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,9 +10,12 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { CalculationInputs } from '@/types';
+import { CalculationEngine } from '@/lib/engine/CalculationEngine';
+import { ArrowLeft } from 'lucide-react';
 
 export const CalculatorWizard = () => {
-  const { step, setStep, setView, setCalculation } = useAppStore();
+  const { setView, setCalculation } = useAppStore();
   
   const handleCalculate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,11 +23,11 @@ export const CalculatorWizard = () => {
     
     const inputs: CalculationInputs = {
       power: parseFloat(formData.get('power') as string),
-      powerUnit: formData.get('powerUnit') as PowerUnit,
+      powerUnit: formData.get('powerUnit') as any,
       voltage: parseFloat(formData.get('voltage') as string),
-      phase: formData.get('phase') as MotorPhase,
+      phase: formData.get('phase') as any,
       distance: parseFloat(formData.get('distance') as string),
-      starterType: formData.get('starterType') as StarterType,
+      starterType: formData.get('starterType') as any,
       maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
       quantity: 1
     };
@@ -46,20 +47,28 @@ export const CalculatorWizard = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Novo Dimensionamento</h2>
-        <p className="text-slate-500">Preencha os dados técnicos para iniciar o cálculo profissional.</p>
+    <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold text-slate-900">Novo Dimensionamento</h2>
+          <p className="text-slate-500">Preencha os dados técnicos do motor e da instalação.</p>
+        </div>
+        <button 
+          onClick={() => setView('dashboard')}
+          className="btn-secondary flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" /> Voltar
+        </button>
       </div>
 
-      <form onSubmit={handleCalculate} className="space-y-6 bg-panel p-6 rounded-xl border border-border">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleCalculate} className="card-panel shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
           <div className="space-y-2">
-            <Label htmlFor="power">Potência do Motor</Label>
+            <Label className="text-label uppercase tracking-wider">Potência do motor</Label>
             <div className="flex gap-2">
-              <Input id="power" name="power" type="number" step="0.1" defaultValue="10" required />
+              <Input name="power" type="number" step="0.1" defaultValue="10" className="h-11 border-slate-200" required />
               <Select name="powerUnit" defaultValue="cv">
-                <SelectTrigger className="w-24">
+                <SelectTrigger className="h-11 w-24 border-slate-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -72,9 +81,9 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="voltage">Tensão (V)</Label>
+            <Label className="text-label uppercase tracking-wider">Tensão</Label>
             <Select name="voltage" defaultValue="380">
-              <SelectTrigger>
+              <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -86,9 +95,9 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phase">Sistema</Label>
+            <Label className="text-label uppercase tracking-wider">Sistema</Label>
             <Select name="phase" defaultValue="trifasico">
-              <SelectTrigger>
+              <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -99,14 +108,14 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="distance">Distância (m)</Label>
-            <Input id="distance" name="distance" type="number" defaultValue="20" required />
+            <Label className="text-label uppercase tracking-wider">Distância (metros)</Label>
+            <Input name="distance" type="number" defaultValue="20" className="h-11 border-slate-200" required />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="starterType">Tipo de Partida</Label>
+            <Label className="text-label uppercase tracking-wider">Tipo de partida</Label>
             <Select name="starterType" defaultValue="direta">
-              <SelectTrigger>
+              <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -120,14 +129,15 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="maxVoltageDrop">Queda de Tensão Máx. (%)</Label>
-            <Input id="maxVoltageDrop" name="maxVoltageDrop" type="number" step="0.1" defaultValue="4" required />
+            <Label className="text-label uppercase tracking-wider">Queda de tensão admissível (%)</Label>
+            <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue="4" className="h-11 border-slate-200" required />
           </div>
         </div>
 
-        <div className="pt-4 flex justify-end gap-4">
-          <Button type="button" variant="ghost" onClick={() => setView('dashboard')}>Cancelar</Button>
-          <Button type="submit" className="bg-accent hover:bg-accent/90 text-black font-bold px-8">Calcular Solução</Button>
+        <div className="mt-10 flex justify-end">
+          <button type="submit" className="btn-primary w-full sm:w-auto px-10">
+            Calcular Dimensionamento →
+          </button>
         </div>
       </form>
     </div>
