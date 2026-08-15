@@ -78,11 +78,24 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'schneider-lrd-04', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD04', commercialCode: 'LRD04', description: 'Relé TeSys LRD, 0.4-0.63A', nominalCurrent: 0.63, adjustmentRange: { min: 0.4, max: 0.63 }, price: 110.00 },
   { id: 'schneider-lrd-22', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD22', commercialCode: 'LRD22', description: 'Relé TeSys LRD, 16-24A', nominalCurrent: 24, adjustmentRange: { min: 16, max: 24 }, price: 180.00 },
   { id: 'schneider-lrd-32', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD32', commercialCode: 'LRD32', description: 'Relé TeSys LRD, 23-32A', nominalCurrent: 32, adjustmentRange: { min: 23, max: 32 }, price: 220.00 },
+  { id: 'schneider-lrd-33', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD3353', commercialCode: 'LRD3353', description: 'Relé TeSys LRD, 23-32A', nominalCurrent: 32, adjustmentRange: { min: 23, max: 32 }, price: 250.00 },
+  { id: 'schneider-lrd-3355', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD3355', commercialCode: 'LRD3355', description: 'Relé TeSys LRD, 30-40A', nominalCurrent: 40, adjustmentRange: { min: 30, max: 40 }, price: 280.00 },
+  { id: 'schneider-lrd-3357', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD3357', commercialCode: 'LRD3357', description: 'Relé TeSys LRD, 37-50A', nominalCurrent: 50, adjustmentRange: { min: 37, max: 50 }, price: 310.00 },
+  { id: 'schneider-lrd-3359', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD3359', commercialCode: 'LRD3359', description: 'Relé TeSys LRD, 48-65A', nominalCurrent: 65, adjustmentRange: { min: 48, max: 65 }, price: 350.00 },
+  { id: 'schneider-lrd-3361', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD3361', commercialCode: 'LRD3361', description: 'Relé TeSys LRD, 55-70A', nominalCurrent: 70, adjustmentRange: { min: 55, max: 70 }, price: 390.00 },
+  { id: 'schneider-lrd-3363', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD3363', commercialCode: 'LRD3363', description: 'Relé TeSys LRD, 63-80A', nominalCurrent: 80, adjustmentRange: { min: 63, max: 80 }, price: 440.00 },
+  { id: 'schneider-lrd-3365', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD3365', commercialCode: 'LRD3365', description: 'Relé TeSys LRD, 80-104A', nominalCurrent: 104, adjustmentRange: { min: 80, max: 104 }, price: 520.00 },
 
   // Relés Térmicos Siemens Sirius 3RU
   { id: 'siemens-3ru-04', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2116-0GB0', commercialCode: '3RU2116-0GB0', description: 'Relé Sirius, 0.45-0.63A', nominalCurrent: 0.63, adjustmentRange: { min: 0.45, max: 0.63 }, price: 98.00 },
   { id: 'siemens-3ru-22', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2126-4CB0', commercialCode: '3RU2126-4CB0', description: 'Relé Sirius, 17-22A', nominalCurrent: 22, adjustmentRange: { min: 17, max: 22 }, price: 165.00 },
-  { id: 'siemens-3ru-32', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2126-4EB0', commercialCode: '3RU2126-4EB0', description: 'Relé Sirius, 27-32A', nominalCurrent: 32, adjustmentRange: { min: 27, max: 32 }, price: 210.00 }
+  { id: 'siemens-3ru-32', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2126-4EB0', commercialCode: '3RU2126-4EB0', description: 'Relé Sirius, 27-32A', nominalCurrent: 32, adjustmentRange: { min: 27, max: 32 }, price: 210.00 },
+  { id: 'siemens-3ru-40', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2126-4FB0', commercialCode: '3RU2126-4FB0', description: 'Relé Sirius, 34-40A', nominalCurrent: 40, adjustmentRange: { min: 34, max: 40 }, price: 240.00 },
+  { id: 'siemens-3ru-50', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2136-4HB0', commercialCode: '3RU2136-4HB0', description: 'Relé Sirius, 36-50A', nominalCurrent: 50, adjustmentRange: { min: 36, max: 50 }, price: 310.00 },
+  { id: 'siemens-3ru-65', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2136-4JB0', commercialCode: '3RU2136-4JB0', description: 'Relé Sirius, 45-63A', nominalCurrent: 63, adjustmentRange: { min: 45, max: 63 }, price: 380.00 },
+  { id: 'siemens-3ru-80', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2136-4KB0', commercialCode: '3RU2136-4KB0', description: 'Relé Sirius, 57-80A', nominalCurrent: 80, adjustmentRange: { min: 57, max: 80 }, price: 450.00 },
+  { id: 'siemens-3ru-100', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2146-4LB0', commercialCode: '3RU2146-4LB0', description: 'Relé Sirius, 70-90A', nominalCurrent: 90, adjustmentRange: { min: 70, max: 90 }, price: 580.00 },
+  { id: 'siemens-3ru-125', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2146-4MB0', commercialCode: '3RU2146-4MB0', description: 'Relé Sirius, 80-100A', nominalCurrent: 100, adjustmentRange: { min: 80, max: 100 }, price: 650.00 },
 ];
 
 export const getProductsByCategory = (category: string) => 
