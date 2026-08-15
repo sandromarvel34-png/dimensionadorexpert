@@ -181,9 +181,15 @@ export const ProposalFlow = () => {
                     <p className="text-sm font-bold text-primary">{currentResults?.finalCableSection} mm²</p>
                   </div>
                   {currentInputs?.dataSource === 'catalog' && (
-                    <div className="col-span-4 mt-2 pt-2 border-t border-foreground/5 space-y-1">
-                      <p className="text-[9px] text-muted-foreground uppercase font-bold">Motor Selecionado</p>
-                      <p className="text-sm font-bold">WEG {currentInputs.motorCatalogData?.line} - {currentInputs.motorCatalogData?.model}</p>
+                    <div className="col-span-4 mt-2 pt-2 border-t border-foreground/5 grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-[9px] text-muted-foreground uppercase font-bold">Motor Selecionado</p>
+                        <p className="text-sm font-bold">WEG {currentInputs.motorCatalogData?.line} - {currentInputs.motorCatalogData?.model}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[9px] text-muted-foreground uppercase font-bold">Carcaça / Rotação</p>
+                        <p className="text-sm font-bold">{currentInputs.motorCatalogData?.frame || '—'} / {currentInputs.motorCatalogData?.rpm || '—'} RPM</p>
+                      </div>
                     </div>
                   )}
                 </div>
