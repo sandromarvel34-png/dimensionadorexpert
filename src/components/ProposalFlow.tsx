@@ -358,13 +358,13 @@ export const ProposalFlow = () => {
                   </div>
                 </div>
 
-                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/20 flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/20 flex flex-col justify-between print:bg-transparent print:border-slate-200 print:p-2">
+                  <div className="space-y-3 print:space-y-1">
+                    <div className="flex justify-between text-xs font-bold text-muted-foreground uppercase tracking-widest print:text-[8pt]">
                       <span>Subtotal Materiais</span>
                       <span>R$ {totalMaterials.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                    <div className="flex justify-between text-xs font-bold text-muted-foreground uppercase tracking-widest print:text-[8pt]">
                       <span>Subtotal Serviços</span>
                       <span>R$ {totalLabor.toFixed(2)}</span>
                     </div>
@@ -379,21 +379,21 @@ export const ProposalFlow = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="pt-6 border-t border-primary/20 text-center">
-                    <p className="text-[10px] text-primary uppercase font-black tracking-[0.3em] mb-2">Total Geral</p>
-                    <p className="text-4xl font-black text-primary">R$ {grandTotal.toFixed(2)}</p>
+                  <div className="pt-6 border-t border-primary/20 text-center print:pt-2">
+                    <p className="text-[10px] text-primary uppercase font-black tracking-[0.3em] mb-2 print:mb-0 print:text-[7pt]">Total Geral</p>
+                    <p className="text-4xl font-black text-primary print:text-xl">R$ {grandTotal.toFixed(2)}</p>
                   </div>
                 </div>
               </div>
 
               {/* PDF Footer */}
-              <div className="mt-12 pt-8 border-t border-slate-100 flex justify-between items-end">
-                <div className="text-[9px] text-muted-foreground max-w-sm leading-relaxed">
+              <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-end print:mt-2 print:pt-2">
+                <div className="text-[9px] text-muted-foreground max-w-sm leading-relaxed print:text-[7pt]">
                   * Proposta válida por {costs.validity} dias. Dimensionamento realizado seguindo rigorosamente as prescrições da NBR 5410 para motores de indução. O instalador deve conferir as condições reais do local antes da execução.
                 </div>
-                <div className="text-center w-48">
-                  <div className="border-b border-foreground h-10 mb-2"></div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest">Assinatura do Técnico</p>
+                <div className="text-center w-48 print:w-32">
+                  <div className="border-b border-foreground h-10 mb-2 print:h-6 print:mb-1"></div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest print:text-[7pt]">Assinatura do Técnico</p>
                 </div>
               </div>
             </div>

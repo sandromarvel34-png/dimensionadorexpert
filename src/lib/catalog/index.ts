@@ -17,8 +17,8 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'weg-fnh1-100', manufacturer: 'WEG', category: 'fusivel', model: 'F NH1-100', commercialCode: '10000004', description: 'Fusível NH tamanho 1 retardado, 100A', nominalCurrent: 100, voltage: 500, price: 85.00 },
 
   // Soft-Starters e Inversores WEG
-  { id: 'weg-ssw05-16', manufacturer: 'WEG', category: 'contator', model: 'SSW05-16A', commercialCode: '10000005', description: 'Soft-Starter SSW05, 16A', nominalCurrent: 16, price: 850.00 },
-  { id: 'weg-cfw300-15', manufacturer: 'WEG', category: 'contator', model: 'CFW300-15A', commercialCode: '10000006', description: 'Inversor de Frequência CFW300, 15.2A', nominalCurrent: 15.2, price: 1200.00 },
+  { id: 'weg-ssw05-16', manufacturer: 'WEG', category: 'softStarter', model: 'SSW05-16A', commercialCode: '10000005', description: 'Soft-Starter SSW05, 16A', nominalCurrent: 16, price: 850.00 },
+  { id: 'weg-cfw300-15', manufacturer: 'WEG', category: 'inverter', model: 'CFW300-15A', commercialCode: '10000006', description: 'Inversor de Frequência CFW300, 15.2A', nominalCurrent: 15.2, price: 1200.00 },
 
   // Disjuntores WEG MDW
   { id: 'weg-mdw-c6', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C6', commercialCode: '10076440', description: 'Mini disjuntor MDW Curva C, 6A', nominalCurrent: 6, voltage: 440, price: 14.50 },
