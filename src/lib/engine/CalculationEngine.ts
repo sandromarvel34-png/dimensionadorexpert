@@ -83,7 +83,11 @@ export class CalculationEngine {
     const secAmp = this.getSectionByAmpacity(In * 1.25);
     const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop);
     
+    // O dimensionamento final DEVE ser a maior bitola entre ampacidade e queda de tensão
+    // Também respeitando a seção mínima de 2,5mm² para circuitos de motores (força)
     const finalSection = Math.max(secAmp, dropResult.section, this.SECAO_MINIMA_FORCA);
+    
+    // O critério dominante é aquele que resultou na maior bitola (ou ampacidade se forem iguais)
     const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
 
     const breaker = findCompatibleProduct('disjuntor', In * 1.25, 'WEG') || null;

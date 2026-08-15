@@ -42,22 +42,26 @@ export const ResultsView = () => {
       {/* Main Stats Card */}
       <div className="card-panel">
         <h3 className="text-label uppercase tracking-widest mb-6">Resumo Técnico</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
           <div className="space-y-1">
             <p className="text-metadata uppercase">Corrente Nominal</p>
             <p className="text-3xl font-bold text-slate-900">{currentResults.nominalCurrent.toFixed(1)} <span className="text-lg font-medium text-slate-400">A</span></p>
           </div>
           <div className="space-y-1">
-            <p className="text-metadata uppercase">Seção Final</p>
-            <p className="text-3xl font-bold text-blue-600">{currentResults.finalCableSection} <span className="text-lg font-medium text-blue-300">mm²</span></p>
+            <p className="text-metadata uppercase">Por Ampacidade</p>
+            <p className="text-3xl font-bold text-slate-900">{currentResults.cableByAmpacity} <span className="text-lg font-medium text-slate-400">mm²</span></p>
           </div>
           <div className="space-y-1">
-            <p className="text-metadata uppercase">Queda de Tensão</p>
+            <p className="text-metadata uppercase">Por Queda de Tensão</p>
+            <p className="text-3xl font-bold text-slate-900">{currentResults.cableByVoltageDrop} <span className="text-lg font-medium text-slate-400">mm²</span></p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-metadata uppercase">Queda Calculada</p>
             <p className="text-3xl font-bold text-slate-900">{currentResults.voltageDropCalculated ? currentResults.voltageDropCalculated.toFixed(2) : '0.00'} <span className="text-lg font-medium text-slate-400">%</span></p>
           </div>
           <div className="space-y-1">
-            <p className="text-metadata uppercase">Critério Dominante</p>
-            <p className="text-sm font-semibold text-blue-600 uppercase mt-2">{currentResults.limitingCriterion === 'ampacity' ? 'Capacidade de Corrente' : 'Queda de Tensão'}</p>
+            <p className="text-metadata uppercase">Seção Final (Maior)</p>
+            <p className="text-3xl font-bold text-blue-600">{currentResults.finalCableSection} <span className="text-lg font-medium text-blue-300">mm²</span></p>
           </div>
         </div>
       </div>
