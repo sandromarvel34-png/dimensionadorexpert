@@ -535,7 +535,7 @@ export const CalculatorWizard = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Fabricante dos Dispositivos</Label>
                 <Select name="manufacturer" defaultValue="WEG">
@@ -551,16 +551,43 @@ export const CalculatorWizard = () => {
                 </Select>
               </div>
               <div className="space-y-3">
-                <Label className="text-foreground font-medium text-xs">Fator de Serviço (FS)</Label>
-                <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
+                <Label className="text-foreground font-semibold">Método de Agrupamento</Label>
+                <Select name="groupingType" defaultValue="bundle">
+                  <SelectTrigger className="h-11">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="bundle">Em feixe (1 circuito)</SelectItem>
+                    <SelectItem value="bundle_2">Em feixe (2 circuitos)</SelectItem>
+                    <SelectItem value="bundle_3">Em feixe (3 circuitos)</SelectItem>
+                    <SelectItem value="bundle_4">Em feixe (4 circuitos)</SelectItem>
+                    <SelectItem value="layer_wall">Camada única sobre parede</SelectItem>
+                    <SelectItem value="layer_floor">Camada única no piso</SelectItem>
+                    <SelectItem value="tray_perforated">Em bandeja perfurada</SelectItem>
+                    <SelectItem value="tray_unperforated">Em bandeja não perfurada</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-3">
-                <Label className="text-foreground font-medium text-xs">Agrupamento (F1)</Label>
-                <Input name="groupingFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
-              </div>
-              <div className="space-y-3">
-                <Label className="text-foreground font-medium text-xs">Temperatura (F2)</Label>
-                <Input name="tempFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
+                <Label className="text-foreground font-semibold">Temperatura Ambiente</Label>
+                <Select name="ambientTemp" defaultValue="30">
+                  <SelectTrigger className="h-11">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="10">10°C</SelectItem>
+                    <SelectItem value="15">15°C</SelectItem>
+                    <SelectItem value="20">20°C</SelectItem>
+                    <SelectItem value="25">25°C</SelectItem>
+                    <SelectItem value="30">30°C</SelectItem>
+                    <SelectItem value="35">35°C</SelectItem>
+                    <SelectItem value="40">40°C</SelectItem>
+                    <SelectItem value="45">45°C</SelectItem>
+                    <SelectItem value="50">50°C</SelectItem>
+                    <SelectItem value="55">55°C</SelectItem>
+                    <SelectItem value="60">60°C</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
