@@ -28,15 +28,24 @@ export class CalculationEngine {
     '60': 0.50
   };
 
-  static readonly GROUPING_FACTORS: Record<string, number> = {
-    'bundle': 1.00, // Circuitos agrupados (1 circuito)
-    'bundle_2': 0.80, // Circuitos agrupados (2 circuitos)
-    'bundle_3': 0.70, // Circuitos agrupados (3 circuitos)
-    'bundle_4': 0.65, // Circuitos agrupados (4 circuitos)
-    'layer_wall': 1.00, // Instalados sobre a parede
-    'layer_floor': 0.85, // Instalados no piso
-    'tray_perforated': 0.88, // Em bandeja perfurada
-    'tray_unperforated': 0.81  // Em bandeja não perfurada
+  static readonly GROUPING_TYPES: Record<string, number> = {
+    'bundle': 1.00,
+    'layer_wall': 1.00,
+    'layer_floor': 0.85,
+    'tray_perforated': 0.88,
+    'tray_unperforated': 0.81
+  };
+
+  static readonly GROUPING_COUNT_FACTORS: Record<string, number> = {
+    '1': 1.00,
+    '2': 0.80,
+    '3': 0.70,
+    '4': 0.65,
+    '5': 0.60,
+    '6': 0.57,
+    '7': 0.54,
+    '8': 0.52,
+    '9': 0.50
   };
 
   /**
