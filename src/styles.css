@@ -74,10 +74,45 @@
 
 /* Print Styles */
 @media print {
-  @page { size: A4; margin: 1cm; }
-  body { background: white !important; font-size: 10pt !important; color: #000 !important; }
-  .no-print { display: none !important; }
-  .card-panel { border: 1px solid #E2E8F0 !important; box-shadow: none !important; }
-  button { display: none !important; }
+  @page { 
+    size: A4; 
+    margin: 1cm !important; 
+  }
+  
+  body { 
+    background: white !important; 
+    font-size: 8pt !important; 
+    color: #000 !important; 
+    margin: 0 !important; 
+    padding: 0 !important;
+  }
+  
+  .print\:p-0 { padding: 0 !important; }
+  .print\:m-0 { margin: 0 !important; }
+  .print\:shadow-none { box-shadow: none !important; }
+  .print\:border-0 { border: 0 !important; }
+  .print\:hidden { display: none !important; }
+  
+  .card-panel { 
+    border: 1px solid #E2E8F0 !important; 
+    box-shadow: none !important; 
+    padding: 1rem !important;
+    border-radius: 8px !important;
+  }
+  
+  /* Force single page layout */
+  .max-w-6xl { max-width: 100% !important; }
+  h1 { font-size: 16pt !important; margin-bottom: 0.5rem !important; }
+  h2 { font-size: 12pt !important; margin-bottom: 0.25rem !important; }
+  h3 { font-size: 9pt !important; margin-bottom: 0.25rem !important; }
+  p, span, td, th { font-size: 8pt !important; line-height: 1.2 !important; }
+  
+  /* Compact tables */
+  table td, table th { padding: 4px 8px !important; }
+  
+  /* Grid adjustments for print */
+  .grid { display: grid !important; gap: 0.5rem !important; }
+  .grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
+  .grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
