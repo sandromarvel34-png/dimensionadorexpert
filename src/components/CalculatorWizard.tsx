@@ -353,7 +353,7 @@ export const CalculatorWizard = () => {
                         <SelectValue placeholder="Selecionar linha" />
                       </SelectTrigger>
                       <SelectContent position="popper">
-                        {Array.from(new Set(filters.map(f => f.line))).map(line => (
+                        {availableLines.map(line => (
                           <SelectItem key={line} value={line}>{line}</SelectItem>
                         ))}
                       </SelectContent>
