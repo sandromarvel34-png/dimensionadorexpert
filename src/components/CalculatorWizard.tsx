@@ -328,11 +328,11 @@ export const CalculatorWizard = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">cos φ</Label>
-                        <Input name="powerFactor" type="number" step="0.01" defaultValue={currentInputs?.powerFactor || ""} placeholder="Ex: 0.86" className="h-11" required={dataSource === 'manual'} />
+                        <Input name="powerFactor" type="number" step="0.01" defaultValue={currentInputs?.powerFactor || "0.85"} placeholder="Ex: 0.85" className="h-11" required={dataSource === 'manual'} />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
-                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency || ""} placeholder="Ex: 0.85" className="h-11" required={dataSource === 'manual'} />
+                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency || "0.9"} placeholder="Ex: 0.90" className="h-11" required={dataSource === 'manual'} />
                       </div>
                     </div>
                   </div>
