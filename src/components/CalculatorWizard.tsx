@@ -125,7 +125,8 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingFactor: CalculationEngine.GROUPING_FACTORS[formData.get('groupingType') as string] || 1.0,
+        groupingType: formData.get('groupingType') as string,
+        groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: selectedMotor.power_factor,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
@@ -155,7 +156,8 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingFactor: CalculationEngine.GROUPING_FACTORS[formData.get('groupingType') as string] || 1.0,
+        groupingType: formData.get('groupingType') as string,
+        groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: pf,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
@@ -559,20 +561,30 @@ export const CalculatorWizard = () => {
                 </Select>
               </div>
               <div className="space-y-3">
-                <Label className="text-foreground font-semibold">Método de Agrupamento</Label>
-                <Select name="groupingType" defaultValue={Object.keys(CalculationEngine.GROUPING_FACTORS).find(key => CalculationEngine.GROUPING_FACTORS[key] === currentInputs?.groupingFactor) || "bundle"}>
+                <Label className="text-foreground font-semibold">Método de Instalação</Label>
+                <Select name="groupingType" defaultValue={currentInputs?.groupingType || "bundle"}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    <SelectItem value="bundle">Circuitos agrupados (1 circuito)</SelectItem>
-                    <SelectItem value="bundle_2">Circuitos agrupados (2 circuitos)</SelectItem>
-                    <SelectItem value="bundle_3">Circuitos agrupados (3 circuitos)</SelectItem>
-                    <SelectItem value="bundle_4">Circuitos agrupados (4 circuitos)</SelectItem>
+                    <SelectItem value="bundle">Circuitos agrupados</SelectItem>
                     <SelectItem value="layer_wall">Instalados sobre parede</SelectItem>
                     <SelectItem value="layer_floor">Instalados no piso</SelectItem>
                     <SelectItem value="tray_perforated">Em bandeja perfurada</SelectItem>
                     <SelectItem value="tray_unperforated">Em bandeja não perfurada</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-3">
+                <Label className="text-foreground font-semibold">Número de Circuitos</Label>
+                <Select name="groupingCount" defaultValue={currentInputs?.groupingCount?.toString() || "1"}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                      <SelectItem key={n} value={n.toString()}>{n} circuito{n > 1 ? 's' : ''}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
