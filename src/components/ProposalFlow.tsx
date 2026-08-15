@@ -36,13 +36,15 @@ export const ProposalFlow = () => {
     if (currentResults.protections.contactor && currentResults.protections.contactor.length > 0) {
       const contactor = currentResults.protections.contactor[0];
       const count = currentResults.protections.contactor.length;
-      initialItems.push({ 
-        id: '3', 
-        desc: count > 1 ? `${contactor.model} (Conjunto c/ ${count})` : contactor.model, 
-        qtd: count, 
-        unit: 'un', 
-        price: 0 
-      });
+      if (contactor) {
+        initialItems.push({ 
+          id: '3', 
+          desc: count > 1 ? `${contactor.model} (Conjunto c/ ${count})` : contactor.model, 
+          qtd: count, 
+          unit: 'un', 
+          price: 0 
+        });
+      }
     }
 
     if (currentResults.protections.thermalRelay) {
