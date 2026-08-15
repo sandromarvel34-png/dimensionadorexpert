@@ -26,7 +26,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.breaker) {
       initialItems.push({ 
         id: '2', 
-        desc: `Disjuntor Termomagnético ${currentResults.protections.breaker.model} - ${currentResults.protections.breaker.description}`, 
+        desc: `Disjuntor Termomagnético ${currentResults.protections.breaker.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: currentResults.protections.breaker.price || 0 
@@ -36,7 +36,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.motorBreaker) {
       initialItems.push({ 
         id: 'mb', 
-        desc: `Disjuntor Motor ${currentResults.protections.motorBreaker.model} - ${currentResults.protections.motorBreaker.description}`, 
+        desc: `Disjuntor Motor ${currentResults.protections.motorBreaker.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: currentResults.protections.motorBreaker.price || 0 
@@ -46,7 +46,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.diazedFuse) {
       initialItems.push({ 
         id: 'fd', 
-        desc: `Fusível Diazed ${currentResults.protections.diazedFuse.model} - ${currentResults.protections.diazedFuse.description}`, 
+        desc: `Fusível Diazed ${currentResults.protections.diazedFuse.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: 0 
@@ -56,7 +56,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.nhFuse) {
       initialItems.push({ 
         id: 'fnh', 
-        desc: `Fusível NH ${currentResults.protections.nhFuse.model} - ${currentResults.protections.nhFuse.description}`, 
+        desc: `Fusível NH ${currentResults.protections.nhFuse.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: 0 
@@ -66,7 +66,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.softStarter) {
       initialItems.push({ 
         id: 'ssw', 
-        desc: `Soft-Starter ${currentResults.protections.softStarter.model} - ${currentResults.protections.softStarter.description}`, 
+        desc: `Soft-Starter ${currentResults.protections.softStarter.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: currentResults.protections.softStarter.price || 0 
@@ -76,7 +76,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.inverter) {
       initialItems.push({ 
         id: 'cfw', 
-        desc: `Inversor de Frequência ${currentResults.protections.inverter.model} - ${currentResults.protections.inverter.description}`, 
+        desc: `Inversor de Frequência ${currentResults.protections.inverter.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: currentResults.protections.inverter.price || 0 
@@ -89,7 +89,7 @@ export const ProposalFlow = () => {
       if (contactor) {
         initialItems.push({ 
           id: '3', 
-          desc: count > 1 ? `Contator de Potência ${contactor.model} (Conjunto c/ ${count}) - ${contactor.description}` : `Contator de Potência ${contactor.model} - ${contactor.description}`, 
+          desc: count > 1 ? `Contator de Potência ${contactor.model} (Conjunto c/ ${count})` : `Contator de Potência ${contactor.model}`, 
           qtd: count, 
           unit: 'un', 
           price: 0 
@@ -100,7 +100,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.thermalRelay) {
       initialItems.push({ 
         id: '4', 
-        desc: `Relé Térmico de Sobrecarga ${currentResults.protections.thermalRelay.model} - ${currentResults.protections.thermalRelay.description}`, 
+        desc: `Relé Térmico de Sobrecarga ${currentResults.protections.thermalRelay.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: 0 
@@ -110,7 +110,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.timerRelay) {
       initialItems.push({ 
         id: '5', 
-        desc: `Relé de Tempo Eletrônico ${currentResults.protections.timerRelay.model} - ${currentResults.protections.timerRelay.description}`, 
+        desc: `Relé de Tempo Eletrônico ${currentResults.protections.timerRelay.model}`, 
         qtd: 1, 
         unit: 'un', 
         price: 0 
