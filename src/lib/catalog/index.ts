@@ -134,10 +134,24 @@ export const findCompatibleProduct = (
   current: number, 
   manufacturer?: string
 ) => {
-  return MANUFACTURER_CATALOG.find(p => 
+  // Filtrar por categoria e fabricante (se fornecido)
+  const filtered = MANUFACTURER_CATALOG.filter(p => 
     p.category === category && 
-    (manufacturer ? p.manufacturer === manufacturer : true) &&
-    (p.nominalCurrent ? p.nominalCurrent >= current : true) &&
-    (p.adjustmentRange ? (current >= p.adjustmentRange.min && current <= p.adjustmentRange.max) : true)
+    (manufacturer ? p.manufacturer === manufacturer : true)
   );
+
+  if (category === 'releTermico') {
+    // Para relé térmico, a corrente deve estar DENTRO da faixa de ajuste
+    return filtered.find(p => 
+      p.adjustmentRange && 
+      current >= p.adjustmentRange.min && 
+      current <= p.adjustmentRange.max
+    );
+  } else {
+    // Para disjuntores e contatores, pegamos o primeiro com nominalCurrent >= current
+    // Ordenamos por nominalCurrent para garantir que pegamos o menor componente compatível
+    return filtered
+      .filter(p => p.nominalCurrent && p.nominalCurrent >= current)
+      .sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0))[0];
+  }
 };
