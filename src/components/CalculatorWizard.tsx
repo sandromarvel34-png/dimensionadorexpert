@@ -69,7 +69,7 @@ export const CalculatorWizard = () => {
           <div className="space-y-2">
             <Label className="text-label uppercase tracking-wider">Potência do motor</Label>
             <div className="flex gap-2">
-              <Input name="power" type="number" step="0.1" defaultValue="10" className="h-11 border-slate-200" required />
+              <Input name="power" type="number" step="0.1" defaultValue="5" className="h-11 border-slate-200" required />
               <Select name="powerUnit" defaultValue="cv">
                 <SelectTrigger className="h-11 w-24 border-slate-200">
                   <SelectValue />
@@ -85,7 +85,7 @@ export const CalculatorWizard = () => {
 
           <div className="space-y-2 relative">
             <Label className="text-label uppercase tracking-wider">Tensão</Label>
-            <Select name="voltage" defaultValue="380">
+            <Select name="voltage" defaultValue="220">
               <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
@@ -112,7 +112,7 @@ export const CalculatorWizard = () => {
 
           <div className="space-y-2">
             <Label className="text-label uppercase tracking-wider">Distância (metros)</Label>
-            <Input name="distance" type="number" defaultValue="20" className="h-11 border-slate-200" required />
+            <Input name="distance" type="number" defaultValue="5" className="h-11 border-slate-200" required />
           </div>
 
           <div className="space-y-2 relative">
@@ -147,7 +147,7 @@ export const CalculatorWizard = () => {
 
           <div className="space-y-2">
             <Label className="text-label uppercase tracking-wider">Queda de tensão admissível (%)</Label>
-            <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue="4" className="h-11 border-slate-200" required />
+            <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue="2" className="h-11 border-slate-200" required />
           </div>
           <div className="space-y-2 relative">
             <Label className="text-label uppercase tracking-wider">Agrupamento (Fator)</Label>
