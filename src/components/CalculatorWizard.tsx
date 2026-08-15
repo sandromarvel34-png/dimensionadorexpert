@@ -413,12 +413,7 @@ export const CalculatorWizard = () => {
                       </SelectTrigger>
                       <SelectContent position="popper">
                         <SelectItem value="_all">Todas</SelectItem>
-                        {Array.from(new Set(filters.filter(f => 
-                          f.line === selectedLine && 
-                          (!selectedType || selectedType === '_all' || f.speed_type === selectedType) &&
-                          (!selectedPoles || selectedPoles === '_all' || f.poles === selectedPoles) &&
-                          (!selectedPower || selectedPower === '_all' || f.power_cv.toString() === selectedPower)
-                        ).map(f => f.voltage))).sort((a,b) => a-b).map(v => (
+                        {availableVoltages.map(v => (
                           <SelectItem key={v} value={v.toString()}>{v} V</SelectItem>
                         ))}
                       </SelectContent>
