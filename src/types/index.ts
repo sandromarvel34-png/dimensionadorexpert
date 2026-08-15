@@ -21,6 +21,9 @@ export interface CalculationInputs {
   maxVoltageDrop: number; // em %
   quantity: number;
   preferredManufacturer?: string | undefined;
+  installationMethod?: string; // NBR 5410: B1, A1, etc.
+  groupingFactor?: number;
+  ambientTempFactor?: number;
 }
 
 export interface ManufacturerProduct {
