@@ -29,12 +29,12 @@ export class CalculationEngine {
   };
 
   static readonly GROUPING_FACTORS: Record<string, number> = {
-    'bundle': 1.00, // Em feixe (1 circuito)
-    'bundle_2': 0.80, // Em feixe (2 circuitos)
-    'bundle_3': 0.70, // Em feixe (3 circuitos)
-    'bundle_4': 0.65, // Em feixe (4 circuitos)
-    'layer_wall': 1.00, // Camada única sobre a parede
-    'layer_floor': 0.85, // Camada única no piso
+    'bundle': 1.00, // Circuitos agrupados (1 circuito)
+    'bundle_2': 0.80, // Circuitos agrupados (2 circuitos)
+    'bundle_3': 0.70, // Circuitos agrupados (3 circuitos)
+    'bundle_4': 0.65, // Circuitos agrupados (4 circuitos)
+    'layer_wall': 1.00, // Instalados sobre a parede
+    'layer_floor': 0.85, // Instalados no piso
     'tray_perforated': 0.88, // Em bandeja perfurada
     'tray_unperforated': 0.81  // Em bandeja não perfurada
   };
@@ -206,7 +206,7 @@ export class CalculationEngine {
         standardName: 'ABNT NBR 5410',
         version: '2004',
         section: '6.2.5.5',
-        description: `Fatores de correção aplicados: Agrupamento (${fGroup}) e Temperatura (${fTemp}).`
+        description: `Fatores de correção aplicados: Agrupamento de Circuitos (${fGroup}) e Temperatura (${fTemp}).`
       }
     ];
 

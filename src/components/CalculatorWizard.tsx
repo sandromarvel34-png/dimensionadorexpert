@@ -565,12 +565,12 @@ export const CalculatorWizard = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    <SelectItem value="bundle">Em feixe (1 circuito)</SelectItem>
-                    <SelectItem value="bundle_2">Em feixe (2 circuitos)</SelectItem>
-                    <SelectItem value="bundle_3">Em feixe (3 circuitos)</SelectItem>
-                    <SelectItem value="bundle_4">Em feixe (4 circuitos)</SelectItem>
-                    <SelectItem value="layer_wall">Camada única sobre parede</SelectItem>
-                    <SelectItem value="layer_floor">Camada única no piso</SelectItem>
+                    <SelectItem value="bundle">Circuitos agrupados (1 circuito)</SelectItem>
+                    <SelectItem value="bundle_2">Circuitos agrupados (2 circuitos)</SelectItem>
+                    <SelectItem value="bundle_3">Circuitos agrupados (3 circuitos)</SelectItem>
+                    <SelectItem value="bundle_4">Circuitos agrupados (4 circuitos)</SelectItem>
+                    <SelectItem value="layer_wall">Instalados sobre parede</SelectItem>
+                    <SelectItem value="layer_floor">Instalados no piso</SelectItem>
                     <SelectItem value="tray_perforated">Em bandeja perfurada</SelectItem>
                     <SelectItem value="tray_unperforated">Em bandeja não perfurada</SelectItem>
                   </SelectContent>
