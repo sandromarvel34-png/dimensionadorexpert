@@ -31,8 +31,18 @@ export const CalculatorWizard = () => {
   const [selectedVoltage, setSelectedVoltage] = useState<string>('');
   const [availableMotors, setAvailableMotors] = useState<any[]>([]);
   const [selectedMotorId, setSelectedMotorId] = useState<string>('');
-  const availableLines = useMemo(() => Array.from(new Set(filters.map(f => f.line))), [filters]);
-  const availableTypes = useMemo(() => Array.from(new Set(filters.filter(f => f.line === selectedLine).map(f => f.speed_type))), [filters, selectedLine]);
+  const availableLines = useMemo(() => {
+    const lines = Array.from(new Set(filters.map(f => f.line)));
+    console.log('Available lines:', lines);
+    return lines;
+  }, [filters]);
+  
+  const availableTypes = useMemo(() => {
+    const types = Array.from(new Set(filters.filter(f => f.line === selectedLine).map(f => f.speed_type)));
+    console.log('Available types for', selectedLine, ':', types);
+    return types;
+  }, [filters, selectedLine]);
+  
   const availablePoles = useMemo(() => Array.from(new Set(filters.filter(f => f.line === selectedLine && (!selectedType || selectedType === '_all' || f.speed_type === selectedType)).map(f => f.poles))), [filters, selectedLine, selectedType]);
   const availablePowers = useMemo(() => Array.from(new Set(filters.filter(f => 
     f.line === selectedLine && 
