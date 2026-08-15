@@ -125,8 +125,8 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
-        ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
+        groupingFactor: CalculationEngine.GROUPING_FACTORS[formData.get('groupingType') as string] || 1.0,
+        ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: selectedMotor.power_factor,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
         efficiency: selectedMotor.efficiency,
@@ -155,8 +155,8 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
-        ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
+        groupingFactor: CalculationEngine.GROUPING_FACTORS[formData.get('groupingType') as string] || 1.0,
+        ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: pf,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
         efficiency: eff,
@@ -316,14 +316,18 @@ export const CalculatorWizard = () => {
                     <Label className="text-foreground font-semibold italic text-xs block text-muted-foreground mb-1">
                       Seu motor não é WEG? Informe os dados disponíveis na placa do motor.
                     </Label>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-foreground font-medium text-xs">Fator de Potência (cos φ)</Label>
+                        <Label className="text-foreground font-medium text-xs">cos φ</Label>
                         <Input name="powerFactor" type="number" step="0.01" placeholder="Ex: 0.86" className="h-11" required />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
                         <Input name="efficiency" type="number" step="0.01" placeholder="Ex: 0.85" className="h-11" required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-foreground font-medium text-xs">Fator de Serviço (FS)</Label>
+                        <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
                       </div>
                     </div>
                   </div>

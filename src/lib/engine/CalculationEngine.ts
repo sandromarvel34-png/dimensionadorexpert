@@ -13,6 +13,32 @@ export class CalculationEngine {
   private static readonly EFFICIENCY_DEFAULT = 0.85;
   private static readonly SECAO_MINIMA_FORCA = 2.5;
 
+  // Tabelas de Fatores NBR 5410
+  static readonly TEMPERATURE_FACTORS: Record<string, number> = {
+    '10': 1.22,
+    '15': 1.17,
+    '20': 1.12,
+    '25': 1.06,
+    '30': 1.00,
+    '35': 0.94,
+    '40': 0.87,
+    '45': 0.79,
+    '50': 0.71,
+    '55': 0.61,
+    '60': 0.50
+  };
+
+  static readonly GROUPING_FACTORS: Record<string, number> = {
+    'bundle': 1.00, // Em feixe (1 circuito)
+    'bundle_2': 0.80, // Em feixe (2 circuitos)
+    'bundle_3': 0.70, // Em feixe (3 circuitos)
+    'bundle_4': 0.65, // Em feixe (4 circuitos)
+    'layer_wall': 1.00, // Camada única sobre a parede
+    'layer_floor': 0.85, // Camada única no piso
+    'tray_perforated': 0.88, // Em bandeja perfurada
+    'tray_unperforated': 0.81  // Em bandeja não perfurada
+  };
+
   /**
    * Calcula a corrente nominal (In) do motor
    * Baseado nos fatores do arquivo de referência
