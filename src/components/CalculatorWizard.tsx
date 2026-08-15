@@ -49,11 +49,13 @@ export const CalculatorWizard = () => {
       if (selectedLine) {
         try {
           const motors = await getMotorsByFilter({
-            line: selectedLine,
-            speed_type: selectedType || undefined,
-            poles: selectedPoles || undefined,
-            power_cv: selectedPower ? parseFloat(selectedPower) : undefined,
-            voltage: selectedVoltage ? parseFloat(selectedVoltage) : undefined
+            data: {
+              line: selectedLine,
+              speed_type: selectedType || undefined,
+              poles: selectedPoles || undefined,
+              power_cv: selectedPower ? parseFloat(selectedPower) : undefined,
+              voltage: selectedVoltage ? parseFloat(selectedVoltage) : undefined
+            }
           });
           setAvailableMotors(motors);
         } catch (error) {
