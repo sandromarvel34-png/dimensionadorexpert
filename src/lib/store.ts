@@ -45,8 +45,8 @@ export const useAppStore = create<AppState>()(
       openHistoryItem: (item) => {
         set({ 
           currentInputs: item, 
-          currentResults: item, // item already contains results flattened
-          view: 'results' 
+          currentResults: item.nominalCurrent ? item : null, // If item contains results, load them
+          view: item.nominalCurrent ? 'results' : 'wizard' 
         });
       },
       addToHistory: (item) => set((state) => ({ 

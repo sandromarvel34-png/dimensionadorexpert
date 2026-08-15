@@ -165,10 +165,11 @@ export const findCompatibleProduct = (
   current: number, 
   manufacturer?: string
 ) => {
+  const mfr = (manufacturer === 'any' || !manufacturer) ? undefined : manufacturer;
   // Filtrar por categoria e fabricante (se fornecido)
   const filtered = MANUFACTURER_CATALOG.filter(p => 
     p.category === category && 
-    (manufacturer && manufacturer !== 'any' ? p.manufacturer === manufacturer : true)
+    (mfr ? p.manufacturer.toLowerCase() === mfr.toLowerCase() : true)
   );
 
   if (category === 'releTermico') {
