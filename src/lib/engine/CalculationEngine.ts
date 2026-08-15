@@ -93,14 +93,20 @@ export class CalculationEngine {
     const eff = inputs.efficiency || this.EFFICIENCY_DEFAULT;
     const fs = inputs.serviceFactor || 1.0;
 
-    const In = this.calculateNominalCurrent(
-      inputs.power, 
-      inputs.powerUnit, 
-      inputs.voltage, 
-      inputs.phase,
-      pf,
-      eff
-    );
+    let In: number;
+    
+    if (inputs.dataSource === 'catalog' && inputs.motorCatalogData) {
+      In = inputs.motorCatalogData.nominalCurrent;
+    } else {
+      In = this.calculateNominalCurrent(
+        inputs.power, 
+        inputs.powerUnit, 
+        inputs.voltage, 
+        inputs.phase,
+        pf,
+        eff
+      );
+    }
     
     
     // Fatores de correção (Default 1.0 se não informados)
