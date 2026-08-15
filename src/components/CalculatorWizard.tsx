@@ -26,6 +26,7 @@ export const CalculatorWizard = () => {
     const formData = new FormData(e.currentTarget);
     
     const inputs: CalculationInputs = {
+      dataSource: 'manual',
       power: parseFloat(formData.get('power') as string),
       powerUnit: formData.get('powerUnit') as any,
       voltage: parseFloat(formData.get('voltage') as string),
