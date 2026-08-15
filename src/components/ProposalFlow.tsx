@@ -111,6 +111,45 @@ export const ProposalFlow = () => {
             </div>
           </div>
 
+          {/* Motor Data - Visible only in Print */}
+          <div className="hidden print:block card-panel space-y-4">
+            <h3 className="text-card-title">Dados Técnicos do Motor</h3>
+            <div className="grid grid-cols-4 gap-4 text-[8pt]">
+              <div>
+                <Label className="text-[7pt] uppercase block">Potência</Label>
+                <span className="font-semibold">{currentInputs?.power} {currentInputs?.powerUnit}</span>
+              </div>
+              <div>
+                <Label className="text-[7pt] uppercase block">Tensão</Label>
+                <span className="font-semibold">{currentInputs?.voltage} V</span>
+              </div>
+              <div>
+                <Label className="text-[7pt] uppercase block">Distância</Label>
+                <span className="font-semibold">{currentInputs?.distance} m</span>
+              </div>
+              <div>
+                <Label className="text-[7pt] uppercase block">Partida</Label>
+                <span className="font-semibold text-capitalize">{currentInputs?.starterType}</span>
+              </div>
+              <div>
+                <Label className="text-[7pt] uppercase block">Fator de Potência</Label>
+                <span className="font-semibold">{currentInputs?.powerFactor}</span>
+              </div>
+              <div>
+                <Label className="text-[7pt] uppercase block">Fator de Serviço</Label>
+                <span className="font-semibold">{currentInputs?.serviceFactor}</span>
+              </div>
+              <div>
+                <Label className="text-[7pt] uppercase block">Rendimento</Label>
+                <span className="font-semibold">{currentInputs?.efficiency}</span>
+              </div>
+              <div>
+                <Label className="text-[7pt] uppercase block">Corrente Nominal (In)</Label>
+                <span className="font-semibold">{currentResults?.nominalCurrent.toFixed(2)} A</span>
+              </div>
+            </div>
+          </div>
+
           {/* Materials */}
           <div className="card-panel space-y-6 print:space-y-2">
             <div className="flex justify-between items-center">
