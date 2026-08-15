@@ -53,7 +53,7 @@ export const ResultsView = () => {
           </div>
           <div className="space-y-1">
             <p className="text-metadata uppercase">Queda de Tensão</p>
-            <p className="text-3xl font-bold text-slate-900">{currentResults.voltageDropPercent.toFixed(2)} <span className="text-lg font-medium text-slate-400">%</span></p>
+            <p className="text-3xl font-bold text-slate-900">{currentResults.voltageDrop ? currentResults.voltageDrop.toFixed(2) : '0.00'} <span className="text-lg font-medium text-slate-400">%</span></p>
           </div>
           <div className="space-y-1">
             <p className="text-metadata uppercase">Critério Dominante</p>
