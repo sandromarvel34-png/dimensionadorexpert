@@ -158,117 +158,254 @@ export const CalculatorWizard = () => {
 
       <form onSubmit={handleCalculate} className="card-panel shadow-lg border-primary/5">
         <div className="space-y-10">
-          {/* Row 1 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-3">
-              <Label className="text-foreground font-semibold">Potência do motor</Label>
-              <div className="flex gap-2">
-                <Input name="power" type="number" step="0.1" defaultValue="5" className="h-12 text-base" required />
-                <Select name="powerUnit" defaultValue="cv">
-                  <SelectTrigger className="w-32 h-12">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="cv">CV</SelectItem>
-                    <SelectItem value="hp">HP</SelectItem>
-                    <SelectItem value="kW">kW</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          {/* Data Source Selection */}
+          <div className="space-y-4">
+            <Label className="text-foreground font-semibold">Como deseja informar os dados do motor?</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setDataSource('manual')}
+                className={cn(
+                  "flex items-center gap-3 p-4 rounded-[10px] border-2 transition-all text-left",
+                  dataSource === 'manual' 
+                    ? "border-primary bg-primary/5 text-primary" 
+                    : "border-border hover:border-muted-foreground/30 bg-card text-muted-foreground"
+                )}
+              >
+                <div className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center",
+                  dataSource === 'manual' ? "bg-primary text-white" : "bg-muted text-muted-foreground"
+                )}>
+                  <ClipboardList className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm">Informar dados da placa</p>
+                  <p className="text-xs opacity-80">Inserir manualmente os dados técnicos</p>
+                </div>
+              </button>
 
-            <div className="space-y-3">
-              <Label className="text-foreground font-semibold">Tensão de alimentação</Label>
-              <Select name="voltage" defaultValue="220">
-                <SelectTrigger className="h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="220">220 V</SelectItem>
-                  <SelectItem value="380">380 V</SelectItem>
-                  <SelectItem value="440">440 V</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Row 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-3">
-              <Label className="text-foreground font-semibold">Sistema</Label>
-              <Select name="phase" defaultValue="trifasico">
-                <SelectTrigger className="h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="monofasico">Monofásico</SelectItem>
-                  <SelectItem value="trifasico">Trifásico</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-3">
-              <Label className="text-foreground font-semibold">Distância até o ponto de alimentação</Label>
-              <div className="relative">
-                <Input name="distance" type="number" defaultValue="5" className="h-12 pr-16 text-base" required />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">metros</span>
-              </div>
+              <button
+                type="button"
+                onClick={() => setDataSource('catalog')}
+                className={cn(
+                  "flex items-center gap-3 p-4 rounded-[10px] border-2 transition-all text-left",
+                  dataSource === 'catalog' 
+                    ? "border-primary bg-primary/5 text-primary" 
+                    : "border-border hover:border-muted-foreground/30 bg-card text-muted-foreground"
+                )}
+              >
+                <div className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center",
+                  dataSource === 'catalog' ? "bg-primary text-white" : "bg-muted text-muted-foreground"
+                )}>
+                  <Database className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm">Selecionar motor WEG</p>
+                  <p className="text-xs opacity-80">Carregar dados do catálogo oficial</p>
+                </div>
+              </button>
             </div>
           </div>
 
-          {/* Row 3 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-3">
-              <Label className="text-foreground font-semibold">Tipo de partida</Label>
-              <Select name="starterType" defaultValue="direta">
-                <SelectTrigger className="h-12">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="direta">Partida Direta</SelectItem>
-                  <SelectItem value="reversao">Reversão</SelectItem>
-                  <SelectItem value="estrelaTriangulo">Estrela-Triângulo</SelectItem>
-                  <SelectItem value="softStarter">Soft Starter</SelectItem>
-                  <SelectItem value="inversor">Inversor de Frequência</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-3">
-              <Label className="text-foreground font-semibold">Queda de tensão admissível</Label>
-              <div className="relative">
-                <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue="2" className="h-12 pr-12 text-base" required />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">%</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Advanced / Technical Data */}
           <div className="pt-6 border-t border-border">
-            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6">Parâmetros Técnicos</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6">Dados do Motor</h3>
+            
+            {dataSource === 'manual' ? (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Potência do motor</Label>
+                    <div className="flex gap-2">
+                      <Input name="power" type="number" step="0.1" defaultValue="5" className="h-12 text-base" required />
+                      <Select name="powerUnit" defaultValue="cv">
+                        <SelectTrigger className="w-32 h-12">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          <SelectItem value="cv">CV</SelectItem>
+                          <SelectItem value="hp">HP</SelectItem>
+                          <SelectItem value="kW">kW</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Tensão de alimentação</Label>
+                    <Select name="voltage" defaultValue="220">
+                      <SelectTrigger className="h-12">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="220">220 V</SelectItem>
+                        <SelectItem value="380">380 V</SelectItem>
+                        <SelectItem value="440">440 V</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Sistema</Label>
+                    <Select name="phase" defaultValue="trifasico">
+                      <SelectTrigger className="h-12">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="monofasico">Monofásico</SelectItem>
+                        <SelectItem value="trifasico">Trifásico</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold italic text-xs block text-muted-foreground mb-1">
+                      Seu motor não é WEG? Informe os dados disponíveis na placa do motor.
+                    </Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-foreground font-medium text-xs">Fator de Potência (cos φ)</Label>
+                        <Input name="powerFactor" type="number" step="0.01" placeholder="Ex: 0.86" className="h-11" required />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
+                        <Input name="efficiency" type="number" step="0.01" placeholder="Ex: 0.85" className="h-11" required />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Fabricante</Label>
+                    <div className="h-12 flex items-center px-4 bg-muted/50 rounded-[10px] border border-border text-foreground font-medium">
+                      WEG
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Linha</Label>
+                    <Select value={selectedLine} onValueChange={setSelectedLine}>
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="Selecionar linha" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        {catalogLines.map(line => (
+                          <SelectItem key={line} value={line}>{line}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Modelo</Label>
+                    <Select 
+                      value={selectedModelId} 
+                      onValueChange={setSelectedModelId}
+                      disabled={!selectedLine}
+                    >
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="Selecionar modelo" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        {modelsInLine.map(model => (
+                          <SelectItem key={model.id} value={model.id}>{model.model} ({model.voltage}V)</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {selectedMotor && (
+                  <div className="bg-primary/5 border border-primary/20 rounded-[14px] p-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-start gap-3 mb-4">
+                      <CheckCircle2 className="w-5 h-5 text-primary mt-0.5" />
+                      <div>
+                        <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Dados técnicos do catálogo WEG</h4>
+                        <p className="text-xs text-primary/70 italic">Valores carregados automaticamente para o modelo selecionado.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Potência</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.power} {selectedMotor.powerUnit.toUpperCase()}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Tensão</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.voltage}V</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">In (Corrente)</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.nominalCurrent} A</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Cos φ</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.powerFactor}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Rendimento</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.efficiency}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="pt-6 border-t border-border">
+            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6">Dados da Instalação</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="space-y-3">
-                <Label className="text-foreground font-medium text-xs">Fabricante Preferencial</Label>
-                <Select name="manufacturer" defaultValue="WEG">
-                  <SelectTrigger className="h-11">
+                <Label className="text-foreground font-semibold">Distância até a alimentação</Label>
+                <div className="relative">
+                  <Input name="distance" type="number" defaultValue="5" className="h-12 pr-16 text-base" required />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">metros</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-foreground font-semibold">Tipo de partida</Label>
+                <Select name="starterType" defaultValue="direta">
+                  <SelectTrigger className="h-12">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    <SelectItem value="WEG">WEG</SelectItem>
-                    <SelectItem value="Schneider">Schneider</SelectItem>
-                    <SelectItem value="Siemens">Siemens</SelectItem>
+                    <SelectItem value="direta">Partida Direta</SelectItem>
+                    <SelectItem value="reversao">Reversão</SelectItem>
+                    <SelectItem value="estrelaTriangulo">Estrela-Triângulo</SelectItem>
+                    <SelectItem value="softStarter">Soft Starter</SelectItem>
+                    <SelectItem value="inversor">Inversor de Frequência</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-3">
-                <Label className="text-foreground font-medium text-xs">Fator de Potência (cos φ)</Label>
-                <Input name="powerFactor" type="number" step="0.01" defaultValue="0.86" className="h-11" required />
+                <Label className="text-foreground font-semibold">Queda de tensão admissível</Label>
+                <div className="relative">
+                  <Input name="maxVoltageDrop" type="number" step="0.1" defaultValue="2" className="h-12 pr-12 text-base" required />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium pointer-events-none">%</span>
+                </div>
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               <div className="space-y-3">
-                <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
-                <Input name="efficiency" type="number" step="0.01" defaultValue="0.85" className="h-11" required />
+                <Label className="text-foreground font-medium text-xs">Fator de Serviço (FS)</Label>
+                <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
+              </div>
+              <div className="space-y-3">
+                <Label className="text-foreground font-medium text-xs">Agrupamento (F1)</Label>
+                <Input name="groupingFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
+              </div>
+              <div className="space-y-3">
+                <Label className="text-foreground font-medium text-xs">Temperatura (F2)</Label>
+                <Input name="tempFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
               </div>
             </div>
           </div>
