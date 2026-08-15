@@ -26,7 +26,57 @@ export const ProposalFlow = () => {
     if (currentResults.protections.breaker) {
       initialItems.push({ 
         id: '2', 
-        desc: currentResults.protections.breaker.model, 
+        desc: `Disjuntor Termomagnético ${currentResults.protections.breaker.model} - ${currentResults.protections.breaker.description}`, 
+        qtd: 1, 
+        unit: 'un', 
+        price: 0 
+      });
+    }
+
+    if (currentResults.protections.motorBreaker) {
+      initialItems.push({ 
+        id: 'mb', 
+        desc: `Disjuntor Motor ${currentResults.protections.motorBreaker.model} - ${currentResults.protections.motorBreaker.description}`, 
+        qtd: 1, 
+        unit: 'un', 
+        price: 0 
+      });
+    }
+
+    if (currentResults.protections.diazedFuse) {
+      initialItems.push({ 
+        id: 'fd', 
+        desc: `Fusível Diazed ${currentResults.protections.diazedFuse.model} - ${currentResults.protections.diazedFuse.description}`, 
+        qtd: 1, 
+        unit: 'un', 
+        price: 0 
+      });
+    }
+
+    if (currentResults.protections.nhFuse) {
+      initialItems.push({ 
+        id: 'fnh', 
+        desc: `Fusível NH ${currentResults.protections.nhFuse.model} - ${currentResults.protections.nhFuse.description}`, 
+        qtd: 1, 
+        unit: 'un', 
+        price: 0 
+      });
+    }
+
+    if (currentResults.protections.softStarter) {
+      initialItems.push({ 
+        id: 'ssw', 
+        desc: `Soft-Starter ${currentResults.protections.softStarter.model} - ${currentResults.protections.softStarter.description}`, 
+        qtd: 1, 
+        unit: 'un', 
+        price: 0 
+      });
+    }
+
+    if (currentResults.protections.inverter) {
+      initialItems.push({ 
+        id: 'cfw', 
+        desc: `Inversor de Frequência ${currentResults.protections.inverter.model} - ${currentResults.protections.inverter.description}`, 
         qtd: 1, 
         unit: 'un', 
         price: 0 
@@ -39,7 +89,7 @@ export const ProposalFlow = () => {
       if (contactor) {
         initialItems.push({ 
           id: '3', 
-          desc: count > 1 ? `${contactor.model} (Conjunto c/ ${count})` : contactor.model, 
+          desc: count > 1 ? `Contator de Potência ${contactor.model} (Conjunto c/ ${count}) - ${contactor.description}` : `Contator de Potência ${contactor.model} - ${contactor.description}`, 
           qtd: count, 
           unit: 'un', 
           price: 0 
@@ -50,7 +100,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.thermalRelay) {
       initialItems.push({ 
         id: '4', 
-        desc: currentResults.protections.thermalRelay.model, 
+        desc: `Relé Térmico de Sobrecarga ${currentResults.protections.thermalRelay.model} - ${currentResults.protections.thermalRelay.description}`, 
         qtd: 1, 
         unit: 'un', 
         price: 0 
@@ -60,7 +110,7 @@ export const ProposalFlow = () => {
     if (currentResults.protections.timerRelay) {
       initialItems.push({ 
         id: '5', 
-        desc: currentResults.protections.timerRelay.model, 
+        desc: `Relé de Tempo Eletrônico ${currentResults.protections.timerRelay.model} - ${currentResults.protections.timerRelay.description}`, 
         qtd: 1, 
         unit: 'un', 
         price: 0 

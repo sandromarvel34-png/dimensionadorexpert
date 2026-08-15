@@ -72,10 +72,15 @@ export interface CalculationResults {
   limitingCriterion: 'ampacity' | 'voltageDrop';
   protections: {
     breaker?: ManufacturerProduct | null;
+    motorBreaker?: ManufacturerProduct | null;
     fuse?: ManufacturerProduct | null;
+    diazedFuse?: ManufacturerProduct | null;
+    nhFuse?: ManufacturerProduct | null;
     contactor?: ManufacturerProduct[] | null;
     thermalRelay?: ManufacturerProduct | null;
     timerRelay?: ManufacturerProduct | null;
+    softStarter?: ManufacturerProduct | null;
+    inverter?: ManufacturerProduct | null;
   };
   references: TechnicalReference[];
 }

@@ -3,6 +3,23 @@ import {
 } from '../../types';
 
 export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
+  // Disjuntores Motores WEG MPW
+  { id: 'weg-mpw18-10', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW18-3-U010', commercialCode: '12428135', description: 'Disjuntor Motor MPW18, 6.3-10A', nominalCurrent: 10, adjustmentRange: { min: 6.3, max: 10 }, voltage: 690, price: 185.00 },
+  { id: 'weg-mpw18-16', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW18-3-U016', commercialCode: '12428136', description: 'Disjuntor Motor MPW18, 10-16A', nominalCurrent: 16, adjustmentRange: { min: 10, max: 16 }, voltage: 690, price: 195.00 },
+  { id: 'weg-mpw18-20', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW18-3-U020', commercialCode: '12428137', description: 'Disjuntor Motor MPW18, 16-20A', nominalCurrent: 20, adjustmentRange: { min: 16, max: 20 }, voltage: 690, price: 215.00 },
+  { id: 'weg-mpw40-25', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW40-3-U025', commercialCode: '12428138', description: 'Disjuntor Motor MPW40, 20-25A', nominalCurrent: 25, adjustmentRange: { min: 20, max: 25 }, voltage: 690, price: 245.00 },
+  { id: 'weg-mpw40-32', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW40-3-U032', commercialCode: '12428139', description: 'Disjuntor Motor MPW40, 25-32A', nominalCurrent: 32, adjustmentRange: { min: 25, max: 32 }, voltage: 690, price: 285.00 },
+
+  // Fusíveis WEG Diazed e NH
+  { id: 'weg-fd-16', manufacturer: 'WEG', category: 'fusivel', model: 'F D-16', commercialCode: '10000001', description: 'Fusível Diazed retardado, 16A', nominalCurrent: 16, voltage: 500, price: 12.00 },
+  { id: 'weg-fd-25', manufacturer: 'WEG', category: 'fusivel', model: 'F D-25', commercialCode: '10000002', description: 'Fusível Diazed retardado, 25A', nominalCurrent: 25, voltage: 500, price: 14.00 },
+  { id: 'weg-fnh00-63', manufacturer: 'WEG', category: 'fusivel', model: 'F NH00-63', commercialCode: '10000003', description: 'Fusível NH tamanho 00 retardado, 63A', nominalCurrent: 63, voltage: 500, price: 45.00 },
+  { id: 'weg-fnh1-100', manufacturer: 'WEG', category: 'fusivel', model: 'F NH1-100', commercialCode: '10000004', description: 'Fusível NH tamanho 1 retardado, 100A', nominalCurrent: 100, voltage: 500, price: 85.00 },
+
+  // Soft-Starters e Inversores WEG
+  { id: 'weg-ssw05-16', manufacturer: 'WEG', category: 'contator', model: 'SSW05-16A', commercialCode: '10000005', description: 'Soft-Starter SSW05, 16A', nominalCurrent: 16, price: 850.00 },
+  { id: 'weg-cfw300-15', manufacturer: 'WEG', category: 'contator', model: 'CFW300-15A', commercialCode: '10000006', description: 'Inversor de Frequência CFW300, 15.2A', nominalCurrent: 15.2, price: 1200.00 },
+
   // Disjuntores WEG MDW
   { id: 'weg-mdw-c6', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C6', commercialCode: '10076440', description: 'Mini disjuntor MDW Curva C, 6A', nominalCurrent: 6, voltage: 440, price: 14.50 },
   { id: 'weg-mdw-c10', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C10', commercialCode: '10076442', description: 'Mini disjuntor MDW Curva C, 10A', nominalCurrent: 10, voltage: 440, price: 15.50 },

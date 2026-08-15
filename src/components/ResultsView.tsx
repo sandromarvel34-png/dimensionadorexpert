@@ -122,6 +122,64 @@ export const ResultsView = () => {
             </div>
           </div>
 
+          {/* Motor Breaker */}
+          {currentResults.protections.motorBreaker && (
+            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
+              <p className="text-label uppercase tracking-widest text-[10px]">Disjuntor Motor</p>
+              <div>
+                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.motorBreaker.model}</p>
+                <p className="text-metadata font-semibold text-primary">{currentResults.protections.motorBreaker.manufacturer}</p>
+                <p className="text-metadata mt-1">Faixa: {currentResults.protections.motorBreaker.adjustmentRange?.min}–{currentResults.protections.motorBreaker.adjustmentRange?.max} A</p>
+              </div>
+            </div>
+          )}
+
+          {/* Fuses */}
+          {currentResults.protections.diazedFuse && (
+            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
+              <p className="text-label uppercase tracking-widest text-[10px]">Fusível Diazed</p>
+              <div>
+                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.diazedFuse.model}</p>
+                <p className="text-metadata font-semibold text-primary">{currentResults.protections.diazedFuse.manufacturer}</p>
+                <p className="text-metadata mt-1">{currentResults.protections.diazedFuse.nominalCurrent} A</p>
+              </div>
+            </div>
+          )}
+
+          {currentResults.protections.nhFuse && (
+            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
+              <p className="text-label uppercase tracking-widest text-[10px]">Fusível NH</p>
+              <div>
+                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.nhFuse.model}</p>
+                <p className="text-metadata font-semibold text-primary">{currentResults.protections.nhFuse.manufacturer}</p>
+                <p className="text-metadata mt-1">{currentResults.protections.nhFuse.nominalCurrent} A</p>
+              </div>
+            </div>
+          )}
+
+          {/* Soft-Starter / Inverter */}
+          {currentResults.protections.softStarter && (
+            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group border-primary/20">
+              <p className="text-label uppercase tracking-widest text-[10px]">Soft-Starter</p>
+              <div>
+                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.softStarter.model}</p>
+                <p className="text-metadata font-semibold text-primary">{currentResults.protections.softStarter.manufacturer}</p>
+                <p className="text-metadata mt-1">{currentResults.protections.softStarter.description}</p>
+              </div>
+            </div>
+          )}
+
+          {currentResults.protections.inverter && (
+            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group border-primary/20">
+              <p className="text-label uppercase tracking-widest text-[10px]">Inversor de Frequência</p>
+              <div>
+                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.inverter.model}</p>
+                <p className="text-metadata font-semibold text-primary">{currentResults.protections.inverter.manufacturer}</p>
+                <p className="text-metadata mt-1">{currentResults.protections.inverter.description}</p>
+              </div>
+            </div>
+          )}
+
           {/* Contactor */}
           <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
             <p className="text-label uppercase tracking-widest text-[10px]">
