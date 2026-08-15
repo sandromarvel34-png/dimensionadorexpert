@@ -576,9 +576,9 @@ export const CalculatorWizard = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    <SelectItem value="bundle">Em feixe (ao ar livre ou em conduto)</SelectItem>
-                    <SelectItem value="layer_wall">Em camada sobre a parede</SelectItem>
-                    <SelectItem value="layer_floor">Em camada no piso</SelectItem>
+                    <SelectItem value="bundle">Circuitos agrupados (ao ar livre ou em conduto)</SelectItem>
+                    <SelectItem value="layer_wall">Instalados sobre parede</SelectItem>
+                    <SelectItem value="layer_floor">Instalados no piso</SelectItem>
                     <SelectItem value="tray_perforated">Em bandeja perfurada</SelectItem>
                     <SelectItem value="tray_unperforated">Em bandeja não perfurada</SelectItem>
                   </SelectContent>
