@@ -137,8 +137,8 @@ export const CalculatorWizard = () => {
               </SelectTrigger>
               <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
                 <SelectItem value="WEG">WEG</SelectItem>
-                <SelectItem value="Schneider">Schneider (Em breve)</SelectItem>
-                <SelectItem value="Siemens">Siemens (Em breve)</SelectItem>
+                <SelectItem value="Schneider">Schneider</SelectItem>
+                <SelectItem value="Siemens">Siemens</SelectItem>
               </SelectContent>
             </Select>
           </div>
