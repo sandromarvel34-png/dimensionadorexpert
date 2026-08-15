@@ -191,7 +191,7 @@ export class CalculationEngine {
       limitingCriterion,
       protections: {
         breaker,
-        contactor: contactor ? [contactor] : null,
+        contactor: contactors.length > 0 ? contactors : null,
         thermalRelay
       },
       references: refs
