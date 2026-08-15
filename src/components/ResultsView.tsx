@@ -1,97 +1,120 @@
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ChevronRight, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCircle2 } from 'lucide-react';
 
 export const ResultsView = () => {
-  const { currentResults, setView } = useAppStore();
+  const { currentResults, currentInputs, setView } = useAppStore();
 
-  if (!currentResults) return null;
+  if (!currentResults || !currentInputs) return null;
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 space-y-8">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => setView('wizard')}><ArrowLeft className="mr-2" /> Voltar</Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-panel border-border p-6 border-l-4 border-l-accent">
-          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Condutor Dimensionado</h3>
-          <p className="text-5xl font-black text-slate-900">{currentResults.finalCableSection} mm²</p>
-          <div className="mt-4 p-2 bg-accent/10 rounded text-accent text-sm font-bold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" /> Dimensionamento Concluído
+    <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <button 
+            onClick={() => setView('wizard')}
+            className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors mb-2"
+          >
+            <ArrowLeft className="w-4 h-4" /> Voltar
+          </button>
+          <h1 className="text-3xl font-semibold text-slate-900">Resultado do Dimensionamento</h1>
+          <div className="flex flex-wrap gap-x-3 text-metadata font-medium uppercase tracking-wider">
+            <span>{currentInputs.power} {currentInputs.powerUnit}</span>
+            <span className="text-slate-300">•</span>
+            <span>{currentInputs.voltage} V</span>
+            <span className="text-slate-300">•</span>
+            <span>{currentInputs.phase}</span>
+            <span className="text-slate-300">•</span>
+            <span>{currentInputs.distance} m</span>
+            <span className="text-slate-300">•</span>
+            <span>Partida {currentInputs.starterType}</span>
           </div>
-        </Card>
-
-        <Card className="bg-panel border-border p-6 flex flex-col justify-between">
-          <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">Resumo da Solução</h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center py-2 border-b border-border">
-              <span className="text-slate-700">Corrente Nominal</span>
-              <span className="font-mono text-accent">{currentResults.nominalCurrent.toFixed(1)} A</span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-border">
-              <span className="text-slate-700">Critério Dominante</span>
-              <span className="font-mono text-accent uppercase text-xs">{currentResults.limitingCriterion}</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Condutor */}
-        <Card className="bg-panel border-border p-4 text-center space-y-2">
-          <div className="text-xs text-slate-500 font-bold uppercase">Condutor</div>
-          <div className="text-slate-900 font-bold">{currentResults.finalCableSection} mm²</div>
-          <div className="text-[10px] text-slate-500">PVC / Cobre</div>
-        </Card>
-
-        {/* Disjuntor */}
-        <Card className="bg-panel border-border p-4 text-center space-y-2">
-          <div className="text-xs text-slate-500 font-bold uppercase">Disjuntor</div>
-          <div className="text-slate-900 font-bold">
-            {currentResults.protections.breaker ? currentResults.protections.breaker.model : 'Não encontrado'}
-          </div>
-          <div className="text-[10px] text-slate-500">
-            {currentResults.protections.breaker?.manufacturer || '-'} {currentResults.protections.breaker?.nominalCurrent ? `(${currentResults.protections.breaker.nominalCurrent}A)` : ''}
-          </div>
-        </Card>
-
-        {/* Contator */}
-        <Card className="bg-panel border-border p-4 text-center space-y-2">
-          <div className="text-xs text-slate-500 font-bold uppercase">Contator</div>
-          <div className="text-slate-900 font-bold">
-            {currentResults.protections.contactor?.[0] ? currentResults.protections.contactor[0].model : 'Não encontrado'}
-          </div>
-          <div className="text-[10px] text-slate-500">
-            {currentResults.protections.contactor?.[0]?.manufacturer || '-'} {currentResults.protections.contactor?.[0]?.nominalCurrent ? `(${currentResults.protections.contactor[0].nominalCurrent}A)` : ''}
-          </div>
-        </Card>
-
-        {/* Relé Térmico */}
-        <Card className="bg-panel border-border p-4 text-center space-y-2">
-          <div className="text-xs text-slate-500 font-bold uppercase">Relé Térmico</div>
-          <div className="text-slate-900 font-bold">
-            {currentResults.protections.thermalRelay ? currentResults.protections.thermalRelay.model : 'Não encontrado'}
-          </div>
-          <div className="text-[10px] text-slate-500">
-            {currentResults.protections.thermalRelay?.adjustmentRange 
-              ? `${currentResults.protections.thermalRelay.adjustmentRange.min}-${currentResults.protections.thermalRelay.adjustmentRange.max}A`
-              : '-'}
-          </div>
-        </Card>
-      </div>
-
-      <div className="flex justify-center pt-8">
-        <Button 
-          size="lg" 
-          className="bg-accent hover:bg-accent/90 text-black px-12 text-lg font-bold"
+        </div>
+        <button 
           onClick={() => setView('proposal')}
+          className="btn-primary flex items-center gap-2"
         >
-          Criar Proposta
-        </Button>
+          Criar Proposta →
+        </button>
       </div>
 
+      {/* Main Stats Card */}
+      <div className="card-panel">
+        <h3 className="text-label uppercase tracking-widest mb-6">Resumo Técnico</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="space-y-1">
+            <p className="text-metadata uppercase">Corrente Nominal</p>
+            <p className="text-3xl font-bold text-slate-900">{currentResults.nominalCurrent.toFixed(1)} <span className="text-lg font-medium text-slate-400">A</span></p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-metadata uppercase">Seção Final</p>
+            <p className="text-3xl font-bold text-blue-600">{currentResults.finalCableSection} <span className="text-lg font-medium text-blue-300">mm²</span></p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-metadata uppercase">Queda de Tensão</p>
+            <p className="text-3xl font-bold text-slate-900">{currentResults.voltageDropCalculated ? currentResults.voltageDropCalculated.toFixed(2) : '0.00'} <span className="text-lg font-medium text-slate-400">%</span></p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-metadata uppercase">Critério Dominante</p>
+            <p className="text-sm font-semibold text-blue-600 uppercase mt-2">{currentResults.limitingCriterion === 'ampacity' ? 'Capacidade de Corrente' : 'Queda de Tensão'}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Components Grid */}
+      <div className="space-y-6">
+        <h3 className="text-card-title">Componentes Dimensionados</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+          {/* Cable */}
+          <div className="card-panel flex flex-col justify-between h-40 hover:border-blue-200 transition-colors">
+            <p className="text-metadata uppercase">Condutor</p>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">{currentResults.finalCableSection} mm²</p>
+              <p className="text-metadata mt-1">Cobre • PVC</p>
+            </div>
+          </div>
+
+          {/* Breaker */}
+          <div className="card-panel flex flex-col justify-between h-40 hover:border-blue-200 transition-colors">
+            <p className="text-metadata uppercase">Disjuntor</p>
+            <div>
+              <p className="text-xl font-bold text-slate-900">{currentResults.protections.breaker?.model || '—'}</p>
+              <p className="text-metadata mt-1">{currentResults.protections.breaker?.manufacturer || '—'} • {currentResults.protections.breaker?.nominalCurrent ? `${currentResults.protections.breaker.nominalCurrent} A` : 'Não encontrado'}</p>
+            </div>
+          </div>
+
+          {/* Contactor */}
+          <div className="card-panel flex flex-col justify-between h-40 hover:border-blue-200 transition-colors">
+            <p className="text-metadata uppercase">Contator</p>
+            <div>
+              <p className="text-xl font-bold text-slate-900">{currentResults.protections.contactor?.[0]?.model || '—'}</p>
+              <p className="text-metadata mt-1">{currentResults.protections.contactor?.[0]?.manufacturer || '—'} • {currentResults.protections.contactor?.[0]?.nominalCurrent ? `${currentResults.protections.contactor[0].nominalCurrent} A` : 'Não encontrado'}</p>
+            </div>
+          </div>
+
+          {/* Thermal Relay */}
+          <div className="card-panel flex flex-col justify-between h-40 hover:border-blue-200 transition-colors">
+            <p className="text-metadata uppercase">Relé Térmico</p>
+            <div>
+              <p className="text-xl font-bold text-slate-900">{currentResults.protections.thermalRelay?.model || '—'}</p>
+              <p className="text-metadata mt-1">WEG • {currentResults.protections.thermalRelay?.adjustmentRange ? `${currentResults.protections.thermalRelay.adjustmentRange.min}–${currentResults.protections.thermalRelay.adjustmentRange.max} A` : 'Não encontrado'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center gap-6 pt-10">
+        <button 
+          onClick={() => setView('proposal')}
+          className="btn-primary w-full sm:w-80 h-14 text-lg shadow-xl shadow-blue-100"
+        >
+          Criar Proposta Comercial →
+        </button>
+        <p className="text-metadata text-slate-400 flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-green-500" /> Dimensionamento em conformidade com NBR 5410
+        </p>
+      </div>
     </div>
   );
 };

@@ -26,7 +26,20 @@ export const useAppStore = create<AppState>()(
 
       setView: (view) => set({ view }),
       setStep: (step) => set({ step }),
-      setCalculation: (inputs, results) => set({ currentInputs: inputs, currentResults: results }),
+      setCalculation: (inputs, results) => {
+        const historyItem = {
+          id: Math.random().toString(36).substr(2, 9),
+          date: new Date().toISOString(),
+          ...inputs,
+          ...results,
+          hasProposal: false
+        };
+        set((state) => ({ 
+          currentInputs: inputs, 
+          currentResults: results,
+          history: [historyItem, ...state.history].slice(0, 50)
+        }));
+      },
       addToHistory: (item) => set((state) => ({ 
         history: [item, ...state.history].slice(0, 50) 
       })),

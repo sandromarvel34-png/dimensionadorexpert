@@ -3,10 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Printer, Save } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Printer, Save, CheckCircle2 } from 'lucide-react';
 
 export const ProposalFlow = () => {
   const { setView, currentResults, currentInputs } = useAppStore();
@@ -22,9 +21,9 @@ export const ProposalFlow = () => {
   const [items, setItems] = useState<any[]>(
     currentResults ? [
       { id: '1', desc: `Cabo Flexível ${currentResults.finalCableSection}mm²`, qtd: currentInputs?.distance || 1, unit: 'm', price: 0 },
-      { id: '2', desc: 'Disjuntor de Proteção', qtd: 1, unit: 'un', price: 0 },
-      { id: '3', desc: 'Contator de Potência', qtd: 1, unit: 'un', price: 0 },
-      { id: '4', desc: 'Relé Térmico de Sobrecarga', qtd: 1, unit: 'un', price: 0 },
+      { id: '2', desc: currentResults.protections.breaker?.model || 'Disjuntor de Proteção', qtd: 1, unit: 'un', price: 0 },
+      { id: '3', desc: currentResults.protections.contactor?.[0]?.model || 'Contator de Potência', qtd: 1, unit: 'un', price: 0 },
+      { id: '4', desc: currentResults.protections.thermalRelay?.model || 'Relé Térmico', qtd: 1, unit: 'un', price: 0 },
     ] : []
   );
 
@@ -40,9 +39,9 @@ export const ProposalFlow = () => {
     discount: 0
   });
 
-  const totalMaterials = items.reduce((acc, item) => acc + (item.qtd * item.price), 0);
-  const totalLabor = labor.hours * labor.rate;
-  const grandTotal = totalMaterials + totalLabor + costs.travel + costs.others - costs.discount;
+  const totalMaterials = items.reduce((acc, item) => acc + (item.qtd * (item.price || 0)), 0);
+  const totalLabor = (labor.hours || 0) * (labor.rate || 0);
+  const grandTotal = totalMaterials + totalLabor + (costs.travel || 0) + (costs.others || 0) - (costs.discount || 0);
 
   const addItem = () => {
     setItems([...items, { id: Math.random().toString(), desc: '', qtd: 1, unit: 'un', price: 0 }]);
@@ -56,136 +55,173 @@ export const ProposalFlow = () => {
     setItems(items.map(i => i.id === id ? { ...i, [field]: value } : i));
   };
 
+  const handleSave = () => {
+    toast.success('Proposta salva com sucesso!');
+  };
+
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4 space-y-8 pb-32">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => setView('results')}><ArrowLeft className="mr-2" /> Voltar aos Resultados</Button>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => window.print()}><Printer className="mr-2 w-4 h-4" /> Imprimir</Button>
-          <Button className="bg-accent text-black font-bold"><Save className="mr-2 w-4 h-4" /> Salvar Proposta</Button>
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 pb-32">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <button 
+            onClick={() => setView('results')}
+            className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors mb-2"
+          >
+            <ArrowLeft className="w-4 h-4" /> Voltar ao Resultado
+          </button>
+          <h1 className="text-3xl font-semibold text-slate-900">Gerar Proposta Comercial</h1>
+          <p className="text-slate-500">Transforme seu dimensionamento em um orçamento profissional.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button onClick={() => window.print()} className="btn-secondary flex items-center gap-2">
+            <Printer className="w-4 h-4" /> Imprimir
+          </button>
+          <button onClick={handleSave} className="btn-primary flex items-center gap-2">
+            <Save className="w-4 h-4" /> Salvar Proposta
+          </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <Card className="bg-panel border-border">
-            <CardContent className="p-6 space-y-6">
-              <h3 className="text-xl font-bold text-white">Dados do Cliente</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Nome / Razão Social</Label>
-                  <Input value={clientData.name} onChange={e => setClientData({...clientData, name: e.target.value})} placeholder="Ex: Indústria Alfa" />
-                </div>
-                <div className="space-y-2">
-                  <Label>CPF / CNPJ</Label>
-                  <Input value={clientData.doc} onChange={e => setClientData({...clientData, doc: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Telefone</Label>
-                  <Input value={clientData.phone} onChange={e => setClientData({...clientData, phone: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                  <Label>E-mail</Label>
-                  <Input value={clientData.email} onChange={e => setClientData({...clientData, email: e.target.value})} />
-                </div>
+          {/* Client Data */}
+          <div className="card-panel space-y-6">
+            <h3 className="text-card-title">Dados do Cliente</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-wider">Nome / Razão Social</Label>
+                <Input className="h-11 border-slate-200" value={clientData.name} onChange={e => setClientData({...clientData, name: e.target.value})} placeholder="Ex: Indústria Metalúrgica SA" />
               </div>
-            </CardContent>
-          </Card>
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-wider">CPF / CNPJ</Label>
+                <Input className="h-11 border-slate-200" value={clientData.doc} onChange={e => setClientData({...clientData, doc: e.target.value})} placeholder="00.000.000/0001-00" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-wider">Telefone</Label>
+                <Input className="h-11 border-slate-200" value={clientData.phone} onChange={e => setClientData({...clientData, phone: e.target.value})} placeholder="(11) 99999-9999" />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-wider">E-mail</Label>
+                <Input className="h-11 border-slate-200" value={clientData.email} onChange={e => setClientData({...clientData, email: e.target.value})} placeholder="cliente@email.com" />
+              </div>
+            </div>
+          </div>
 
-          <Card className="bg-panel border-border">
-            <CardContent className="p-6 space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-bold text-white">Lista de Materiais</h3>
-                <Button size="sm" variant="outline" onClick={addItem}><Plus className="mr-2 w-4 h-4" /> Add Item</Button>
+          {/* Materials */}
+          <div className="card-panel space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-card-title">Lista de Materiais</h3>
+              <button onClick={addItem} className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                <Plus className="w-4 h-4" /> Adicionar Item
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-12 gap-4 px-2 text-metadata font-bold uppercase tracking-wider">
+                <div className="col-span-6">Descrição</div>
+                <div className="col-span-2 text-center">Qtd</div>
+                <div className="col-span-2 text-right">Preço Un.</div>
+                <div className="col-span-2 text-right">Total</div>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {items.map((item) => (
-                  <div key={item.id} className="grid grid-cols-12 gap-3 items-end border-b border-border/50 pb-4">
-                    <div className="col-span-5 space-y-2">
-                      <Label className="text-[10px] uppercase text-muted">Descrição</Label>
-                      <Input value={item.desc} onChange={e => updateItem(item.id, 'desc', e.target.value)} />
+                  <div key={item.id} className="grid grid-cols-12 gap-4 items-center p-2 border border-slate-50 rounded-lg hover:border-slate-200 transition-colors group">
+                    <div className="col-span-6">
+                      <Input value={item.desc} onChange={e => updateItem(item.id, 'desc', e.target.value)} className="h-9 border-transparent bg-transparent hover:border-slate-200 focus:bg-white focus:border-blue-200 transition-all" />
                     </div>
-                    <div className="col-span-2 space-y-2">
-                      <Label className="text-[10px] uppercase text-muted">Qtd</Label>
-                      <Input type="number" value={item.qtd} onChange={e => updateItem(item.id, 'qtd', parseFloat(e.target.value))} />
+                    <div className="col-span-2">
+                      <Input type="number" value={item.qtd} onChange={e => updateItem(item.id, 'qtd', parseFloat(e.target.value) || 0)} className="h-9 text-center border-transparent bg-transparent hover:border-slate-200 focus:bg-white focus:border-blue-200" />
                     </div>
-                    <div className="col-span-2 space-y-2">
-                      <Label className="text-[10px] uppercase text-muted">Preço Un.</Label>
-                      <Input type="number" value={item.price} onChange={e => updateItem(item.id, 'price', parseFloat(e.target.value))} />
+                    <div className="col-span-2">
+                      <Input type="number" value={item.price} onChange={e => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)} className="h-9 text-right border-transparent bg-transparent hover:border-slate-200 focus:bg-white focus:border-blue-200" />
                     </div>
-                    <div className="col-span-2 text-right py-2">
-                      <span className="text-sm font-mono text-white">R$ {(item.qtd * item.price).toFixed(2)}</span>
+                    <div className="col-span-1 text-right text-sm font-semibold text-slate-700">
+                      R$ {(item.qtd * (item.price || 0)).toFixed(2)}
                     </div>
                     <div className="col-span-1 text-right">
-                      <Button size="icon" variant="ghost" className="text-red-500 hover:text-red-400" onClick={() => removeItem(item.id)}><Trash2 className="w-4 h-4" /></Button>
+                      <button onClick={() => removeItem(item.id)} className="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="bg-panel border-border">
-            <CardContent className="p-6 space-y-6">
-              <h3 className="text-xl font-bold text-white">Mão de Obra e Prazos</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Tempo Estimado (Horas)</Label>
-                  <Input type="number" value={labor.hours} onChange={e => setLabor({...labor, hours: parseFloat(e.target.value)})} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Valor Hora (R$)</Label>
-                  <Input type="number" value={labor.rate} onChange={e => setLabor({...labor, rate: parseFloat(e.target.value)})} />
-                </div>
-                <div className="md:col-span-2 space-y-2">
-                  <Label>Observações do Serviço</Label>
-                  <Textarea placeholder="Descreva o que será realizado..." />
-                </div>
+          {/* Labor */}
+          <div className="card-panel space-y-6">
+            <h3 className="text-card-title">Mão de Obra e Prazos</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-wider">Tempo Estimado (Horas)</Label>
+                <Input type="number" className="h-11 border-slate-200" value={labor.hours} onChange={e => setLabor({...labor, hours: parseFloat(e.target.value) || 0})} />
               </div>
-            </CardContent>
-          </Card>
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-wider">Valor Hora (R$)</Label>
+                <Input type="number" className="h-11 border-slate-200" value={labor.rate} onChange={e => setLabor({...labor, rate: parseFloat(e.target.value) || 0})} />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <Label className="text-label uppercase tracking-wider">Observações do Serviço</Label>
+                <Textarea className="min-h-[100px] border-slate-200" placeholder="Ex: Instalação, testes e entrega técnica inclusos..." />
+              </div>
+            </div>
+          </div>
         </div>
 
+        {/* Financial Summary */}
         <div className="space-y-6">
-          <Card className="bg-panel border-accent border-2 sticky top-24">
-            <CardContent className="p-6 space-y-6">
-              <h3 className="text-xl font-bold text-white text-center">Resumo Financeiro</h3>
+          <div className="card-panel border-blue-600 border-2 sticky top-24 space-y-8">
+            <h3 className="text-card-title text-center">Resumo Financeiro</h3>
+            
+            <div className="space-y-4 text-sm font-medium">
+              <div className="flex justify-between text-slate-500">
+                <span>Materiais</span>
+                <span className="text-slate-900">R$ {totalMaterials.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-slate-500">
+                <span>Mão de Obra</span>
+                <span className="text-slate-900">R$ {totalLabor.toFixed(2)}</span>
+              </div>
               
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-muted">
-                  <span>Materiais</span>
-                  <span className="text-white">R$ {totalMaterials.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-muted">
-                  <span>Mão de Obra</span>
-                  <span className="text-white">R$ {totalLabor.toFixed(2)}</span>
-                </div>
-                <div className="pt-3 border-t border-border space-y-3">
-                  <div className="flex justify-between items-center text-muted">
-                    <span>Deslocamento</span>
-                    <Input className="w-24 h-8 text-right" type="number" value={costs.travel} onChange={e => setCosts({...costs, travel: parseFloat(e.target.value) || 0})} />
+              <div className="pt-6 border-t border-slate-100 space-y-4">
+                <div className="flex items-center justify-between text-slate-500">
+                  <span>Deslocamento</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs">R$</span>
+                    <input type="number" className="w-20 text-right bg-slate-50 border-none rounded p-1 text-slate-900 focus:ring-1 focus:ring-blue-600 outline-none" value={costs.travel} onChange={e => setCosts({...costs, travel: parseFloat(e.target.value) || 0})} />
                   </div>
-                  <div className="flex justify-between items-center text-muted">
-                    <span>Outros Custos</span>
-                    <Input className="w-24 h-8 text-right" type="number" value={costs.others} onChange={e => setCosts({...costs, others: parseFloat(e.target.value) || 0})} />
+                </div>
+                <div className="flex items-center justify-between text-slate-500">
+                  <span>Outros Custos</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs">R$</span>
+                    <input type="number" className="w-20 text-right bg-slate-50 border-none rounded p-1 text-slate-900 focus:ring-1 focus:ring-blue-600 outline-none" value={costs.others} onChange={e => setCosts({...costs, others: parseFloat(e.target.value) || 0})} />
                   </div>
-                  <div className="flex justify-between items-center text-red-400">
-                    <span>Desconto</span>
-                    <Input className="w-24 h-8 text-right border-red-900/50" type="number" value={costs.discount} onChange={e => setCosts({...costs, discount: parseFloat(e.target.value) || 0})} />
+                </div>
+                <div className="flex items-center justify-between text-red-500">
+                  <span>Desconto</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs">- R$</span>
+                    <input type="number" className="w-20 text-right bg-red-50 border-none rounded p-1 text-red-600 focus:ring-1 focus:ring-red-600 outline-none" value={costs.discount} onChange={e => setCosts({...costs, discount: parseFloat(e.target.value) || 0})} />
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="pt-6 border-t border-border text-center">
-                <span className="text-muted text-xs uppercase font-bold tracking-widest">Valor Total do Serviço</span>
-                <div className="text-4xl font-black text-accent mt-2">R$ {grandTotal.toFixed(2)}</div>
-              </div>
+            <div className="pt-8 border-t border-slate-100 text-center">
+              <p className="text-metadata font-bold uppercase tracking-widest mb-1">Valor Total da Proposta</p>
+              <div className="text-4xl font-black text-blue-600">R$ {grandTotal.toFixed(2)}</div>
+            </div>
 
-              <Button className="w-full bg-accent hover:bg-accent/90 text-black font-bold h-12 text-lg">
-                Gerar Proposta Final
-              </Button>
-            </CardContent>
-          </Card>
+            <button onClick={handleSave} className="btn-primary w-full h-14 text-lg shadow-xl shadow-blue-100">
+              Gerar Proposta Final
+            </button>
+            
+            <p className="text-[11px] text-slate-400 text-center leading-relaxed">
+              * Valores sujeitos a alteração conforme disponibilidade de estoque dos fornecedores.
+            </p>
+          </div>
         </div>
       </div>
     </div>
