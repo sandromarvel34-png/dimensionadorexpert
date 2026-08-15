@@ -119,7 +119,7 @@ export class CalculationEngine {
     
     // Iteramos pelas bitolas padrão para encontrar a primeira que atenda à queda máxima
     // O critério é encontrar a bitola que resulte em uma queda <= maxDropPercent
-    let selectedSection: number = standardSections[0];
+    let selectedSection: number = standardSections[0] as number;
     let actualDrop: number = 100;
 
     for (const section of standardSections) {
