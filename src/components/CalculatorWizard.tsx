@@ -71,7 +71,7 @@ export const CalculatorWizard = () => {
                 <SelectTrigger className="h-11 w-24 border-slate-200">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[100px]">
                   <SelectItem value="cv">CV</SelectItem>
                   <SelectItem value="hp">HP</SelectItem>
                   <SelectItem value="kW">kW</SelectItem>
@@ -80,13 +80,13 @@ export const CalculatorWizard = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             <Label className="text-label uppercase tracking-wider">Tensão</Label>
             <Select name="voltage" defaultValue="380">
               <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
                 <SelectItem value="220">220 V</SelectItem>
                 <SelectItem value="380">380 V</SelectItem>
                 <SelectItem value="440">440 V</SelectItem>
@@ -94,13 +94,13 @@ export const CalculatorWizard = () => {
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             <Label className="text-label uppercase tracking-wider">Sistema</Label>
             <Select name="phase" defaultValue="trifasico">
               <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
                 <SelectItem value="monofasico">Monofásico</SelectItem>
                 <SelectItem value="trifasico">Trifásico</SelectItem>
               </SelectContent>
@@ -112,13 +112,13 @@ export const CalculatorWizard = () => {
             <Input name="distance" type="number" defaultValue="20" className="h-11 border-slate-200" required />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             <Label className="text-label uppercase tracking-wider">Tipo de partida</Label>
             <Select name="starterType" defaultValue="direta">
               <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[200px]">
                 <SelectItem value="direta">Direta</SelectItem>
                 <SelectItem value="reversao">Reversão</SelectItem>
                 <SelectItem value="estrelaTriangulo">Estrela-Triângulo</SelectItem>
