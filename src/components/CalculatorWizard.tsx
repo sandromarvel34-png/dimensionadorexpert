@@ -71,7 +71,7 @@ export const CalculatorWizard = () => {
                 <SelectTrigger className="h-11 w-24 border-slate-200">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[100px]">
                   <SelectItem value="cv">CV</SelectItem>
                   <SelectItem value="hp">HP</SelectItem>
                   <SelectItem value="kW">kW</SelectItem>
@@ -86,7 +86,7 @@ export const CalculatorWizard = () => {
               <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
                 <SelectItem value="220">220 V</SelectItem>
                 <SelectItem value="380">380 V</SelectItem>
                 <SelectItem value="440">440 V</SelectItem>
@@ -100,7 +100,7 @@ export const CalculatorWizard = () => {
               <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
                 <SelectItem value="monofasico">Monofásico</SelectItem>
                 <SelectItem value="trifasico">Trifásico</SelectItem>
               </SelectContent>
@@ -118,13 +118,13 @@ export const CalculatorWizard = () => {
               <SelectTrigger className="h-11 border-slate-200">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="direta">Direta</SelectItem>
-                <SelectItem value="reversao">Reversão</SelectItem>
-                <SelectItem value="estrelaTriangulo">Estrela-Triângulo</SelectItem>
-                <SelectItem value="softStarter">Soft Starter</SelectItem>
-                <SelectItem value="inversor">Inversor de Frequência</SelectItem>
-              </SelectContent>
+                <SelectContent className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[200px]">
+                  <SelectItem value="direta">Direta</SelectItem>
+                  <SelectItem value="reversao">Reversão</SelectItem>
+                  <SelectItem value="estrelaTriangulo">Estrela-Triângulo</SelectItem>
+                  <SelectItem value="softStarter">Soft Starter</SelectItem>
+                  <SelectItem value="inversor">Inversor de Frequência</SelectItem>
+                </SelectContent>
             </Select>
           </div>
 
