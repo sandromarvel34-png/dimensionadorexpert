@@ -29,7 +29,7 @@ export const ProposalFlow = () => {
         desc: `Disjuntor Termomagnético ${currentResults.protections.breaker.model} - ${currentResults.protections.breaker.description}`, 
         qtd: 1, 
         unit: 'un', 
-        price: 0 
+        price: currentResults.protections.breaker.price || 0 
       });
     }
 
@@ -39,7 +39,7 @@ export const ProposalFlow = () => {
         desc: `Disjuntor Motor ${currentResults.protections.motorBreaker.model} - ${currentResults.protections.motorBreaker.description}`, 
         qtd: 1, 
         unit: 'un', 
-        price: 0 
+        price: currentResults.protections.motorBreaker.price || 0 
       });
     }
 
@@ -69,7 +69,7 @@ export const ProposalFlow = () => {
         desc: `Soft-Starter ${currentResults.protections.softStarter.model} - ${currentResults.protections.softStarter.description}`, 
         qtd: 1, 
         unit: 'un', 
-        price: 0 
+        price: currentResults.protections.softStarter.price || 0 
       });
     }
 
@@ -79,7 +79,7 @@ export const ProposalFlow = () => {
         desc: `Inversor de Frequência ${currentResults.protections.inverter.model} - ${currentResults.protections.inverter.description}`, 
         qtd: 1, 
         unit: 'un', 
-        price: 0 
+        price: currentResults.protections.inverter.price || 0 
       });
     }
 
