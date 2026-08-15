@@ -119,8 +119,8 @@ export class CalculationEngine {
     
     // Iteramos pelas bitolas padrão para encontrar a primeira que atenda à queda máxima
     // O critério é encontrar a bitola que resulte em uma queda <= maxDropPercent
-    let selectedSection = standardSections[0];
-    let actualDrop = 100;
+    let selectedSection: number = standardSections[0];
+    let actualDrop: number = 100;
 
     for (const section of standardSections) {
       const actualDropVolts = (k * this.RHO_COPPER * distance * current * pf) / section;
