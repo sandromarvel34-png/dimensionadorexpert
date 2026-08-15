@@ -20,30 +20,97 @@ import { cn } from '@/lib/utils';
 export const CalculatorWizard = () => {
   const { setView, setCalculation } = useAppStore();
   const [isCalculating, setIsCalculating] = useState(false);
+  const [dataSource, setDataSource] = useState<'manual' | 'catalog'>('manual');
   
+  // Catalog selection state
+  const [selectedLine, setSelectedLine] = useState<string>('');
+  const [selectedModelId, setSelectedModelId] = useState<string>('');
+  
+  const catalogLines = useMemo(() => {
+    return Array.from(new Set(WEG_MOTOR_CATALOG.map(m => m.line)));
+  }, []);
+  
+  const modelsInLine = useMemo(() => {
+    if (!selectedLine) return [];
+    return WEG_MOTOR_CATALOG.filter(m => m.line === selectedLine);
+  }, [selectedLine]);
+  
+  const selectedMotor = useMemo(() => {
+    return WEG_MOTOR_CATALOG.find(m => m.id === selectedModelId);
+  }, [selectedModelId]);
+
   const handleCalculate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isCalculating) return;
 
     const formData = new FormData(e.currentTarget);
     
-    const inputs: CalculationInputs = {
-      dataSource: 'manual',
-      power: parseFloat(formData.get('power') as string),
-      powerUnit: formData.get('powerUnit') as any,
-      voltage: parseFloat(formData.get('voltage') as string),
-      phase: formData.get('phase') as any,
-      distance: parseFloat(formData.get('distance') as string),
-      starterType: formData.get('starterType') as any,
-      maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
-      preferredManufacturer: formData.get('manufacturer') as string || undefined,
-      groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
-      ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
-      powerFactor: parseFloat(formData.get('powerFactor') as string) || 0.86,
-      serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
-      efficiency: parseFloat(formData.get('efficiency') as string) || 0.85,
-      quantity: 1
-    };
+    let inputs: CalculationInputs;
+
+    if (dataSource === 'catalog') {
+      if (!selectedMotor) {
+        toast.error('Selecione um motor do catálogo WEG.');
+        return;
+      }
+
+      inputs = {
+        dataSource: 'catalog',
+        motorCatalogData: {
+          manufacturer: 'WEG',
+          line: selectedMotor.line,
+          model: selectedMotor.model,
+          nominalCurrent: selectedMotor.nominalCurrent,
+          powerFactor: selectedMotor.powerFactor,
+          efficiency: selectedMotor.efficiency,
+          power: selectedMotor.power,
+          powerUnit: selectedMotor.powerUnit
+        },
+        power: selectedMotor.power,
+        powerUnit: selectedMotor.powerUnit,
+        voltage: selectedMotor.voltage,
+        phase: 'trifasico',
+        distance: parseFloat(formData.get('distance') as string),
+        starterType: formData.get('starterType') as any,
+        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
+        preferredManufacturer: formData.get('manufacturer') as string || undefined,
+        groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
+        ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
+        powerFactor: selectedMotor.powerFactor,
+        serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
+        efficiency: selectedMotor.efficiency,
+        quantity: 1
+      };
+    } else {
+      const pf = parseFloat(formData.get('powerFactor') as string);
+      const eff = parseFloat(formData.get('efficiency') as string);
+
+      if (isNaN(pf) || pf <= 0) {
+        toast.error('Informe o Fator de Potência (cos φ).');
+        return;
+      }
+      if (isNaN(eff) || eff <= 0) {
+        toast.error('Informe o Rendimento (η).');
+        return;
+      }
+
+      inputs = {
+        dataSource: 'manual',
+        power: parseFloat(formData.get('power') as string),
+        powerUnit: formData.get('powerUnit') as any,
+        voltage: parseFloat(formData.get('voltage') as string),
+        phase: formData.get('phase') as any,
+        distance: parseFloat(formData.get('distance') as string),
+        starterType: formData.get('starterType') as any,
+        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
+        preferredManufacturer: formData.get('manufacturer') as string || undefined,
+        groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
+        ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
+        powerFactor: pf,
+        serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
+        efficiency: eff,
+        quantity: 1
+      };
+    }
 
     // Validation
     let hasError = false;
@@ -59,8 +126,6 @@ export const CalculatorWizard = () => {
     if (hasError) return;
 
     setIsCalculating(true);
-
-    // Artificial delay for premium feel
     await new Promise(resolve => setTimeout(resolve, 800));
 
     try {
