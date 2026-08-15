@@ -1,4 +1,4 @@
-import { PowerUnit } from '../types';
+import { PowerUnit } from '../../types';
 
 export interface MotorCatalogEntry {
   id: string;
