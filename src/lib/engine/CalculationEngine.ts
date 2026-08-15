@@ -87,7 +87,7 @@ export class CalculationEngine {
     const fTemp = inputs.ambientTempFactor || 1.0;
     
     // Corrente de projeto corrigida (Ib) para dimensionamento de cabos
-    // Ib = In / (f1 * f2)
+    // Ib = (In * 1.25) / (f1 * f2) -> 1.25 é fator de segurança para motores
     const correctedCurrent = (In * 1.25) / (fGroup * fTemp);
 
     const secAmp = this.getSectionByAmpacity(correctedCurrent);
@@ -99,6 +99,10 @@ export class CalculationEngine {
     const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
 
     const mfr = inputs.preferredManufacturer;
+    // Dimensionamento dos dispositivos:
+    // Disjuntor: In * 1.25 (proteção contra sobrecarga/partida)
+    // Contator: In (corrente nominal do motor em AC-3)
+    // Relé Térmico: In (ajuste na corrente nominal)
     const breaker = findCompatibleProduct('disjuntor', In * 1.25, mfr) || null;
     const contactor = findCompatibleProduct('contator', In, mfr) || null;
     const thermalRelay = findCompatibleProduct('releTermico', In, mfr) || null;

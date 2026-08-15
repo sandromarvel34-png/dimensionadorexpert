@@ -124,6 +124,28 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'siemens-3ru-80', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2136-4KB0', commercialCode: '3RU2136-4KB0', description: 'Relé Sirius, 57-80A', nominalCurrent: 80, adjustmentRange: { min: 57, max: 80 }, price: 450.00 },
   { id: 'siemens-3ru-100', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2146-4LB0', commercialCode: '3RU2146-4LB0', description: 'Relé Sirius, 70-90A', nominalCurrent: 90, adjustmentRange: { min: 70, max: 90 }, price: 580.00 },
   { id: 'siemens-3ru-125', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2146-4MB0', commercialCode: '3RU2146-4MB0', description: 'Relé Sirius, 80-100A', nominalCurrent: 100, adjustmentRange: { min: 80, max: 100 }, price: 650.00 },
+  // Itens adicionais para motores de até 100cv (Correntes nominais até ~300A em 220V)
+  { id: 'weg-mdw-c125-fixed', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C125', commercialCode: '10076453', description: 'Mini disjuntor MDW Curva C, 125A', nominalCurrent: 125, voltage: 440, price: 155.00 },
+  { id: 'schneider-acti9-c125-fixed', manufacturer: 'Schneider', category: 'disjuntor', model: 'iC60N-C125', commercialCode: 'A9F74192', description: 'Mini disjuntor Acti9 iC60N Curva C, 125A', nominalCurrent: 125, voltage: 440, price: 260.00 },
+  { id: 'siemens-5sy-c125-fixed', manufacturer: 'Siemens', category: 'disjuntor', model: '5SY6125-7', commercialCode: '5SY6125-7', description: 'Mini disjuntor 5SY6 Curva C, 125A', nominalCurrent: 125, voltage: 440, price: 235.00 },
+  
+  // Contatores de Alta Potência (Linha CWM / TeSys / Sirius)
+  { id: 'weg-cwm300', manufacturer: 'WEG', category: 'contator', model: 'CWM300', commercialCode: '10045424', description: 'Contator de potência CWM, 300A, AC-3', nominalCurrent: 300, voltage: 690, price: 1850.00 },
+  { id: 'schneider-tesys-d225', manufacturer: 'Schneider', category: 'contator', model: 'LC1D225', commercialCode: 'LC1D225M7', description: 'Contator TeSys D, 225A, AC-3', nominalCurrent: 225, voltage: 690, price: 1550.00 },
+  { id: 'siemens-sirius-d225', manufacturer: 'Siemens', category: 'contator', model: '3RT1064', commercialCode: '3RT1064-6AF36', description: 'Contator Sirius, 225A, AC-3', nominalCurrent: 225, voltage: 690, price: 1450.00 },
+
+  // Disjuntores de Caixa Moldada (Acima de 125A)
+  { id: 'weg-dwb160', manufacturer: 'WEG', category: 'disjuntor', model: 'DWB160', commercialCode: '10045678', description: 'Disjuntor Caixa Moldada DWB160, 160A', nominalCurrent: 160, voltage: 440, price: 450.00 },
+  { id: 'weg-dwb250', manufacturer: 'WEG', category: 'disjuntor', model: 'DWB250', commercialCode: '10045679', description: 'Disjuntor Caixa Moldada DWB250, 250A', nominalCurrent: 250, voltage: 440, price: 650.00 },
+  { id: 'weg-dwb400', manufacturer: 'WEG', category: 'disjuntor', model: 'DWB400', commercialCode: '10045680', description: 'Disjuntor Caixa Moldada DWB400, 400A', nominalCurrent: 400, voltage: 440, price: 950.00 },
+
+  { id: 'schneider-nsx160', manufacturer: 'Schneider', category: 'disjuntor', model: 'NSX160', commercialCode: 'NSX160N', description: 'Disjuntor Compact NSX160, 160A', nominalCurrent: 160, voltage: 440, price: 680.00 },
+  { id: 'schneider-nsx250', manufacturer: 'Schneider', category: 'disjuntor', model: 'NSX250', commercialCode: 'NSX250N', description: 'Disjuntor Compact NSX250, 250A', nominalCurrent: 250, voltage: 440, price: 880.00 },
+  { id: 'schneider-nsx400', manufacturer: 'Schneider', category: 'disjuntor', model: 'NSX400', commercialCode: 'NSX400N', description: 'Disjuntor Compact NSX400, 400A', nominalCurrent: 400, voltage: 440, price: 1280.00 },
+
+  { id: 'siemens-3va160', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA160', commercialCode: '3VA160', description: 'Disjuntor 3VA1, 160A', nominalCurrent: 160, voltage: 440, price: 580.00 },
+  { id: 'siemens-3va250', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA250', commercialCode: '3VA250', description: 'Disjuntor 3VA1, 250A', nominalCurrent: 250, voltage: 440, price: 780.00 },
+  { id: 'siemens-3va400', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA400', commercialCode: '3VA400', description: 'Disjuntor 3VA1, 400A', nominalCurrent: 400, voltage: 440, price: 1180.00 },
 ];
 
 export const getProductsByCategory = (category: string) => 
@@ -134,10 +156,24 @@ export const findCompatibleProduct = (
   current: number, 
   manufacturer?: string
 ) => {
-  return MANUFACTURER_CATALOG.find(p => 
+  // Filtrar por categoria e fabricante (se fornecido)
+  const filtered = MANUFACTURER_CATALOG.filter(p => 
     p.category === category && 
-    (manufacturer ? p.manufacturer === manufacturer : true) &&
-    (p.nominalCurrent ? p.nominalCurrent >= current : true) &&
-    (p.adjustmentRange ? (current >= p.adjustmentRange.min && current <= p.adjustmentRange.max) : true)
+    (manufacturer ? p.manufacturer === manufacturer : true)
   );
+
+  if (category === 'releTermico') {
+    // Para relé térmico, a corrente deve estar DENTRO da faixa de ajuste
+    return filtered.find(p => 
+      p.adjustmentRange && 
+      current >= p.adjustmentRange.min && 
+      current <= p.adjustmentRange.max
+    );
+  } else {
+    // Para disjuntores e contatores, pegamos o primeiro com nominalCurrent >= current
+    // Ordenamos por nominalCurrent para garantir que pegamos o menor componente compatível
+    return filtered
+      .filter(p => p.nominalCurrent && p.nominalCurrent >= current)
+      .sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0))[0];
+  }
 };
