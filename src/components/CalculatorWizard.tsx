@@ -300,6 +300,13 @@ export const CalculatorWizard = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Fator de Serviço (FS)</Label>
+                    <div className="relative">
+                      <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-12 text-base" required />
+                      <p className="mt-1 text-[10px] text-muted-foreground">Multiplicador de carga máxima contínua (ex: 1.15)</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Sistema</Label>
                     <Select name="phase" defaultValue="trifasico">
                       <SelectTrigger className="h-12">
@@ -316,7 +323,7 @@ export const CalculatorWizard = () => {
                     <Label className="text-foreground font-semibold italic text-xs block text-muted-foreground mb-1">
                       Seu motor não é WEG? Informe os dados disponíveis na placa do motor.
                     </Label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">cos φ</Label>
                         <Input name="powerFactor" type="number" step="0.01" placeholder="Ex: 0.86" className="h-11" required />
@@ -324,10 +331,6 @@ export const CalculatorWizard = () => {
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
                         <Input name="efficiency" type="number" step="0.01" placeholder="Ex: 0.85" className="h-11" required />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-foreground font-medium text-xs">Fator de Serviço (FS)</Label>
-                        <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
                       </div>
                     </div>
                   </div>
@@ -482,12 +485,19 @@ export const CalculatorWizard = () => {
                         Fonte: {selectedMotor.catalog_reference || 'Catálogo Oficial WEG'}
                       </div>
                     </div>
-                    <div className="mt-4 p-4 bg-background/50 border border-border rounded-lg space-y-3">
-                      <Label className="text-foreground font-semibold text-xs">Ajuste de Motor</Label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                          <Label className="text-[10px] text-muted-foreground uppercase font-bold">Fator de Serviço (FS)</Label>
-                          <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-9" required />
+                    <div className="mt-4 p-4 bg-background/50 border border-border rounded-lg space-y-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-4 bg-primary rounded-full" />
+                        <Label className="text-foreground font-semibold text-xs">Informações Complementares</Label>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="space-y-1.5">
+                          <Label className="text-[10px] text-muted-foreground uppercase font-bold flex items-center gap-1.5">
+                            Fator de Serviço (FS)
+                            <Info className="w-3 h-3 text-muted-foreground/50" />
+                          </Label>
+                          <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-10 bg-background border-border" required />
+                          <p className="text-[9px] text-muted-foreground italic">Padrão: 1.0 (verifique a placa do motor)</p>
                         </div>
                       </div>
                     </div>
