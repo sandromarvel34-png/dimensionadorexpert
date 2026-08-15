@@ -113,7 +113,6 @@ export class CalculationEngine {
     pf: number = 0.85,
     phase: string = 'trifasico'
   ): { section: number; actualDrop: number } {
-    
     const k = phase === 'trifasico' ? Math.sqrt(3) : 2;
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150];
     
