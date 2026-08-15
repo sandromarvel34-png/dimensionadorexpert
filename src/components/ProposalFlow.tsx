@@ -112,40 +112,40 @@ export const ProposalFlow = () => {
           </div>
 
           {/* Motor Data - Visible only in Print */}
-          <div className="hidden print:block card-panel space-y-4">
-            <h3 className="text-card-title">Dados Técnicos do Motor</h3>
-            <div className="grid grid-cols-4 gap-4 text-[8pt]">
-              <div>
-                <Label className="text-[7pt] uppercase block">Potência</Label>
-                <span className="font-semibold">{currentInputs?.power} {currentInputs?.powerUnit}</span>
+          <div className="hidden print:block card-panel space-y-2">
+            <h3 className="text-card-title border-b pb-1 mb-2">Dados Técnicos do Motor</h3>
+            <div className="grid grid-cols-4 gap-x-6 gap-y-2">
+              <div className="flex flex-col">
+                <span className="text-[7pt] text-slate-500 uppercase font-bold">Potência</span>
+                <span className="text-[9pt] font-semibold">{currentInputs?.power} {currentInputs?.powerUnit}</span>
               </div>
-              <div>
-                <Label className="text-[7pt] uppercase block">Tensão</Label>
-                <span className="font-semibold">{currentInputs?.voltage} V</span>
+              <div className="flex flex-col">
+                <span className="text-[7pt] text-slate-500 uppercase font-bold">Tensão</span>
+                <span className="text-[9pt] font-semibold">{currentInputs?.voltage} V</span>
               </div>
-              <div>
-                <Label className="text-[7pt] uppercase block">Distância</Label>
-                <span className="font-semibold">{currentInputs?.distance} m</span>
+              <div className="flex flex-col">
+                <span className="text-[7pt] text-slate-500 uppercase font-bold">Distância</span>
+                <span className="text-[9pt] font-semibold">{currentInputs?.distance} m</span>
               </div>
-              <div>
-                <Label className="text-[7pt] uppercase block">Partida</Label>
-                <span className="font-semibold text-capitalize">{currentInputs?.starterType}</span>
+              <div className="flex flex-col">
+                <span className="text-[7pt] text-slate-500 uppercase font-bold">Partida</span>
+                <span className="text-[9pt] font-semibold capitalize">{currentInputs?.starterType}</span>
               </div>
-              <div>
-                <Label className="text-[7pt] uppercase block">Fator de Potência</Label>
-                <span className="font-semibold">{currentInputs?.powerFactor}</span>
+              <div className="flex flex-col">
+                <span className="text-[7pt] text-slate-500 uppercase font-bold">Fator de Potência</span>
+                <span className="text-[9pt] font-semibold">{currentInputs?.powerFactor}</span>
               </div>
-              <div>
-                <Label className="text-[7pt] uppercase block">Fator de Serviço</Label>
-                <span className="font-semibold">{currentInputs?.serviceFactor}</span>
+              <div className="flex flex-col">
+                <span className="text-[7pt] text-slate-500 uppercase font-bold">Fator de Serviço</span>
+                <span className="text-[9pt] font-semibold">{currentInputs?.serviceFactor}</span>
               </div>
-              <div>
-                <Label className="text-[7pt] uppercase block">Rendimento</Label>
-                <span className="font-semibold">{currentInputs?.efficiency}</span>
+              <div className="flex flex-col">
+                <span className="text-[7pt] text-slate-500 uppercase font-bold">Rendimento</span>
+                <span className="text-[9pt] font-semibold">{currentInputs?.efficiency}</span>
               </div>
-              <div>
-                <Label className="text-[7pt] uppercase block">Corrente Nominal (In)</Label>
-                <span className="font-semibold">{currentResults?.nominalCurrent.toFixed(2)} A</span>
+              <div className="flex flex-col">
+                <span className="text-[7pt] text-slate-500 uppercase font-bold text-blue-700">Corrente Nominal (In)</span>
+                <span className="text-[9pt] font-bold text-blue-700">{currentResults?.nominalCurrent.toFixed(2)} A</span>
               </div>
             </div>
           </div>
