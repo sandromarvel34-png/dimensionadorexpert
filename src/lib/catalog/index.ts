@@ -63,18 +63,32 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
 
   // Contatores Schneider TeSys
   { id: 'schneider-tesys-d9', manufacturer: 'Schneider', category: 'contator', model: 'LC1D09', commercialCode: 'LC1D09M7', description: 'Contator TeSys D, 9A, AC-3', nominalCurrent: 9, voltage: 690, price: 155.00 },
+  { id: 'schneider-tesys-d12', manufacturer: 'Schneider', category: 'contator', model: 'LC1D12', commercialCode: 'LC1D12M7', description: 'Contator TeSys D, 12A, AC-3', nominalCurrent: 12, voltage: 690, price: 185.00 },
   { id: 'schneider-tesys-d18', manufacturer: 'Schneider', category: 'contator', model: 'LC1D18', commercialCode: 'LC1D18M7', description: 'Contator TeSys D, 18A, AC-3', nominalCurrent: 18, voltage: 690, price: 215.00 },
+  { id: 'schneider-tesys-d25', manufacturer: 'Schneider', category: 'contator', model: 'LC1D25', commercialCode: 'LC1D25M7', description: 'Contator TeSys D, 25A, AC-3', nominalCurrent: 25, voltage: 690, price: 245.00 },
   { id: 'schneider-tesys-d32', manufacturer: 'Schneider', category: 'contator', model: 'LC1D32', commercialCode: 'LC1D32M7', description: 'Contator TeSys D, 32A, AC-3', nominalCurrent: 32, voltage: 690, price: 285.00 },
   { id: 'schneider-tesys-d40', manufacturer: 'Schneider', category: 'contator', model: 'LC1D40', commercialCode: 'LC1D40M7', description: 'Contator TeSys D, 40A, AC-3', nominalCurrent: 40, voltage: 690, price: 345.00 },
+  { id: 'schneider-tesys-d50', manufacturer: 'Schneider', category: 'contator', model: 'LC1D50', commercialCode: 'LC1D50M7', description: 'Contator TeSys D, 50A, AC-3', nominalCurrent: 50, voltage: 690, price: 395.00 },
   { id: 'schneider-tesys-d65', manufacturer: 'Schneider', category: 'contator', model: 'LC1D65', commercialCode: 'LC1D65M7', description: 'Contator TeSys D, 65A, AC-3', nominalCurrent: 65, voltage: 690, price: 425.00 },
+  { id: 'schneider-tesys-d80', manufacturer: 'Schneider', category: 'contator', model: 'LC1D80', commercialCode: 'LC1D80M7', description: 'Contator TeSys D, 80A, AC-3', nominalCurrent: 80, voltage: 690, price: 545.00 },
+  { id: 'schneider-tesys-d95', manufacturer: 'Schneider', category: 'contator', model: 'LC1D95', commercialCode: 'LC1D95M7', description: 'Contator TeSys D, 95A, AC-3', nominalCurrent: 95, voltage: 690, price: 685.00 },
+  { id: 'schneider-tesys-d115', manufacturer: 'Schneider', category: 'contator', model: 'LC1D115', commercialCode: 'LC1D115M7', description: 'Contator TeSys D, 115A, AC-3', nominalCurrent: 115, voltage: 690, price: 895.00 },
+  { id: 'schneider-tesys-d150', manufacturer: 'Schneider', category: 'contator', model: 'LC1D150', commercialCode: 'LC1D150M7', description: 'Contator TeSys D, 150A, AC-3', nominalCurrent: 150, voltage: 690, price: 1150.00 },
 
 
   // Contatores Siemens Sirius
   { id: 'siemens-sirius-d9', manufacturer: 'Siemens', category: 'contator', model: '3RT2016', commercialCode: '3RT2016-1AB01', description: 'Contator Sirius, 9A, AC-3', nominalCurrent: 9, voltage: 690, price: 145.00 },
+  { id: 'siemens-sirius-d12', manufacturer: 'Siemens', category: 'contator', model: '3RT2017', commercialCode: '3RT2017-1AB01', description: 'Contator Sirius, 12A, AC-3', nominalCurrent: 12, voltage: 690, price: 175.00 },
   { id: 'siemens-sirius-d18', manufacturer: 'Siemens', category: 'contator', model: '3RT2025', commercialCode: '3RT2025-1AB01', description: 'Contator Sirius, 18A, AC-3', nominalCurrent: 18, voltage: 690, price: 195.00 },
+  { id: 'siemens-sirius-d25', manufacturer: 'Siemens', category: 'contator', model: '3RT2026', commercialCode: '3RT2026-1AB01', description: 'Contator Sirius, 25A, AC-3', nominalCurrent: 25, voltage: 690, price: 225.00 },
   { id: 'siemens-sirius-d32', manufacturer: 'Siemens', category: 'contator', model: '3RT2027', commercialCode: '3RT2027-1AB01', description: 'Contator Sirius, 32A, AC-3', nominalCurrent: 32, voltage: 690, price: 265.00 },
   { id: 'siemens-sirius-d40', manufacturer: 'Siemens', category: 'contator', model: '3RT2035', commercialCode: '3RT2035-1AB01', description: 'Contator Sirius, 40A, AC-3', nominalCurrent: 40, voltage: 690, price: 325.00 },
+  { id: 'siemens-sirius-d50', manufacturer: 'Siemens', category: 'contator', model: '3RT2036', commercialCode: '3RT2036-1AB01', description: 'Contator Sirius, 50A, AC-3', nominalCurrent: 50, voltage: 690, price: 365.00 },
   { id: 'siemens-sirius-d65', manufacturer: 'Siemens', category: 'contator', model: '3RT2037', commercialCode: '3RT2037-1AB01', description: 'Contator Sirius, 65A, AC-3', nominalCurrent: 65, voltage: 690, price: 395.00 },
+  { id: 'siemens-sirius-d80', manufacturer: 'Siemens', category: 'contator', model: '3RT2038', commercialCode: '3RT2038-1AB01', description: 'Contator Sirius, 80A, AC-3', nominalCurrent: 80, voltage: 690, price: 495.00 },
+  { id: 'siemens-sirius-d95', manufacturer: 'Siemens', category: 'contator', model: '3RT2046', commercialCode: '3RT2046-1AB01', description: 'Contator Sirius, 95A, AC-3', nominalCurrent: 95, voltage: 690, price: 625.00 },
+  { id: 'siemens-sirius-d115', manufacturer: 'Siemens', category: 'contator', model: '3RT2047', commercialCode: '3RT2047-1AB01', description: 'Contator Sirius, 115A, AC-3', nominalCurrent: 115, voltage: 690, price: 845.00 },
+  { id: 'siemens-sirius-d150', manufacturer: 'Siemens', category: 'contator', model: '3RT1056', commercialCode: '3RT1056-6AF36', description: 'Contator Sirius, 150A, AC-3', nominalCurrent: 150, voltage: 690, price: 1050.00 },
 
 
   // Relés Térmicos WEG RW27
