@@ -121,9 +121,9 @@ export const CalculatorWizard = () => {
         powerUnit: 'cv',
         voltage: selectedMotor.voltage,
         phase: 'trifasico',
-        distance: parseFloat(formData.get('distance') as string),
+        distance: parseFloat(formData.get('distance') as string) || 5,
         starterType: formData.get('starterType') as any,
-        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
+        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
         groupingType: formData.get('groupingType') as string,
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
@@ -152,9 +152,9 @@ export const CalculatorWizard = () => {
         powerUnit: formData.get('powerUnit') as any,
         voltage: parseFloat(formData.get('voltage') as string),
         phase: formData.get('phase') as any,
-        distance: parseFloat(formData.get('distance') as string),
+        distance: parseFloat(formData.get('distance') as string) || 5,
         starterType: formData.get('starterType') as any,
-        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
+        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
         groupingType: formData.get('groupingType') as string,
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
@@ -271,7 +271,7 @@ export const CalculatorWizard = () => {
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Potência do motor</Label>
                     <div className="flex gap-2">
-                      <Input name="power" type="number" step="0.1" defaultValue={currentInputs?.power || "5"} className="h-12 text-base" required />
+                      <Input name="power" type="number" step="0.1" defaultValue={currentInputs?.power?.toString() || "5"} className="h-12 text-base" required />
                       <Select name="powerUnit" defaultValue={currentInputs?.powerUnit || "cv"}>
                         <SelectTrigger className="w-32 h-12">
                           <SelectValue />
