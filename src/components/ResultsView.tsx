@@ -19,7 +19,10 @@ export const ResultsView = () => {
             <ArrowLeft className="w-4 h-4" /> Voltar ao formulário
           </button>
           <h1 className="text-4xl font-bold text-foreground tracking-tight">Resultado do Dimensionamento</h1>
-          <div className="flex flex-wrap gap-x-4 text-metadata font-semibold uppercase tracking-widest text-[10px]">
+          <div className="flex flex-wrap gap-2 text-metadata font-semibold uppercase tracking-widest text-[10px]">
+            <span className="bg-primary text-white px-2 py-1 rounded">
+              {currentInputs.dataSource === 'catalog' ? `Catálogo WEG: ${currentInputs.motorCatalogData?.model}` : 'Fonte: Dados da Placa'}
+            </span>
             <span className="bg-muted px-2 py-1 rounded">{currentInputs.power} {currentInputs.powerUnit}</span>
             <span className="bg-muted px-2 py-1 rounded">{currentInputs.voltage} V</span>
             <span className="bg-muted px-2 py-1 rounded">{currentInputs.phase}</span>

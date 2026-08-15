@@ -141,7 +141,12 @@ export const ProposalFlow = () => {
 
               {/* Technical Data Table */}
               <div className="mb-8">
-                <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em] mb-4">Dados Técnicos da Carga</h3>
+                <div className="flex justify-between items-end mb-4">
+                  <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em]">Dados Técnicos da Carga</h3>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase">
+                    Fonte: {currentInputs?.dataSource === 'catalog' ? 'Catálogo WEG' : 'Dados da Placa'}
+                  </span>
+                </div>
                 <div className="grid grid-cols-4 gap-4 p-5 bg-foreground/5 rounded-xl border border-foreground/10">
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Potência</p>
@@ -164,8 +169,8 @@ export const ProposalFlow = () => {
                     <p className="text-sm font-bold capitalize">{currentInputs?.starterType}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">cos φ / FS</p>
-                    <p className="text-sm font-bold">{currentInputs?.powerFactor} / {currentInputs?.serviceFactor}</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">cos φ / η / FS</p>
+                    <p className="text-sm font-bold">{currentInputs?.powerFactor} / {currentInputs?.efficiency} / {currentInputs?.serviceFactor}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Critério</p>
@@ -175,6 +180,12 @@ export const ProposalFlow = () => {
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Seção Final</p>
                     <p className="text-sm font-bold text-primary">{currentResults?.finalCableSection} mm²</p>
                   </div>
+                  {currentInputs?.dataSource === 'catalog' && (
+                    <div className="col-span-4 mt-2 pt-2 border-t border-foreground/5 space-y-1">
+                      <p className="text-[9px] text-muted-foreground uppercase font-bold">Motor Selecionado</p>
+                      <p className="text-sm font-bold">WEG {currentInputs.motorCatalogData?.line} - {currentInputs.motorCatalogData?.model}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -5,6 +5,7 @@ import { CalculationInputs } from '../../types';
 
 describe('CalculationEngine', () => {
   const defaultInputs: CalculationInputs = {
+    dataSource: 'manual',
     power: 10,
     powerUnit: 'cv',
     voltage: 380,
