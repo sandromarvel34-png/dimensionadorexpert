@@ -29,6 +29,12 @@ export const ResultsView = () => {
             <span>{currentInputs.distance} m</span>
             <span className="text-slate-300">•</span>
             <span>Partida {currentInputs.starterType}</span>
+            <span className="text-slate-300">•</span>
+            <span>FS {currentInputs.serviceFactor || '1.0'}</span>
+            <span className="text-slate-300">•</span>
+            <span>cos φ {currentInputs.powerFactor || '0.86'}</span>
+            <span className="text-slate-300">•</span>
+            <span>η {currentInputs.efficiency || '0.85'}</span>
           </div>
         </div>
         <button 
