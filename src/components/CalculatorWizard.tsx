@@ -494,10 +494,8 @@ export const CalculatorWizard = () => {
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {/* ... rest of catalog filters ... */}
+            )}
+          </div>
 
           <div className="pt-6 border-t border-border">
             <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6">Dados da Instalação</h3>
