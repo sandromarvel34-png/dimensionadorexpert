@@ -12,8 +12,10 @@ import {
 import { toast } from 'sonner';
 import { CalculationInputs } from '@/types';
 import { CalculationEngine } from '@/lib/engine/CalculationEngine';
-import { ArrowLeft, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, Loader2, Database, ClipboardList, Info, CheckCircle2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { WEG_MOTOR_CATALOG } from '@/lib/catalog/motors';
+import { cn } from '@/lib/utils';
 
 export const CalculatorWizard = () => {
   const { setView, setCalculation } = useAppStore();
