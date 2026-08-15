@@ -116,7 +116,10 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
 
   // Relés Térmicos Siemens Sirius 3RU
   { id: 'siemens-3ru-04', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2116-0GB0', commercialCode: '3RU2116-0GB0', description: 'Relé Sirius, 0.45-0.63A', nominalCurrent: 0.63, adjustmentRange: { min: 0.45, max: 0.63 }, price: 98.00 },
+  { id: 'siemens-3ru-10', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2116-1JB0', commercialCode: '3RU2116-1JB0', description: 'Relé Sirius, 7-10A', nominalCurrent: 10, adjustmentRange: { min: 7, max: 10 }, price: 125.00 },
+  { id: 'siemens-3ru-16', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2116-4AB0', commercialCode: '3RU2116-4AB0', description: 'Relé Sirius, 11-16A', nominalCurrent: 16, adjustmentRange: { min: 11, max: 16 }, price: 145.00 },
   { id: 'siemens-3ru-22', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2126-4CB0', commercialCode: '3RU2126-4CB0', description: 'Relé Sirius, 17-22A', nominalCurrent: 22, adjustmentRange: { min: 17, max: 22 }, price: 165.00 },
+  { id: 'siemens-3ru-25', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2126-4DB0', commercialCode: '3RU2126-4DB0', description: 'Relé Sirius, 20-25A', nominalCurrent: 25, adjustmentRange: { min: 20, max: 25 }, price: 185.00 },
   { id: 'siemens-3ru-32', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2126-4EB0', commercialCode: '3RU2126-4EB0', description: 'Relé Sirius, 27-32A', nominalCurrent: 32, adjustmentRange: { min: 27, max: 32 }, price: 210.00 },
   { id: 'siemens-3ru-40', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2126-4FB0', commercialCode: '3RU2126-4FB0', description: 'Relé Sirius, 34-40A', nominalCurrent: 40, adjustmentRange: { min: 34, max: 40 }, price: 240.00 },
   { id: 'siemens-3ru-50', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2136-4HB0', commercialCode: '3RU2136-4HB0', description: 'Relé Sirius, 36-50A', nominalCurrent: 50, adjustmentRange: { min: 36, max: 50 }, price: 310.00 },

@@ -121,9 +121,9 @@ export const CalculatorWizard = () => {
         powerUnit: 'cv',
         voltage: selectedMotor.voltage,
         phase: 'trifasico',
-        distance: parseFloat(formData.get('distance') as string),
+        distance: parseFloat(formData.get('distance') as string) || 5,
         starterType: formData.get('starterType') as any,
-        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
+        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
         groupingType: formData.get('groupingType') as string,
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
@@ -152,9 +152,9 @@ export const CalculatorWizard = () => {
         powerUnit: formData.get('powerUnit') as any,
         voltage: parseFloat(formData.get('voltage') as string),
         phase: formData.get('phase') as any,
-        distance: parseFloat(formData.get('distance') as string),
+        distance: parseFloat(formData.get('distance') as string) || 5,
         starterType: formData.get('starterType') as any,
-        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
+        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
         groupingType: formData.get('groupingType') as string,
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
@@ -271,7 +271,7 @@ export const CalculatorWizard = () => {
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Potência do motor</Label>
                     <div className="flex gap-2">
-                      <Input name="power" type="number" step="0.1" defaultValue={currentInputs?.power || "5"} className="h-12 text-base" required />
+                      <Input name="power" type="number" step="0.1" defaultValue={currentInputs?.power?.toString() || "5"} className="h-12 text-base" required />
                       <Select name="powerUnit" defaultValue={currentInputs?.powerUnit || "cv"}>
                         <SelectTrigger className="w-32 h-12">
                           <SelectValue />
@@ -304,7 +304,7 @@ export const CalculatorWizard = () => {
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Fator de Serviço (FS)</Label>
                     <div className="relative">
-                      <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor || "1.0"} className="h-12 text-base" required />
+                      <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor?.toString() || "1.0"} className="h-12 text-base" required />
                       <p className="mt-1 text-[10px] text-muted-foreground">Multiplicador de carga máxima contínua (ex: 1.15)</p>
                     </div>
                   </div>
@@ -328,11 +328,11 @@ export const CalculatorWizard = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">cos φ</Label>
-                        <Input name="powerFactor" type="number" step="0.01" defaultValue={currentInputs?.powerFactor || "0.85"} placeholder="Ex: 0.85" className="h-11" required={dataSource === 'manual'} />
+                        <Input name="powerFactor" type="number" step="0.01" defaultValue={currentInputs?.powerFactor?.toString() || "0.85"} placeholder="Ex: 0.85" className="h-11" required={dataSource === 'manual'} />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
-                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency || "0.9"} placeholder="Ex: 0.90" className="h-11" required={dataSource === 'manual'} />
+                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency?.toString() || "0.9"} placeholder="Ex: 0.90" className="h-11" required={dataSource === 'manual'} />
                       </div>
                     </div>
                   </div>
@@ -498,7 +498,7 @@ export const CalculatorWizard = () => {
                             Fator de Serviço (FS)
                             <Info className="w-3 h-3 text-muted-foreground/50" />
                           </Label>
-                          <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor || "1.0"} className="h-10 bg-background border-border" required />
+                          <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor?.toString() || "1.0"} className="h-10 bg-background border-border" required />
                           <p className="text-[9px] text-muted-foreground italic">Padrão: 1.0 (verifique a placa do motor)</p>
                         </div>
                       </div>
