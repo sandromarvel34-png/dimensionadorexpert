@@ -146,6 +146,15 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'siemens-3va160', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA160', commercialCode: '3VA160', description: 'Disjuntor 3VA1, 160A', nominalCurrent: 160, voltage: 440, price: 580.00 },
   { id: 'siemens-3va250', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA250', commercialCode: '3VA250', description: 'Disjuntor 3VA1, 250A', nominalCurrent: 250, voltage: 440, price: 780.00 },
   { id: 'siemens-3va400', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA400', commercialCode: '3VA400', description: 'Disjuntor 3VA1, 400A', nominalCurrent: 400, voltage: 440, price: 1180.00 },
+
+  // Relés de Tempo WEG RTW
+  { id: 'weg-rtw-1', manufacturer: 'WEG', category: 'releTempo', model: 'RTW-ET', commercialCode: '10045600', description: 'Relé de tempo eletrônico RTW Estrela-Triângulo', nominalCurrent: 0, price: 75.00 },
+  
+  // Relés de Tempo Schneider RE17
+  { id: 'schneider-re17-1', manufacturer: 'Schneider', category: 'releTempo', model: 'RE17RMMW', commercialCode: 'RE17RMMW', description: 'Relé de tempo modular TeSys', nominalCurrent: 0, price: 125.00 },
+
+  // Relés de Tempo Siemens Sirius 3RP
+  { id: 'siemens-3rp-1', manufacturer: 'Siemens', category: 'releTempo', model: '3RP25', commercialCode: '3RP25', description: 'Relé de tempo Sirius', nominalCurrent: 0, price: 115.00 },
 ];
 
 export const getProductsByCategory = (category: string) => 
@@ -159,7 +168,7 @@ export const findCompatibleProduct = (
   // Filtrar por categoria e fabricante (se fornecido)
   const filtered = MANUFACTURER_CATALOG.filter(p => 
     p.category === category && 
-    (manufacturer ? p.manufacturer === manufacturer : true)
+    (manufacturer && manufacturer !== 'any' ? p.manufacturer === manufacturer : true)
   );
 
   if (category === 'releTermico') {
@@ -169,6 +178,9 @@ export const findCompatibleProduct = (
       current >= p.adjustmentRange.min && 
       current <= p.adjustmentRange.max
     );
+  } else if (category === 'releTempo') {
+    // Relé de tempo geralmente não depende de corrente nominal para proteção, apenas presença
+    return filtered[0];
   } else {
     // Para disjuntores e contatores, pegamos o primeiro com nominalCurrent >= current
     // Ordenamos por nominalCurrent para garantir que pegamos o menor componente compatível

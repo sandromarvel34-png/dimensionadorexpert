@@ -50,7 +50,7 @@ export interface CalculationInputs {
 export interface ManufacturerProduct {
   id: string;
   manufacturer: string;
-  category: 'disjuntor' | 'fusivel' | 'contator' | 'releTermico' | 'cabo';
+  category: 'disjuntor' | 'fusivel' | 'contator' | 'releTermico' | 'releTempo' | 'disjuntorMotor' | 'cabo';
   model: string;
   commercialCode: string;
   description: string;
@@ -73,6 +73,7 @@ export interface CalculationResults {
     fuse?: ManufacturerProduct | null;
     contactor?: ManufacturerProduct[] | null;
     thermalRelay?: ManufacturerProduct | null;
+    timerRelay?: ManufacturerProduct | null;
   };
   references: TechnicalReference[];
 }

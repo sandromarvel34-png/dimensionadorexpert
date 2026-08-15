@@ -333,7 +333,7 @@ export const CalculatorWizard = () => {
               <div className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   <div className="space-y-3">
-                    <Label className="text-foreground font-semibold">Fabricante</Label>
+                    <Label className="text-foreground font-semibold">Fabricante do Motor</Label>
                     <div className="h-12 flex items-center px-4 bg-muted/50 rounded-[10px] border border-border text-foreground font-medium">
                       WEG
                     </div>
@@ -520,7 +520,21 @@ export const CalculatorWizard = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
+              <div className="space-y-3">
+                <Label className="text-foreground font-semibold">Fabricante dos Dispositivos</Label>
+                <Select name="manufacturer" defaultValue="WEG">
+                  <SelectTrigger className="h-11">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="any">Qualquer (Melhor preço)</SelectItem>
+                    <SelectItem value="WEG">WEG</SelectItem>
+                    <SelectItem value="Schneider">Schneider</SelectItem>
+                    <SelectItem value="Siemens">Siemens</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-3">
                 <Label className="text-foreground font-medium text-xs">Fator de Serviço (FS)</Label>
                 <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />

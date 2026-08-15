@@ -147,6 +147,18 @@ export const ResultsView = () => {
               <p className="text-metadata mt-1">{currentResults.protections.thermalRelay?.adjustmentRange ? `Faixa: ${currentResults.protections.thermalRelay.adjustmentRange.min}–${currentResults.protections.thermalRelay.adjustmentRange.max} A` : 'Não encontrado'}</p>
             </div>
           </div>
+
+          {/* Timer Relay (Conditional) */}
+          {currentResults.protections.timerRelay && (
+            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group border-primary/20">
+              <p className="text-label uppercase tracking-widest text-[10px]">Relé de Tempo</p>
+              <div>
+                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.timerRelay.model}</p>
+                <p className="text-metadata font-semibold text-primary">{currentResults.protections.timerRelay.manufacturer}</p>
+                <p className="text-metadata mt-1">{currentResults.protections.timerRelay.description}</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
