@@ -126,7 +126,7 @@ export class CalculationEngine {
       }
     }
 
-    const lastSection = standardSections[standardSections.length - 1];
+    const lastSection = standardSections[standardSections.length - 1] as number;
     const finalDrop = (k * this.RHO_COPPER * distance * current * pf) / lastSection / voltage * 100;
     return { section: lastSection, actualDrop: finalDrop };
   }
