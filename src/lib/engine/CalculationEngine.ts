@@ -162,7 +162,9 @@ export class CalculationEngine {
     // Corrente de projeto corrigida (Ib) para dimensionamento de cabos
     // Ib = (In * 1.25 * FS) / (f1 * f2)
     const correctedCurrent = (In * 1.25 * fs) / (fGroup * fTemp);
-
+    
+    // NBR 5410: Para dimensionamento de condutores em circuitos de motores, 
+    // a ampacidade deve ser suficiente para Ib.
     const secAmp = this.getSectionByAmpacity(correctedCurrent);
     const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     

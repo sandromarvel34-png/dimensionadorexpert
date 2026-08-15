@@ -88,7 +88,7 @@ a[href*="lovable.app"] {
 @media print {
   @page { 
     size: A4; 
-    margin: 1cm !important; 
+    margin: 10mm !important; 
   }
   
   body { 
@@ -97,7 +97,11 @@ a[href*="lovable.app"] {
     color: #000 !important; 
     margin: 0 !important; 
     padding: 0 !important;
+    overflow: visible !important;
   }
+  
+  /* Reset container widths */
+  .max-w-6xl { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
   
   .print\:p-0 { padding: 0 !important; }
   .print\:m-0 { margin: 0 !important; }
@@ -105,26 +109,38 @@ a[href*="lovable.app"] {
   .print\:border-0 { border: 0 !important; }
   .print\:hidden { display: none !important; }
   
+  /* Avoid page breaks inside sections */
+  .card-panel, table, tr, div[class*="bg-foreground/5"] {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
   .card-panel { 
     border: 1px solid #E2E8F0 !important; 
     box-shadow: none !important; 
-    padding: 1rem !important;
+    padding: 0.75rem !important;
     border-radius: 8px !important;
+    margin-bottom: 0.75rem !important;
   }
   
-  /* Force single page layout */
-  .max-w-6xl { max-width: 100% !important; }
-  h1 { font-size: 16pt !important; margin-bottom: 0.5rem !important; }
-  h2 { font-size: 12pt !important; margin-bottom: 0.25rem !important; }
-  h3 { font-size: 9pt !important; margin-bottom: 0.25rem !important; }
-  p, span, td, th { font-size: 8pt !important; line-height: 1.2 !important; }
+  h1 { font-size: 14pt !important; margin-bottom: 0.25rem !important; }
+  h2 { font-size: 11pt !important; margin-bottom: 0.2rem !important; }
+  h3 { font-size: 8pt !important; margin-bottom: 0.2rem !important; }
+  p, span, td, th { font-size: 7.5pt !important; line-height: 1.15 !important; }
   
-  /* Compact tables */
-  table td, table th { padding: 4px 8px !important; }
+  /* Compact tables for print */
+  table { width: 100% !important; border-collapse: collapse !important; }
+  table td, table th { padding: 3px 6px !important; border: 1px solid #E2E8F0 !important; }
   
-  /* Grid adjustments for print */
+  /* Grid adjustments for print to avoid overflow */
   .grid { display: grid !important; gap: 0.5rem !important; }
   .grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
   .grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
+  
+  /* Fix for "Componentes Dimensionados" cutting off */
+  .lg\:col-span-2 { width: 100% !important; grid-column: span 3 / span 3 !important; }
+  
+  /* Ensure logo/zap icon prints */
+  .fill-current { fill: #2563EB !important; }
 }
 

@@ -202,7 +202,7 @@ export const ProposalFlow = () => {
 
           {/* PDF Preview Container */}
           <div className="bg-white border border-border rounded-[14px] shadow-2xl overflow-hidden print:border-0 print:shadow-none print:rounded-none">
-            <div className="p-10 print:p-0">
+            <div className="p-10 print:p-0 print:block">
               {/* PDF Header */}
               <div className="flex justify-between items-start mb-10 border-b pb-8 border-slate-100">
                 <div className="flex items-center gap-3 text-primary">
@@ -242,7 +242,7 @@ export const ProposalFlow = () => {
                     Fonte: {currentInputs?.dataSource === 'catalog' ? 'Catálogo WEG' : 'Dados da Placa'}
                   </span>
                 </div>
-                <div className="grid grid-cols-4 gap-4 p-5 bg-foreground/5 rounded-xl border border-foreground/10">
+                <div className="grid grid-cols-4 gap-2 p-3 bg-foreground/5 rounded-xl border border-foreground/10 print:grid-cols-4">
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Potência</p>
                     <p className="text-sm font-bold">{currentInputs?.power} {currentInputs?.powerUnit}</p>
@@ -312,16 +312,16 @@ export const ProposalFlow = () => {
                     <tbody className="divide-y divide-border">
                       {items.map((item) => (
                         <tr key={item.id} className="group hover:bg-muted/30 transition-colors">
-                          <td className="p-2">
-                            <Input value={item.desc} onChange={e => updateItem(item.id, 'desc', e.target.value)} className="h-8 border-transparent bg-transparent focus:bg-white text-sm font-medium" />
+                          <td className="p-2 print:p-1">
+                            <Input value={item.desc} onChange={e => updateItem(item.id, 'desc', e.target.value)} className="h-8 border-transparent bg-transparent focus:bg-white text-sm font-medium print:text-[8pt] print:h-auto print:p-0" />
                           </td>
-                          <td className="p-2">
-                            <Input type="number" value={item.qtd} onChange={e => updateItem(item.id, 'qtd', parseFloat(e.target.value) || 0)} className="h-8 w-16 mx-auto text-center border-transparent bg-transparent focus:bg-white text-sm" />
+                          <td className="p-2 print:p-1">
+                            <Input type="number" value={item.qtd} onChange={e => updateItem(item.id, 'qtd', parseFloat(e.target.value) || 0)} className="h-8 w-16 mx-auto text-center border-transparent bg-transparent focus:bg-white text-sm print:text-[8pt] print:h-auto print:p-0" />
                           </td>
-                          <td className="p-2">
-                            <Input type="number" value={item.price} onChange={e => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)} className="h-8 w-24 ml-auto text-right border-transparent bg-transparent focus:bg-white text-sm" />
+                          <td className="p-2 print:p-1">
+                            <Input type="number" value={item.price} onChange={e => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)} className="h-8 w-24 ml-auto text-right border-transparent bg-transparent focus:bg-white text-sm print:text-[8pt] print:h-auto print:p-0" />
                           </td>
-                          <td className="p-3 text-right font-bold text-foreground">
+                          <td className="p-3 text-right font-bold text-foreground print:p-1 print:text-[8pt]">
                             R$ {(item.qtd * (item.price || 0)).toFixed(2)}
                           </td>
                           <td className="p-2 no-print text-right">
