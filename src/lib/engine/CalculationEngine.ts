@@ -49,7 +49,9 @@ export class CalculationEngine {
       { mm: 35, amp: 125 },
       { mm: 50, amp: 151 },
       { mm: 70, amp: 192 },
-      { mm: 95, amp: 232 }
+      { mm: 95, amp: 232 },
+      { mm: 120, amp: 269 },
+      { mm: 150, amp: 309 }
     ];
 
     const result = cabos.find(c => c.amp >= current);
@@ -68,7 +70,7 @@ export class CalculationEngine {
   ): { section: number; actualDrop: number } {
     const S = (100 * Math.sqrt(3) * this.RHO_COPPER * distance * current * this.COS_PHI) / (maxDropPercent * voltage);
     
-    const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95];
+    const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150];
     const pickedSection = standardSections.find(sec => sec >= S) || 95;
     
     const actualDropVolts = (Math.sqrt(3) * this.RHO_COPPER * distance * current * this.COS_PHI) / pickedSection;
