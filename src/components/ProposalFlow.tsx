@@ -5,17 +5,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Printer, Save, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Printer, Save, Zap } from 'lucide-react';
 
 export const ProposalFlow = () => {
   const { setView, currentResults, currentInputs } = useAppStore();
   const [clientData, setClientData] = useState({
     name: '',
     doc: '',
-    company: '',
     phone: '',
-    email: '',
-    address: ''
+    email: ''
   });
   
   const [items, setItems] = useState<any[]>(
@@ -29,14 +27,14 @@ export const ProposalFlow = () => {
 
   const [labor, setLabor] = useState({
     hours: 0,
-    rate: 150,
-    total: 0
+    rate: 150
   });
 
   const [costs, setCosts] = useState({
     travel: 0,
     others: 0,
-    discount: 0
+    discount: 0,
+    validity: 30
   });
 
   const totalMaterials = items.reduce((acc, item) => acc + (item.qtd * (item.price || 0)), 0);
@@ -60,209 +58,261 @@ export const ProposalFlow = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 pb-32 print:pb-0 print:py-0 print:px-0">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 print:mb-8">
-        <div className="space-y-1">
+    <div className="max-w-6xl mx-auto px-6 py-12 print:p-0 print:py-0">
+      <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-8 print:hidden">
+        <div className="space-y-2">
           <button 
             onClick={() => setView('results')}
-            className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors mb-2 no-print"
+            className="btn-ghost px-0 h-auto gap-2 text-sm font-semibold"
           >
-            <ArrowLeft className="w-4 h-4" /> Voltar ao Resultado
+            <ArrowLeft className="w-4 h-4" /> Voltar aos resultados
           </button>
-          <h1 className="text-3xl font-semibold text-slate-900">Proposta Comercial</h1>
-          <p className="text-slate-500 no-print">Transforme seu dimensionamento em um orçamento profissional.</p>
-          <div className="hidden print:block text-slate-500 text-sm">
-            Gerado em: {new Date().toLocaleDateString('pt-BR')}
-          </div>
+          <h2 className="text-3xl font-bold text-foreground tracking-tight">Proposta Comercial</h2>
+          <p className="text-muted-foreground text-lg">Personalize os dados e gere o orçamento profissional.</p>
         </div>
-        <div className="flex items-center gap-3 no-print">
-          <button onClick={() => window.print()} className="btn-secondary flex items-center gap-2">
-            <Printer className="w-4 h-4" /> Imprimir
+        <div className="flex gap-4">
+          <button onClick={() => window.print()} className="btn-secondary">
+            <Printer className="w-5 h-5" /> Imprimir PDF
           </button>
-          <button onClick={handleSave} className="btn-primary flex items-center gap-2">
-            <Save className="w-4 h-4" /> Salvar Proposta
+          <button onClick={handleSave} className="btn-primary">
+            <Save className="w-5 h-5" /> Salvar Proposta
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          {/* Client Data */}
-          <div className="card-panel space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="lg:col-span-2 space-y-8 print:col-span-3">
+          {/* Client Data Form - Hidden in Print if Empty */}
+          <div className="card-panel space-y-6 print:hidden">
             <h3 className="text-card-title">Dados do Cliente</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
               <div className="space-y-2">
-                <Label className="text-label uppercase tracking-wider">Nome / Razão Social</Label>
-                <Input className="h-11 border-slate-200" value={clientData.name} onChange={e => setClientData({...clientData, name: e.target.value})} placeholder="Ex: Indústria Metalúrgica SA" />
+                <Label className="text-label uppercase tracking-widest text-[10px]">Nome / Razão Social</Label>
+                <Input value={clientData.name} onChange={e => setClientData({...clientData, name: e.target.value})} placeholder="Ex: Indústria Metalúrgica SA" />
               </div>
               <div className="space-y-2">
-                <Label className="text-label uppercase tracking-wider">CPF / CNPJ</Label>
-                <Input className="h-11 border-slate-200" value={clientData.doc} onChange={e => setClientData({...clientData, doc: e.target.value})} placeholder="00.000.000/0001-00" />
+                <Label className="text-label uppercase tracking-widest text-[10px]">CPF / CNPJ</Label>
+                <Input value={clientData.doc} onChange={e => setClientData({...clientData, doc: e.target.value})} placeholder="00.000.000/0001-00" />
               </div>
               <div className="space-y-2">
-                <Label className="text-label uppercase tracking-wider">Telefone</Label>
-                <Input className="h-11 border-slate-200" value={clientData.phone} onChange={e => setClientData({...clientData, phone: e.target.value})} placeholder="(11) 99999-9999" />
+                <Label className="text-label uppercase tracking-widest text-[10px]">Telefone</Label>
+                <Input value={clientData.phone} onChange={e => setClientData({...clientData, phone: e.target.value})} placeholder="(11) 99999-9999" />
               </div>
               <div className="space-y-2">
-                <Label className="text-label uppercase tracking-wider">E-mail</Label>
-                <Input className="h-11 border-slate-200" value={clientData.email} onChange={e => setClientData({...clientData, email: e.target.value})} placeholder="cliente@email.com" />
+                <Label className="text-label uppercase tracking-widest text-[10px]">E-mail</Label>
+                <Input value={clientData.email} onChange={e => setClientData({...clientData, email: e.target.value})} placeholder="cliente@email.com" />
               </div>
             </div>
           </div>
 
-          {/* Motor Data - Visible only in Print */}
-          <div className="hidden print:block card-panel space-y-2">
-            <h3 className="text-card-title border-b pb-1 mb-2">Dados Técnicos do Motor</h3>
-            <div className="grid grid-cols-4 gap-x-6 gap-y-2">
-              <div className="flex flex-col">
-                <span className="text-[7pt] text-slate-500 uppercase font-bold">Potência</span>
-                <span className="text-[9pt] font-semibold">{currentInputs?.power} {currentInputs?.powerUnit}</span>
+          {/* PDF Preview Container */}
+          <div className="bg-white border border-border rounded-[14px] shadow-2xl overflow-hidden print:border-0 print:shadow-none print:rounded-none">
+            <div className="p-10 print:p-0">
+              {/* PDF Header */}
+              <div className="flex justify-between items-start mb-10 border-b pb-8 border-slate-100">
+                <div className="flex items-center gap-3 text-primary">
+                  <Zap className="w-10 h-10 fill-current" />
+                  <div>
+                    <h1 className="text-2xl font-black uppercase tracking-tighter">Calculadora Elétrica Pro</h1>
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Memorial e Orçamento Técnico</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <h2 className="text-xl font-bold text-foreground">PROPOSTA TÉCNICA</h2>
+                  <p className="text-metadata font-bold">{new Date().toLocaleDateString('pt-BR')}</p>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-[7pt] text-slate-500 uppercase font-bold">Tensão</span>
-                <span className="text-[9pt] font-semibold">{currentInputs?.voltage} V</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[7pt] text-slate-500 uppercase font-bold">Distância</span>
-                <span className="text-[9pt] font-semibold">{currentInputs?.distance} m</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[7pt] text-slate-500 uppercase font-bold">Partida</span>
-                <span className="text-[9pt] font-semibold capitalize">{currentInputs?.starterType}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[7pt] text-slate-500 uppercase font-bold">Fator de Potência</span>
-                <span className="text-[9pt] font-semibold">{currentInputs?.powerFactor}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[7pt] text-slate-500 uppercase font-bold">Fator de Serviço</span>
-                <span className="text-[9pt] font-semibold">{currentInputs?.serviceFactor}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[7pt] text-slate-500 uppercase font-bold">Rendimento</span>
-                <span className="text-[9pt] font-semibold">{currentInputs?.efficiency}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[7pt] text-slate-500 uppercase font-bold text-blue-700">Corrente Nominal (In)</span>
-                <span className="text-[9pt] font-bold text-blue-700">{currentResults?.nominalCurrent.toFixed(2)} A</span>
-              </div>
-            </div>
-          </div>
 
-          {/* Materials */}
-          <div className="card-panel space-y-6 print:space-y-2">
-            <div className="flex justify-between items-center">
-              <h3 className="text-card-title">Lista de Materiais</h3>
-              <button onClick={addItem} className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 no-print">
-                <Plus className="w-4 h-4" /> Adicionar Item
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div className="grid grid-cols-12 gap-4 px-2 text-metadata font-bold uppercase tracking-wider">
-                <div className="col-span-6">Descrição</div>
-                <div className="col-span-2 text-center">Qtd</div>
-                <div className="col-span-2 text-right">Preço Un.</div>
-                <div className="col-span-2 text-right">Total</div>
+              {/* Client Info in PDF */}
+              {(clientData.name || clientData.email) && (
+                <div className="mb-8 grid grid-cols-2 gap-8 bg-muted/30 p-5 rounded-xl border border-border">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-1">Cliente</p>
+                    <p className="font-bold text-foreground text-lg">{clientData.name || '—'}</p>
+                    <p className="text-sm text-muted-foreground">{clientData.doc}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mb-1">Contato</p>
+                    <p className="text-sm font-semibold">{clientData.email}</p>
+                    <p className="text-sm text-muted-foreground">{clientData.phone}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Technical Data Table */}
+              <div className="mb-8">
+                <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em] mb-4">Dados Técnicos da Carga</h3>
+                <div className="grid grid-cols-4 gap-4 p-5 bg-foreground/5 rounded-xl border border-foreground/10">
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Potência</p>
+                    <p className="text-sm font-bold">{currentInputs?.power} {currentInputs?.powerUnit}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Tensão</p>
+                    <p className="text-sm font-bold">{currentInputs?.voltage} V</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">In (Corrente)</p>
+                    <p className="text-sm font-bold text-primary">{currentResults?.nominalCurrent.toFixed(2)} A</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Distância</p>
+                    <p className="text-sm font-bold">{currentInputs?.distance} m</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Partida</p>
+                    <p className="text-sm font-bold capitalize">{currentInputs?.starterType}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">cos φ / FS</p>
+                    <p className="text-sm font-bold">{currentInputs?.powerFactor} / {currentInputs?.serviceFactor}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Critério</p>
+                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : 'Queda de V'}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Seção Final</p>
+                    <p className="text-sm font-bold text-primary">{currentResults?.finalCableSection} mm²</p>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                {items.map((item) => (
-                  <div key={item.id} className="grid grid-cols-12 gap-4 items-center p-2 border border-slate-50 rounded-lg hover:border-slate-200 transition-colors group">
-                    <div className="col-span-6">
-                      <Input value={item.desc} onChange={e => updateItem(item.id, 'desc', e.target.value)} className="h-9 border-transparent bg-transparent hover:border-slate-200 focus:bg-white focus:border-blue-200 transition-all" />
-                    </div>
-                    <div className="col-span-2">
-                      <Input type="number" value={item.qtd} onChange={e => updateItem(item.id, 'qtd', parseFloat(e.target.value) || 0)} className="h-9 text-center border-transparent bg-transparent hover:border-slate-200 focus:bg-white focus:border-blue-200" />
-                    </div>
-                    <div className="col-span-2">
-                      <Input type="number" value={item.price} onChange={e => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)} className="h-9 text-right border-transparent bg-transparent hover:border-slate-200 focus:bg-white focus:border-blue-200" />
-                    </div>
-                    <div className="col-span-1 text-right text-sm font-semibold text-slate-700">
-                      R$ {(item.qtd * (item.price || 0)).toFixed(2)}
-                    </div>
-                    <div className="col-span-1 text-right">
-                      <button onClick={() => removeItem(item.id)} className="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+
+              {/* Materials Table */}
+              <div className="mb-8">
+                <div className="flex justify-between items-end mb-4">
+                  <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em]">Lista de Materiais e Equipamentos</h3>
+                  <button onClick={addItem} className="text-xs font-bold text-primary hover:underline no-print flex items-center gap-1">
+                    <Plus className="w-3 h-3" /> ADICIONAR ITEM
+                  </button>
+                </div>
+                <div className="border border-border rounded-xl overflow-hidden">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-muted/50 border-b border-border">
+                      <tr>
+                        <th className="p-3 font-bold text-[10px] uppercase tracking-wider w-1/2">Descrição</th>
+                        <th className="p-3 font-bold text-[10px] uppercase tracking-wider text-center">Qtd</th>
+                        <th className="p-3 font-bold text-[10px] uppercase tracking-wider text-right">Preço Un.</th>
+                        <th className="p-3 font-bold text-[10px] uppercase tracking-wider text-right">Total</th>
+                        <th className="p-3 no-print"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {items.map((item) => (
+                        <tr key={item.id} className="group hover:bg-muted/30 transition-colors">
+                          <td className="p-2">
+                            <Input value={item.desc} onChange={e => updateItem(item.id, 'desc', e.target.value)} className="h-8 border-transparent bg-transparent focus:bg-white text-sm font-medium" />
+                          </td>
+                          <td className="p-2">
+                            <Input type="number" value={item.qtd} onChange={e => updateItem(item.id, 'qtd', parseFloat(e.target.value) || 0)} className="h-8 w-16 mx-auto text-center border-transparent bg-transparent focus:bg-white text-sm" />
+                          </td>
+                          <td className="p-2">
+                            <Input type="number" value={item.price} onChange={e => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)} className="h-8 w-24 ml-auto text-right border-transparent bg-transparent focus:bg-white text-sm" />
+                          </td>
+                          <td className="p-3 text-right font-bold text-foreground">
+                            R$ {(item.qtd * (item.price || 0)).toFixed(2)}
+                          </td>
+                          <td className="p-2 no-print text-right">
+                            <button onClick={() => removeItem(item.id)} className="text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Labor and Totals */}
+              <div className="grid grid-cols-2 gap-8">
+                <div className="space-y-6 print:space-y-4">
+                  <div>
+                    <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em] mb-4">Mão de Obra e Serviços</h3>
+                    <div className="space-y-3 p-4 bg-muted/30 rounded-xl border border-border">
+                      <div className="flex justify-between items-center no-print">
+                        <Label className="text-[10px] uppercase font-bold text-muted-foreground">Horas Estimadas</Label>
+                        <Input type="number" className="w-20 h-8 text-right" value={labor.hours} onChange={e => setLabor({...labor, hours: parseFloat(e.target.value) || 0})} />
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-semibold text-muted-foreground">Valor Estimado</span>
+                        <span className="text-sm font-bold text-foreground">R$ {totalLabor.toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
+                  <div>
+                    <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em] mb-4">Observações Gerais</h3>
+                    <Textarea className="min-h-[80px] text-xs border-border" placeholder="Ex: Prazo de entrega de 5 dias úteis. Garantia de 12 meses nos equipamentos." />
+                  </div>
+                </div>
 
-          {/* Labor */}
-          <div className="card-panel space-y-6">
-            <h3 className="text-card-title">Mão de Obra e Prazos</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className="text-label uppercase tracking-wider">Tempo Estimado (Horas)</Label>
-                <Input type="number" className="h-11 border-slate-200" value={labor.hours} onChange={e => setLabor({...labor, hours: parseFloat(e.target.value) || 0})} />
+                <div className="bg-primary/5 p-6 rounded-2xl border border-primary/20 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                      <span>Subtotal Materiais</span>
+                      <span>R$ {totalMaterials.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                      <span>Subtotal Serviços</span>
+                      <span>R$ {totalLabor.toFixed(2)}</span>
+                    </div>
+                    <div className="pt-3 border-t border-primary/10 space-y-2 no-print">
+                      <div className="flex justify-between items-center text-[10px] font-bold text-muted-foreground uppercase">
+                        <span>Deslocamento (R$)</span>
+                        <Input type="number" className="w-20 h-7 text-right text-xs" value={costs.travel} onChange={e => setCosts({...costs, travel: parseFloat(e.target.value) || 0})} />
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] font-bold text-destructive uppercase">
+                        <span>Desconto (R$)</span>
+                        <Input type="number" className="w-20 h-7 text-right text-xs text-destructive border-destructive/20" value={costs.discount} onChange={e => setCosts({...costs, discount: parseFloat(e.target.value) || 0})} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pt-6 border-t border-primary/20 text-center">
+                    <p className="text-[10px] text-primary uppercase font-black tracking-[0.3em] mb-2">Total Geral</p>
+                    <p className="text-4xl font-black text-primary">R$ {grandTotal.toFixed(2)}</p>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label className="text-label uppercase tracking-wider">Valor Hora (R$)</Label>
-                <Input type="number" className="h-11 border-slate-200" value={labor.rate} onChange={e => setLabor({...labor, rate: parseFloat(e.target.value) || 0})} />
-              </div>
-              <div className="md:col-span-2 space-y-2">
-                <Label className="text-label uppercase tracking-wider">Observações do Serviço</Label>
-                <Textarea className="min-h-[100px] border-slate-200" placeholder="Ex: Instalação, testes e entrega técnica inclusos..." />
+
+              {/* PDF Footer */}
+              <div className="mt-12 pt-8 border-t border-slate-100 flex justify-between items-end">
+                <div className="text-[9px] text-muted-foreground max-w-sm leading-relaxed">
+                  * Proposta válida por {costs.validity} dias. Dimensionamento realizado seguindo rigorosamente as prescrições da NBR 5410 para motores de indução. O instalador deve conferir as condições reais do local antes da execução.
+                </div>
+                <div className="text-center w-48">
+                  <div className="border-b border-foreground h-10 mb-2"></div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest">Assinatura do Técnico</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Financial Summary */}
-        <div className="space-y-6 print:space-y-4">
-          <div className="card-panel border-blue-600 border-2 sticky top-24 space-y-8 print:static print:border-1 print:space-y-4">
-            <h3 className="text-card-title text-center">Resumo Financeiro</h3>
+        {/* Commercial Sidebar - Hidden in Print */}
+        <div className="lg:col-span-1 space-y-8 print:hidden">
+          <div className="card-panel space-y-8">
+            <h3 className="text-card-title">Configurações Comerciais</h3>
             
-            <div className="space-y-4 text-sm font-medium">
-              <div className="flex justify-between text-slate-500">
-                <span>Materiais</span>
-                <span className="text-slate-900">R$ {totalMaterials.toFixed(2)}</span>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-widest text-[10px]">Validade da Proposta (Dias)</Label>
+                <Input type="number" value={costs.validity} onChange={e => setCosts({...costs, validity: parseInt(e.target.value) || 30})} />
               </div>
-              <div className="flex justify-between text-slate-500">
-                <span>Mão de Obra</span>
-                <span className="text-slate-900">R$ {totalLabor.toFixed(2)}</span>
-              </div>
-              
-              <div className="pt-6 border-t border-slate-100 space-y-4">
-                <div className="flex items-center justify-between text-slate-500">
-                  <span>Deslocamento</span>
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs">R$</span>
-                    <input type="number" className="w-20 text-right bg-slate-50 border-none rounded p-1 text-slate-900 focus:ring-1 focus:ring-blue-600 outline-none" value={costs.travel} onChange={e => setCosts({...costs, travel: parseFloat(e.target.value) || 0})} />
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-slate-500">
-                  <span>Outros Custos</span>
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs">R$</span>
-                    <input type="number" className="w-20 text-right bg-slate-50 border-none rounded p-1 text-slate-900 focus:ring-1 focus:ring-blue-600 outline-none" value={costs.others} onChange={e => setCosts({...costs, others: parseFloat(e.target.value) || 0})} />
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-red-500">
-                  <span>Desconto</span>
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs">- R$</span>
-                    <input type="number" className="w-20 text-right bg-red-50 border-none rounded p-1 text-red-600 focus:ring-1 focus:ring-red-600 outline-none" value={costs.discount} onChange={e => setCosts({...costs, discount: parseFloat(e.target.value) || 0})} />
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-widest text-[10px]">Valor da Hora Técnica (R$)</Label>
+                <Input type="number" value={labor.rate} onChange={e => setLabor({...labor, rate: parseFloat(e.target.value) || 0})} />
               </div>
             </div>
 
-            <div className="pt-8 border-t border-slate-100 text-center">
-              <p className="text-metadata font-bold uppercase tracking-widest mb-1">Valor Total da Proposta</p>
-              <div className="text-4xl font-black text-blue-600">R$ {grandTotal.toFixed(2)}</div>
+            <div className="pt-8 border-t border-border">
+              <p className="text-metadata leading-relaxed">
+                As informações técnicas do memorial são extraídas automaticamente do seu cálculo mais recente.
+              </p>
             </div>
 
-            <button onClick={handleSave} className="btn-primary w-full h-14 text-lg shadow-xl shadow-blue-100 no-print">
-              Gerar Proposta Final
+            <button onClick={() => window.print()} className="btn-primary w-full shadow-lg shadow-primary/20">
+              <Printer className="w-5 h-5" /> Imprimir Documento
             </button>
-            
-            <p className="text-[11px] text-slate-400 text-center leading-relaxed">
-              * Valores sujeitos a alteração conforme disponibilidade de estoque dos fornecedores.
-            </p>
           </div>
         </div>
       </div>
