@@ -129,11 +129,33 @@ export class CalculationEngine {
     // Disjuntor: In * 1.25 (proteção contra sobrecarga/partida)
     // Contator: In (corrente nominal do motor em AC-3)
     // Relé Térmico: In (ajuste na corrente nominal)
-    // Disjuntor: In * 1.25 * FS
-    // Contator: In * FS (AC-3)
-    // Relé Térmico: In * FS
+    // Dimensionamento dos dispositivos:
     const breaker = findCompatibleProduct('disjuntor', In * 1.25 * fs, mfr) || null;
-    const contactor = findCompatibleProduct('contator', In * fs, mfr) || null;
+    
+    // Lista de contatores dependendo do tipo de partida
+    let contactors: ManufacturerProduct[] = [];
+    if (inputs.starterType === 'direta') {
+      const c = findCompatibleProduct('contator', In * fs, mfr);
+      if (c) contactors.push(c);
+    } else if (inputs.starterType === 'reversao') {
+      const c = findCompatibleProduct('contator', In * fs, mfr);
+      if (c) contactors.push(c, { ...c, id: c.id + '-2', description: c.description + ' (K2)' });
+    } else if (inputs.starterType === 'estrelaTriangulo') {
+      // Dimensionamento simplificado para estrela-triângulo (In * 0.58)
+      const c = findCompatibleProduct('contator', In * fs * 0.58, mfr);
+      if (c) {
+        contactors.push(
+          { ...c, id: c.id + '-K1', description: c.description + ' (K1)' },
+          { ...c, id: c.id + '-K2', description: c.description + ' (K2)' },
+          { ...c, id: c.id + '-K3', description: c.description + ' (K3)' }
+        );
+      }
+    } else {
+      // Soft-starter ou Inversor
+      const c = findCompatibleProduct('contator', In * fs, mfr);
+      if (c) contactors.push(c);
+    }
+
     const thermalRelay = findCompatibleProduct('releTermico', In * fs, mfr) || null;
 
     const refs: TechnicalReference[] = [
@@ -169,7 +191,7 @@ export class CalculationEngine {
       limitingCriterion,
       protections: {
         breaker,
-        contactor: contactor ? [contactor] : null,
+        contactor: contactors.length > 0 ? contactors : null,
         thermalRelay
       },
       references: refs

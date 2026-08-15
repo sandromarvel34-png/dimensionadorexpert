@@ -124,11 +124,17 @@ export const ResultsView = () => {
 
           {/* Contactor */}
           <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
-            <p className="text-label uppercase tracking-widest text-[10px]">Contator</p>
+            <p className="text-label uppercase tracking-widest text-[10px]">
+              Contator {currentResults.protections.contactor && currentResults.protections.contactor.length > 1 ? `(x${currentResults.protections.contactor.length})` : ''}
+            </p>
             <div>
               <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.contactor?.[0]?.model || '—'}</p>
               <p className="text-metadata font-semibold text-primary">{currentResults.protections.contactor?.[0]?.manufacturer || '—'}</p>
-              <p className="text-metadata mt-1">{currentResults.protections.contactor?.[0]?.nominalCurrent ? `${currentResults.protections.contactor[0].nominalCurrent} A (AC-3)` : 'Não encontrado'}</p>
+              <p className="text-metadata mt-1">
+                {currentResults.protections.contactor?.[0]?.nominalCurrent 
+                  ? `${currentResults.protections.contactor[0].nominalCurrent} A (AC-3)${currentResults.protections.contactor.length > 1 ? ` • ${currentResults.protections.contactor.length} un` : ''}` 
+                  : 'Não encontrado'}
+              </p>
             </div>
           </div>
 

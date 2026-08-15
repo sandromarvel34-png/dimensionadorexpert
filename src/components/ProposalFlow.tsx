@@ -16,14 +16,49 @@ export const ProposalFlow = () => {
     email: ''
   });
   
-  const [items, setItems] = useState<any[]>(
-    currentResults ? [
-      { id: '1', desc: `Cabo Flexível ${currentResults.finalCableSection}mm²`, qtd: currentInputs?.distance || 1, unit: 'm', price: 0 },
-      { id: '2', desc: currentResults.protections.breaker?.model || 'Disjuntor de Proteção', qtd: 1, unit: 'un', price: 0 },
-      { id: '3', desc: currentResults.protections.contactor?.[0]?.model || 'Contator de Potência', qtd: 1, unit: 'un', price: 0 },
-      { id: '4', desc: currentResults.protections.thermalRelay?.model || 'Relé Térmico', qtd: 1, unit: 'un', price: 0 },
-    ] : []
-  );
+  const [items, setItems] = useState<any[]>(() => {
+    if (!currentResults) return [];
+    
+    const initialItems = [
+      { id: '1', desc: `Cabo Flexível ${currentResults.finalCableSection}mm²`, qtd: currentInputs?.distance || 1, unit: 'm', price: 0 }
+    ];
+
+    if (currentResults.protections.breaker) {
+      initialItems.push({ 
+        id: '2', 
+        desc: currentResults.protections.breaker.model, 
+        qtd: 1, 
+        unit: 'un', 
+        price: 0 
+      });
+    }
+
+    if (currentResults.protections.contactor && currentResults.protections.contactor.length > 0) {
+      const contactor = currentResults.protections.contactor[0];
+      const count = currentResults.protections.contactor.length;
+      if (contactor) {
+        initialItems.push({ 
+          id: '3', 
+          desc: count > 1 ? `${contactor.model} (Conjunto c/ ${count})` : contactor.model, 
+          qtd: count, 
+          unit: 'un', 
+          price: 0 
+        });
+      }
+    }
+
+    if (currentResults.protections.thermalRelay) {
+      initialItems.push({ 
+        id: '4', 
+        desc: currentResults.protections.thermalRelay.model, 
+        qtd: 1, 
+        unit: 'un', 
+        price: 0 
+      });
+    }
+
+    return initialItems;
+  });
 
   const [labor, setLabor] = useState({
     hours: 0,
