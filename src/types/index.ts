@@ -52,7 +52,7 @@ export interface CalculationInputs {
 export interface ManufacturerProduct {
   id: string;
   manufacturer: string;
-  category: 'disjuntor' | 'fusivel' | 'contator' | 'releTermico' | 'releTempo' | 'disjuntorMotor' | 'cabo';
+  category: 'disjuntor' | 'fusivel' | 'contator' | 'releTermico' | 'releTempo' | 'disjuntorMotor' | 'cabo' | 'softStarter' | 'inverter';
   model: string;
   commercialCode: string;
   description: string;

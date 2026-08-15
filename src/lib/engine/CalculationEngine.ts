@@ -162,7 +162,9 @@ export class CalculationEngine {
     // Corrente de projeto corrigida (Ib) para dimensionamento de cabos
     // Ib = (In * 1.25 * FS) / (f1 * f2)
     const correctedCurrent = (In * 1.25 * fs) / (fGroup * fTemp);
-
+    
+    // NBR 5410: Para dimensionamento de condutores em circuitos de motores, 
+    // a ampacidade deve ser suficiente para Ib.
     const secAmp = this.getSectionByAmpacity(correctedCurrent);
     const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     
@@ -186,9 +188,9 @@ export class CalculationEngine {
     let softStarter: ManufacturerProduct | null = null;
     let inverter: ManufacturerProduct | null = null;
     if (inputs.starterType === 'softStarter') {
-      softStarter = findCompatibleProduct('contator', In * fs, mfr) || null;
+      softStarter = findCompatibleProduct('softStarter', In * fs, mfr) || null;
     } else if (inputs.starterType === 'inversor') {
-      inverter = findCompatibleProduct('contator', In * fs, mfr) || null;
+      inverter = findCompatibleProduct('inverter', In * fs, mfr) || null;
     }
     
     // Lista de contatores dependendo do tipo de partida
