@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* Hide Lovable Badge */
+#lovable-badge, 
+.lovable-badge,
+[data-lovable-badge],
+a[href*="lovable.app"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
 
