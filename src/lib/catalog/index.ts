@@ -66,6 +66,13 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   // Relés Térmicos WEG RW27
   { id: 'weg-rw27-0d4', manufacturer: 'WEG', category: 'releTermico', model: 'RW27-1D3-D004', commercialCode: '10046931', description: 'Relé RW27, 0.28-0.4A', nominalCurrent: 0.4, adjustmentRange: { min: 0.28, max: 0.4 }, price: 58.00 },
   { id: 'weg-rw27-32', manufacturer: 'WEG', category: 'releTermico', model: 'RW27-1D3-U032', commercialCode: '10046949', description: 'Relé RW27, 22-32A', nominalCurrent: 32, adjustmentRange: { min: 22, max: 32 }, price: 95.00 },
+  { id: 'weg-rw27-40', manufacturer: 'WEG', category: 'releTermico', model: 'RW27-1D3-U040', commercialCode: '10046950', description: 'Relé RW27, 28-40A', nominalCurrent: 40, adjustmentRange: { min: 28, max: 40 }, price: 115.00 },
+  { id: 'weg-rw27-50', manufacturer: 'WEG', category: 'releTermico', model: 'RW27-1D3-U050', commercialCode: '10046951', description: 'Relé RW27, 40-50A', nominalCurrent: 50, adjustmentRange: { min: 40, max: 50 }, price: 145.00 },
+  { id: 'weg-rw67-80', manufacturer: 'WEG', category: 'releTermico', model: 'RW67-1D3-U080', commercialCode: '10046952', description: 'Relé RW67, 57-80A', nominalCurrent: 80, adjustmentRange: { min: 57, max: 80 }, price: 285.00 },
+  { id: 'weg-rw67-112', manufacturer: 'WEG', category: 'releTermico', model: 'RW67-1D3-U112', commercialCode: '10046953', description: 'Relé RW67, 80-112A', nominalCurrent: 112, adjustmentRange: { min: 80, max: 112 }, price: 345.00 },
+  { id: 'weg-rw117-150', manufacturer: 'WEG', category: 'releTermico', model: 'RW117-1D3-U150', commercialCode: '10046954', description: 'Relé RW117, 100-150A', nominalCurrent: 150, adjustmentRange: { min: 100, max: 150 }, price: 485.00 },
+  { id: 'weg-rw317-215', manufacturer: 'WEG', category: 'releTermico', model: 'RW317-1D3-U215', commercialCode: '10046955', description: 'Relé RW317, 140-215A', nominalCurrent: 215, adjustmentRange: { min: 140, max: 215 }, price: 825.00 },
+  { id: 'weg-rw317-310', manufacturer: 'WEG', category: 'releTermico', model: 'RW317-1D3-U310', commercialCode: '10046956', description: 'Relé RW317, 200-310A', nominalCurrent: 310, adjustmentRange: { min: 200, max: 310 }, price: 985.00 },
 
   // Relés Térmicos Schneider LRD
   { id: 'schneider-lrd-04', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD04', commercialCode: 'LRD04', description: 'Relé TeSys LRD, 0.4-0.63A', nominalCurrent: 0.63, adjustmentRange: { min: 0.4, max: 0.63 }, price: 110.00 },
