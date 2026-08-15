@@ -29,6 +29,7 @@ export const CalculatorWizard = () => {
       distance: parseFloat(formData.get('distance') as string),
       starterType: formData.get('starterType') as any,
       maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
+      preferredManufacturer: formData.get('manufacturer') as string || undefined,
       quantity: 1
     };
 
@@ -124,6 +125,20 @@ export const CalculatorWizard = () => {
                 <SelectItem value="estrelaTriangulo">Estrela-Triângulo</SelectItem>
                 <SelectItem value="softStarter">Soft Starter</SelectItem>
                 <SelectItem value="inversor">Inversor de Frequência</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2 relative">
+            <Label className="text-label uppercase tracking-wider">Fabricante Preferencial</Label>
+            <Select name="manufacturer" defaultValue="WEG">
+              <SelectTrigger className="h-11 border-slate-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper" className="z-[100] bg-white border border-slate-200 shadow-lg min-w-[150px]">
+                <SelectItem value="WEG">WEG</SelectItem>
+                <SelectItem value="Schneider">Schneider (Em breve)</SelectItem>
+                <SelectItem value="Siemens">Siemens (Em breve)</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -90,9 +90,10 @@ export class CalculationEngine {
     // O critério dominante é aquele que resultou na maior bitola (ou ampacidade se forem iguais)
     const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
 
-    const breaker = findCompatibleProduct('disjuntor', In * 1.25, 'WEG') || null;
-    const contactor = findCompatibleProduct('contator', In, 'WEG') || null;
-    const thermalRelay = findCompatibleProduct('releTermico', In, 'WEG') || null;
+    const mfr = inputs.preferredManufacturer;
+    const breaker = findCompatibleProduct('disjuntor', In * 1.25, mfr) || null;
+    const contactor = findCompatibleProduct('contator', In, mfr) || null;
+    const thermalRelay = findCompatibleProduct('releTermico', In, mfr) || null;
 
     const refs: TechnicalReference[] = [
       {

@@ -20,6 +20,7 @@ export interface CalculationInputs {
   starterType: StarterType;
   maxVoltageDrop: number; // em %
   quantity: number;
+  preferredManufacturer?: string;
 }
 
 export interface ManufacturerProduct {
