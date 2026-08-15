@@ -125,8 +125,8 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
-        ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
+        groupingFactor: CalculationEngine.GROUPING_FACTORS[formData.get('groupingType') as string] || 1.0,
+        ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: selectedMotor.power_factor,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
         efficiency: selectedMotor.efficiency,
@@ -155,8 +155,8 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
-        ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
+        groupingFactor: CalculationEngine.GROUPING_FACTORS[formData.get('groupingType') as string] || 1.0,
+        ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: pf,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
         efficiency: eff,
@@ -300,6 +300,13 @@ export const CalculatorWizard = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Fator de Serviço (FS)</Label>
+                    <div className="relative">
+                      <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-12 text-base" required />
+                      <p className="mt-1 text-[10px] text-muted-foreground">Multiplicador de carga máxima contínua (ex: 1.15)</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Sistema</Label>
                     <Select name="phase" defaultValue="trifasico">
                       <SelectTrigger className="h-12">
@@ -316,9 +323,9 @@ export const CalculatorWizard = () => {
                     <Label className="text-foreground font-semibold italic text-xs block text-muted-foreground mb-1">
                       Seu motor não é WEG? Informe os dados disponíveis na placa do motor.
                     </Label>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-foreground font-medium text-xs">Fator de Potência (cos φ)</Label>
+                        <Label className="text-foreground font-medium text-xs">cos φ</Label>
                         <Input name="powerFactor" type="number" step="0.01" placeholder="Ex: 0.86" className="h-11" required />
                       </div>
                       <div className="space-y-2">
@@ -478,6 +485,22 @@ export const CalculatorWizard = () => {
                         Fonte: {selectedMotor.catalog_reference || 'Catálogo Oficial WEG'}
                       </div>
                     </div>
+                    <div className="mt-4 p-4 bg-background/50 border border-border rounded-lg space-y-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1 h-4 bg-primary rounded-full" />
+                        <Label className="text-foreground font-semibold text-xs">Informações Complementares</Label>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="space-y-1.5">
+                          <Label className="text-[10px] text-muted-foreground uppercase font-bold flex items-center gap-1.5">
+                            Fator de Serviço (FS)
+                            <Info className="w-3 h-3 text-muted-foreground/50" />
+                          </Label>
+                          <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-10 bg-background border-border" required />
+                          <p className="text-[9px] text-muted-foreground italic">Padrão: 1.0 (verifique a placa do motor)</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -520,7 +543,7 @@ export const CalculatorWizard = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Fabricante dos Dispositivos</Label>
                 <Select name="manufacturer" defaultValue="WEG">
@@ -536,16 +559,43 @@ export const CalculatorWizard = () => {
                 </Select>
               </div>
               <div className="space-y-3">
-                <Label className="text-foreground font-medium text-xs">Fator de Serviço (FS)</Label>
-                <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
+                <Label className="text-foreground font-semibold">Método de Agrupamento</Label>
+                <Select name="groupingType" defaultValue="bundle">
+                  <SelectTrigger className="h-11">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="bundle">Em feixe (1 circuito)</SelectItem>
+                    <SelectItem value="bundle_2">Em feixe (2 circuitos)</SelectItem>
+                    <SelectItem value="bundle_3">Em feixe (3 circuitos)</SelectItem>
+                    <SelectItem value="bundle_4">Em feixe (4 circuitos)</SelectItem>
+                    <SelectItem value="layer_wall">Camada única sobre parede</SelectItem>
+                    <SelectItem value="layer_floor">Camada única no piso</SelectItem>
+                    <SelectItem value="tray_perforated">Em bandeja perfurada</SelectItem>
+                    <SelectItem value="tray_unperforated">Em bandeja não perfurada</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-3">
-                <Label className="text-foreground font-medium text-xs">Agrupamento (F1)</Label>
-                <Input name="groupingFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
-              </div>
-              <div className="space-y-3">
-                <Label className="text-foreground font-medium text-xs">Temperatura (F2)</Label>
-                <Input name="tempFactor" type="number" step="0.01" defaultValue="1.0" className="h-11" required />
+                <Label className="text-foreground font-semibold">Temperatura Ambiente</Label>
+                <Select name="ambientTemp" defaultValue="30">
+                  <SelectTrigger className="h-11">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="10">10°C</SelectItem>
+                    <SelectItem value="15">15°C</SelectItem>
+                    <SelectItem value="20">20°C</SelectItem>
+                    <SelectItem value="25">25°C</SelectItem>
+                    <SelectItem value="30">30°C</SelectItem>
+                    <SelectItem value="35">35°C</SelectItem>
+                    <SelectItem value="40">40°C</SelectItem>
+                    <SelectItem value="45">45°C</SelectItem>
+                    <SelectItem value="50">50°C</SelectItem>
+                    <SelectItem value="55">55°C</SelectItem>
+                    <SelectItem value="60">60°C</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
