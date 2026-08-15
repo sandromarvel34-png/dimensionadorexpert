@@ -368,7 +368,7 @@ export const CalculatorWizard = () => {
                       </SelectTrigger>
                       <SelectContent position="popper">
                         <SelectItem value="_all">Todos</SelectItem>
-                        {Array.from(new Set(filters.filter(f => f.line === selectedLine).map(f => f.speed_type))).map(type => (
+                        {availableTypes.map(type => (
                           <SelectItem key={type} value={type}>{type}</SelectItem>
                         ))}
                       </SelectContent>
