@@ -57,6 +57,16 @@ export const ProposalFlow = () => {
       });
     }
 
+    if (currentResults.protections.timerRelay) {
+      initialItems.push({ 
+        id: '5', 
+        desc: currentResults.protections.timerRelay.model, 
+        qtd: 1, 
+        unit: 'un', 
+        price: 0 
+      });
+    }
+
     return initialItems;
   });
 
