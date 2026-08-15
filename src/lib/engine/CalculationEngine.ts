@@ -9,28 +9,36 @@ import { findCompatibleProduct } from '../catalog';
 export class CalculationEngine {
   // Constantes físicas (Referência: NBR 5410)
   private static readonly RHO_COPPER = 0.0178; // Ω·mm²/m a 20°C
-  private static readonly COS_PHI = 0.86;
+  private static readonly COS_PHI_DEFAULT = 0.86;
+  private static readonly EFFICIENCY_DEFAULT = 0.85;
   private static readonly SECAO_MINIMA_FORCA = 2.5;
 
   /**
    * Calcula a corrente nominal (In) do motor
    * Baseado nos fatores do arquivo de referência
    */
-  static calculateNominalCurrent(power: number, unit: string, voltage: number, phase: string = 'trifasico'): number {
-    let powerCV = power;
-    if (unit === 'hp') powerCV = power * 1.0138;
-    if (unit === 'kW') powerCV = power / 0.7355;
+  static calculateNominalCurrent(
+    power: number, 
+    unit: string, 
+    voltage: number, 
+    phase: string = 'trifasico',
+    pf: number = 0.86,
+    eff: number = 0.85
+  ): number {
+    let powerKW = power;
+    if (unit === 'cv') powerKW = power * 0.7355;
+    if (unit === 'hp') powerKW = power * 0.7457;
 
-    const fatores: Record<number, number> = { 220: 2.639, 380: 1.529, 440: 1.320 };
-    const fatorBase = fatores[voltage] ?? 1.529;
-    let fator = fatorBase;
-    
-    // Ajuste simples para monofásico se necessário
-    if (phase === 'monofasico') {
-      fator = fatorBase * 1.732;
+    let In: number;
+    if (phase === 'trifasico') {
+      // In = P(kW) * 1000 / (sqrt(3) * V * cosphi * rendimento)
+      In = (powerKW * 1000) / (Math.sqrt(3) * voltage * pf * eff);
+    } else {
+      // Monofásico
+      In = (powerKW * 1000) / (voltage * pf * eff);
     }
 
-    return powerCV * (fator ?? 1.529);
+    return In;
   }
 
   /**
@@ -66,21 +74,34 @@ export class CalculationEngine {
     current: number, 
     distance: number, 
     voltage: number, 
-    maxDropPercent: number
+    maxDropPercent: number,
+    pf: number = 0.86
   ): { section: number; actualDrop: number } {
-    const S = (100 * Math.sqrt(3) * this.RHO_COPPER * distance * current * this.COS_PHI) / (maxDropPercent * voltage);
+    const S = (100 * Math.sqrt(3) * this.RHO_COPPER * distance * current * pf) / (maxDropPercent * voltage);
     
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150];
     const pickedSection = standardSections.find(sec => sec >= S) || 95;
     
-    const actualDropVolts = (Math.sqrt(3) * this.RHO_COPPER * distance * current * this.COS_PHI) / pickedSection;
+    const actualDropVolts = (Math.sqrt(3) * this.RHO_COPPER * distance * current * pf) / pickedSection;
     const actualDropPercent = (actualDropVolts / voltage) * 100;
 
     return { section: pickedSection, actualDrop: actualDropPercent };
   }
 
   static performFullCalculation(inputs: CalculationInputs): CalculationResults {
-    const In = this.calculateNominalCurrent(inputs.power, inputs.powerUnit, inputs.voltage, inputs.phase);
+    const pf = inputs.powerFactor || this.COS_PHI_DEFAULT;
+    const eff = inputs.efficiency || this.EFFICIENCY_DEFAULT;
+    const fs = inputs.serviceFactor || 1.0;
+
+    const In = this.calculateNominalCurrent(
+      inputs.power, 
+      inputs.powerUnit, 
+      inputs.voltage, 
+      inputs.phase,
+      pf,
+      eff
+    );
+    
     
     // Fatores de correção (Default 1.0 se não informados)
     const fGroup = inputs.groupingFactor || 1.0;
@@ -88,10 +109,11 @@ export class CalculationEngine {
     
     // Corrente de projeto corrigida (Ib) para dimensionamento de cabos
     // Ib = (In * 1.25) / (f1 * f2) -> 1.25 é fator de segurança para motores
-    const correctedCurrent = (In * 1.25) / (fGroup * fTemp);
+    // Ib = (In * 1.25 * FS) / (f1 * f2) -> 1.25 é fator de segurança para motores, FS é fator de serviço
+    const correctedCurrent = (In * 1.25 * fs) / (fGroup * fTemp);
 
     const secAmp = this.getSectionByAmpacity(correctedCurrent);
-    const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop);
+    const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf);
     
     // O dimensionamento final DEVE ser a maior bitola entre ampacidade e queda de tensão
     const finalSection = Math.max(secAmp, dropResult.section, this.SECAO_MINIMA_FORCA);
@@ -103,9 +125,12 @@ export class CalculationEngine {
     // Disjuntor: In * 1.25 (proteção contra sobrecarga/partida)
     // Contator: In (corrente nominal do motor em AC-3)
     // Relé Térmico: In (ajuste na corrente nominal)
-    const breaker = findCompatibleProduct('disjuntor', In * 1.25, mfr) || null;
-    const contactor = findCompatibleProduct('contator', In, mfr) || null;
-    const thermalRelay = findCompatibleProduct('releTermico', In, mfr) || null;
+    // Disjuntor: In * 1.25 * FS
+    // Contator: In * FS (AC-3)
+    // Relé Térmico: In * FS
+    const breaker = findCompatibleProduct('disjuntor', In * 1.25 * fs, mfr) || null;
+    const contactor = findCompatibleProduct('contator', In * fs, mfr) || null;
+    const thermalRelay = findCompatibleProduct('releTermico', In * fs, mfr) || null;
 
     const refs: TechnicalReference[] = [
       {

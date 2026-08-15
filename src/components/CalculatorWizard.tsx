@@ -32,6 +32,9 @@ export const CalculatorWizard = () => {
       preferredManufacturer: formData.get('manufacturer') as string || undefined,
       groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
       ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
+      powerFactor: parseFloat(formData.get('powerFactor') as string) || 0.86,
+      serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
+      efficiency: parseFloat(formData.get('efficiency') as string) || 0.85,
       quantity: 1
     };
 
@@ -177,6 +180,22 @@ export const CalculatorWizard = () => {
                 <SelectItem value="0.87">40°C (0.87)</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label className="text-label uppercase tracking-wider">Fator de Potência (cos φ)</Label>
+            <Input name="powerFactor" type="number" step="0.01" defaultValue="0.86" className="h-11 border-slate-200" required />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-label uppercase tracking-wider">Fator de Serviço (FS)</Label>
+            <Input name="serviceFactor" type="number" step="0.01" defaultValue="1.0" className="h-11 border-slate-200" required />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-label uppercase tracking-wider">Rendimento (η)</Label>
+            <Input name="efficiency" type="number" step="0.01" defaultValue="0.85" className="h-11 border-slate-200" required />
           </div>
         </div>
 

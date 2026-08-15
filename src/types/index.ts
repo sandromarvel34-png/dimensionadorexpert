@@ -24,6 +24,9 @@ export interface CalculationInputs {
   installationMethod?: string; // NBR 5410: B1, A1, etc.
   groupingFactor?: number;
   ambientTempFactor?: number;
+  powerFactor?: number;
+  serviceFactor?: number;
+  efficiency?: number;
 }
 
 export interface ManufacturerProduct {
