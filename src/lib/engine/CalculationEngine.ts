@@ -188,9 +188,9 @@ export class CalculationEngine {
     let softStarter: ManufacturerProduct | null = null;
     let inverter: ManufacturerProduct | null = null;
     if (inputs.starterType === 'softStarter') {
-      softStarter = findCompatibleProduct('contator', In * fs, mfr) || null;
+      softStarter = findCompatibleProduct('softStarter', In * fs, mfr) || null;
     } else if (inputs.starterType === 'inversor') {
-      inverter = findCompatibleProduct('contator', In * fs, mfr) || null;
+      inverter = findCompatibleProduct('inverter', In * fs, mfr) || null;
     }
     
     // Lista de contatores dependendo do tipo de partida
