@@ -180,9 +180,6 @@ export const CalculatorWizard = () => {
                 <SelectItem value="0.87">40°C (0.87)</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          </div>
-          
           <div className="space-y-2">
             <Label className="text-label uppercase tracking-wider">Fator de Potência (cos φ)</Label>
             <Input name="powerFactor" type="number" step="0.01" defaultValue="0.86" className="h-11 border-slate-200" required />
