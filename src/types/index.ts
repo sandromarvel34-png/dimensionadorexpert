@@ -40,6 +40,8 @@ export interface CalculationInputs {
   quantity: number;
   preferredManufacturer?: string | undefined;
   installationMethod?: string;
+  groupingType?: string;
+  groupingCount?: number;
   groupingFactor?: number;
   ambientTempFactor?: number;
   powerFactor?: number;
