@@ -14,14 +14,21 @@ export interface TechnicalReference {
 export interface CalculationInputs {
   dataSource: 'manual' | 'catalog';
   motorCatalogData?: {
+    id: string;
     manufacturer: 'WEG';
     line: string;
+    speedType: 'SINGLE' | 'DAHLANDER' | 'DOUBLE_WINDING';
+    poles: string;
     model: string;
     nominalCurrent: number;
     powerFactor: number;
     efficiency: number;
     power: number;
     powerUnit: PowerUnit;
+    voltage: number;
+    rpm?: number;
+    frame?: string;
+    catalogReference?: string;
   };
   power: number;
   powerUnit: PowerUnit;

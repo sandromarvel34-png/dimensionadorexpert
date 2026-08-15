@@ -108,14 +108,12 @@ export class CalculationEngine {
       );
     }
     
-    
     // Fatores de correção (Default 1.0 se não informados)
     const fGroup = inputs.groupingFactor || 1.0;
     const fTemp = inputs.ambientTempFactor || 1.0;
     
     // Corrente de projeto corrigida (Ib) para dimensionamento de cabos
-    // Ib = (In * 1.25) / (f1 * f2) -> 1.25 é fator de segurança para motores
-    // Ib = (In * 1.25 * FS) / (f1 * f2) -> 1.25 é fator de segurança para motores, FS é fator de serviço
+    // Ib = (In * 1.25 * FS) / (f1 * f2)
     const correctedCurrent = (In * 1.25 * fs) / (fGroup * fTemp);
 
     const secAmp = this.getSectionByAmpacity(correctedCurrent);

@@ -101,6 +101,75 @@ export type Database = {
         }
         Relationships: []
       }
+      motor_catalog: {
+        Row: {
+          catalog_reference: string | null
+          created_at: string | null
+          efficiency: number
+          frame: string | null
+          frequency: number | null
+          id: string
+          is_active: boolean | null
+          line: string
+          manufacturer: string
+          model_code: string | null
+          nominal_current: number
+          poles: string
+          power_cv: number
+          power_factor: number
+          power_kw: number
+          rpm: number | null
+          service_factor: number | null
+          speed_type: Database["public"]["Enums"]["motor_speed_type"]
+          updated_at: string | null
+          voltage: number
+        }
+        Insert: {
+          catalog_reference?: string | null
+          created_at?: string | null
+          efficiency: number
+          frame?: string | null
+          frequency?: number | null
+          id?: string
+          is_active?: boolean | null
+          line: string
+          manufacturer?: string
+          model_code?: string | null
+          nominal_current: number
+          poles: string
+          power_cv: number
+          power_factor: number
+          power_kw: number
+          rpm?: number | null
+          service_factor?: number | null
+          speed_type?: Database["public"]["Enums"]["motor_speed_type"]
+          updated_at?: string | null
+          voltage: number
+        }
+        Update: {
+          catalog_reference?: string | null
+          created_at?: string | null
+          efficiency?: number
+          frame?: string | null
+          frequency?: number | null
+          id?: string
+          is_active?: boolean | null
+          line?: string
+          manufacturer?: string
+          model_code?: string | null
+          nominal_current?: number
+          poles?: string
+          power_cv?: number
+          power_factor?: number
+          power_kw?: number
+          rpm?: number | null
+          service_factor?: number | null
+          speed_type?: Database["public"]["Enums"]["motor_speed_type"]
+          updated_at?: string | null
+          voltage?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -214,6 +283,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      motor_speed_type: "SINGLE" | "DAHLANDER" | "DOUBLE_WINDING"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -342,6 +412,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      motor_speed_type: ["SINGLE", "DAHLANDER", "DOUBLE_WINDING"],
     },
   },
 } as const

@@ -13,9 +13,9 @@ import { toast } from 'sonner';
 import { CalculationInputs } from '@/types';
 import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { ArrowLeft, Loader2, Database, ClipboardList, Info, CheckCircle2 } from 'lucide-react';
-import { useState, useMemo } from 'react';
-import { WEG_MOTOR_CATALOG } from '@/lib/catalog/motors';
+import { useState, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { getMotorCatalogFilters, getMotorsByFilter } from '@/lib/catalog/motors.functions';
 
 export const CalculatorWizard = () => {
   const { setView, setCalculation } = useAppStore();
@@ -23,21 +23,66 @@ export const CalculatorWizard = () => {
   const [dataSource, setDataSource] = useState<'manual' | 'catalog'>('manual');
   
   // Catalog selection state
+  const [filters, setFilters] = useState<any[]>([]);
   const [selectedLine, setSelectedLine] = useState<string>('');
-  const [selectedModelId, setSelectedModelId] = useState<string>('');
-  
-  const catalogLines = useMemo(() => {
-    return Array.from(new Set(WEG_MOTOR_CATALOG.map(m => m.line)));
+  const [selectedType, setSelectedType] = useState<string>('');
+  const [selectedPoles, setSelectedPoles] = useState<string>('');
+  const [selectedPower, setSelectedPower] = useState<string>('');
+  const [selectedVoltage, setSelectedVoltage] = useState<string>('');
+  const [availableMotors, setAvailableMotors] = useState<any[]>([]);
+  const [selectedMotorId, setSelectedMotorId] = useState<string>('');
+  const availableLines = useMemo(() => Array.from(new Set(filters.map(f => f.line))), [filters]);
+  const availableTypes = useMemo(() => Array.from(new Set(filters.filter(f => f.line === selectedLine).map(f => f.speed_type))), [filters, selectedLine]);
+  const availablePoles = useMemo(() => Array.from(new Set(filters.filter(f => f.line === selectedLine && (!selectedType || selectedType === '_all' || f.speed_type === selectedType)).map(f => f.poles))), [filters, selectedLine, selectedType]);
+  const availablePowers = useMemo(() => Array.from(new Set(filters.filter(f => 
+    f.line === selectedLine && 
+    (!selectedType || selectedType === '_all' || f.speed_type === selectedType) &&
+    (!selectedPoles || selectedPoles === '_all' || f.poles === selectedPoles)
+  ).map(f => f.power_cv))).sort((a,b) => a-b), [filters, selectedLine, selectedType, selectedPoles]);
+  const availableVoltages = useMemo(() => Array.from(new Set(filters.filter(f => 
+    f.line === selectedLine && 
+    (!selectedType || selectedType === '_all' || f.speed_type === selectedType) &&
+    (!selectedPoles || selectedPoles === '_all' || f.poles === selectedPoles) &&
+    (!selectedPower || selectedPower === '_all' || f.power_cv.toString() === selectedPower)
+  ).map(f => f.voltage))).sort((a,b) => a-b), [filters, selectedLine, selectedType, selectedPoles, selectedPower]);
+
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const data = await getMotorCatalogFilters();
+        setFilters(data);
+      } catch (error) {
+        console.error('Error loading filters:', error);
+      }
+    };
+    loadFilters();
   }, []);
-  
-  const modelsInLine = useMemo(() => {
-    if (!selectedLine) return [];
-    return WEG_MOTOR_CATALOG.filter(m => m.line === selectedLine);
-  }, [selectedLine]);
-  
-  const selectedMotor = useMemo(() => {
-    return WEG_MOTOR_CATALOG.find(m => m.id === selectedModelId);
-  }, [selectedModelId]);
+
+  useEffect(() => {
+    const loadMotors = async () => {
+      if (selectedLine) {
+        try {
+          const motors = await getMotorsByFilter({
+            data: {
+              line: selectedLine,
+              speed_type: (selectedType && selectedType !== '_all') ? selectedType : undefined,
+              poles: (selectedPoles && selectedPoles !== '_all') ? selectedPoles : undefined,
+              power_cv: (selectedPower && selectedPower !== '_all') ? parseFloat(selectedPower) : undefined,
+              voltage: (selectedVoltage && selectedVoltage !== '_all') ? parseFloat(selectedVoltage) : undefined
+            }
+          });
+          setAvailableMotors(motors);
+        } catch (error) {
+          console.error('Error loading motors:', error);
+        }
+      } else {
+        setAvailableMotors([]);
+      }
+    };
+    loadMotors();
+  }, [selectedLine, selectedType, selectedPoles, selectedPower, selectedVoltage]);
+
+  const selectedMotor = availableMotors.find(m => m.id === selectedMotorId);
 
   const handleCalculate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,17 +101,24 @@ export const CalculatorWizard = () => {
       inputs = {
         dataSource: 'catalog',
         motorCatalogData: {
+          id: selectedMotor.id,
           manufacturer: 'WEG',
           line: selectedMotor.line,
-          model: selectedMotor.model,
-          nominalCurrent: selectedMotor.nominalCurrent,
-          powerFactor: selectedMotor.powerFactor,
+          speedType: selectedMotor.speed_type,
+          poles: selectedMotor.poles,
+          model: selectedMotor.model_code || selectedMotor.line,
+          nominalCurrent: selectedMotor.nominal_current,
+          powerFactor: selectedMotor.power_factor,
           efficiency: selectedMotor.efficiency,
-          power: selectedMotor.power,
-          powerUnit: selectedMotor.powerUnit
+          power: selectedMotor.power_cv,
+          powerUnit: 'cv',
+          voltage: selectedMotor.voltage,
+          rpm: selectedMotor.rpm,
+          frame: selectedMotor.frame,
+          catalogReference: selectedMotor.catalog_reference
         },
-        power: selectedMotor.power,
-        powerUnit: selectedMotor.powerUnit,
+        power: selectedMotor.power_cv,
+        powerUnit: 'cv',
         voltage: selectedMotor.voltage,
         phase: 'trifasico',
         distance: parseFloat(formData.get('distance') as string),
@@ -75,7 +127,7 @@ export const CalculatorWizard = () => {
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
         groupingFactor: parseFloat(formData.get('groupingFactor') as string) || 1.0,
         ambientTempFactor: parseFloat(formData.get('tempFactor') as string) || 1.0,
-        powerFactor: selectedMotor.powerFactor,
+        powerFactor: selectedMotor.power_factor,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
         efficiency: selectedMotor.efficiency,
         quantity: 1
@@ -279,7 +331,7 @@ export const CalculatorWizard = () => {
               </div>
             ) : (
               <div className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Fabricante</Label>
                     <div className="h-12 flex items-center px-4 bg-muted/50 rounded-[10px] border border-border text-foreground font-medium">
@@ -289,12 +341,19 @@ export const CalculatorWizard = () => {
 
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Linha</Label>
-                    <Select value={selectedLine} onValueChange={setSelectedLine}>
+                    <Select value={selectedLine} onValueChange={(val) => {
+                      setSelectedLine(val);
+                      setSelectedType('');
+                      setSelectedPoles('');
+                      setSelectedPower('');
+                      setSelectedVoltage('');
+                      setSelectedMotorId('');
+                    }}>
                       <SelectTrigger className="h-12">
                         <SelectValue placeholder="Selecionar linha" />
                       </SelectTrigger>
                       <SelectContent position="popper">
-                        {catalogLines.map(line => (
+                        {availableLines.map(line => (
                           <SelectItem key={line} value={line}>{line}</SelectItem>
                         ))}
                       </SelectContent>
@@ -302,22 +361,82 @@ export const CalculatorWizard = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="text-foreground font-semibold">Modelo</Label>
-                    <Select 
-                      value={selectedModelId} 
-                      onValueChange={setSelectedModelId}
-                      disabled={!selectedLine}
-                    >
+                    <Label className="text-foreground font-semibold">Tipo de Motor</Label>
+                    <Select value={selectedType} onValueChange={setSelectedType} disabled={!selectedLine}>
                       <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Selecionar modelo" />
+                        <SelectValue placeholder="Qualquer tipo" />
                       </SelectTrigger>
                       <SelectContent position="popper">
-                        {modelsInLine.map(model => (
-                          <SelectItem key={model.id} value={model.id}>{model.model} ({model.voltage}V)</SelectItem>
+                        <SelectItem value="_all">Todos</SelectItem>
+                        {availableTypes.map(type => (
+                          <SelectItem key={type} value={type}>{type}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Número de Polos</Label>
+                    <Select value={selectedPoles} onValueChange={setSelectedPoles} disabled={!selectedLine}>
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="Qualquer polo" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="_all">Todos</SelectItem>
+                        {availablePoles.map(poles => (
+                          <SelectItem key={poles} value={poles}>{poles} Polos</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Potência (CV)</Label>
+                    <Select value={selectedPower} onValueChange={setSelectedPower} disabled={!selectedLine}>
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="Qualquer potência" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="_all">Todas</SelectItem>
+                        {availablePowers.map(power => (
+                          <SelectItem key={power} value={power.toString()}>{power} CV</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Tensão (V)</Label>
+                    <Select value={selectedVoltage} onValueChange={setSelectedVoltage} disabled={!selectedLine}>
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="Qualquer tensão" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="_all">Todas</SelectItem>
+                        {availableVoltages.map(v => (
+                          <SelectItem key={v} value={v.toString()}>{v} V</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-foreground font-semibold">Modelo Exato</Label>
+                  <Select 
+                    value={selectedMotorId} 
+                    onValueChange={setSelectedMotorId}
+                    disabled={availableMotors.length === 0}
+                  >
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder={availableMotors.length === 0 ? "Filtre para ver os modelos" : "Selecionar modelo"} />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      {availableMotors.map(motor => (
+                        <SelectItem key={motor.id} value={motor.id}>{motor.model_code} - {motor.power_cv}CV {motor.poles}P {motor.voltage}V</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {selectedMotor && (
@@ -333,7 +452,7 @@ export const CalculatorWizard = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Potência</p>
-                        <p className="text-sm font-semibold text-foreground">{selectedMotor.power} {selectedMotor.powerUnit.toUpperCase()}</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.power_cv} CV</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Tensão</p>
@@ -341,15 +460,22 @@ export const CalculatorWizard = () => {
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">In (Corrente)</p>
-                        <p className="text-sm font-semibold text-foreground">{selectedMotor.nominalCurrent} A</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.nominal_current} A</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Cos φ</p>
-                        <p className="text-sm font-semibold text-foreground">{selectedMotor.powerFactor}</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.power_factor}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Rendimento</p>
                         <p className="text-sm font-semibold text-foreground">{selectedMotor.efficiency}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Polos / Tipo</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.poles}P / {selectedMotor.speed_type}</p>
+                      </div>
+                      <div className="col-span-full mt-2 text-[9px] text-muted-foreground italic border-t pt-2">
+                        Fonte: {selectedMotor.catalog_reference || 'Catálogo Oficial WEG'}
                       </div>
                     </div>
                   </div>
