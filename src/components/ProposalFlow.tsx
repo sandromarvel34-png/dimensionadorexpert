@@ -60,20 +60,23 @@ export const ProposalFlow = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 pb-32">
+    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8 pb-32 print:pb-0 print:py-0 print:px-0">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 print:mb-8">
         <div className="space-y-1">
           <button 
             onClick={() => setView('results')}
-            className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors mb-2"
+            className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors mb-2 no-print"
           >
             <ArrowLeft className="w-4 h-4" /> Voltar ao Resultado
           </button>
-          <h1 className="text-3xl font-semibold text-slate-900">Gerar Proposta Comercial</h1>
-          <p className="text-slate-500">Transforme seu dimensionamento em um orçamento profissional.</p>
+          <h1 className="text-3xl font-semibold text-slate-900">Proposta Comercial</h1>
+          <p className="text-slate-500 no-print">Transforme seu dimensionamento em um orçamento profissional.</p>
+          <div className="hidden print:block text-slate-500 text-sm">
+            Gerado em: {new Date().toLocaleDateString('pt-BR')}
+          </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 no-print">
           <button onClick={() => window.print()} className="btn-secondary flex items-center gap-2">
             <Printer className="w-4 h-4" /> Imprimir
           </button>
@@ -109,10 +112,10 @@ export const ProposalFlow = () => {
           </div>
 
           {/* Materials */}
-          <div className="card-panel space-y-6">
+          <div className="card-panel space-y-6 print:space-y-2">
             <div className="flex justify-between items-center">
               <h3 className="text-card-title">Lista de Materiais</h3>
-              <button onClick={addItem} className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+              <button onClick={addItem} className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 no-print">
                 <Plus className="w-4 h-4" /> Adicionar Item
               </button>
             </div>
@@ -170,8 +173,8 @@ export const ProposalFlow = () => {
         </div>
 
         {/* Financial Summary */}
-        <div className="space-y-6">
-          <div className="card-panel border-blue-600 border-2 sticky top-24 space-y-8">
+        <div className="space-y-6 print:space-y-4">
+          <div className="card-panel border-blue-600 border-2 sticky top-24 space-y-8 print:static print:border-1 print:space-y-4">
             <h3 className="text-card-title text-center">Resumo Financeiro</h3>
             
             <div className="space-y-4 text-sm font-medium">
@@ -214,7 +217,7 @@ export const ProposalFlow = () => {
               <div className="text-4xl font-black text-blue-600">R$ {grandTotal.toFixed(2)}</div>
             </div>
 
-            <button onClick={handleSave} className="btn-primary w-full h-14 text-lg shadow-xl shadow-blue-100">
+            <button onClick={handleSave} className="btn-primary w-full h-14 text-lg shadow-xl shadow-blue-100 no-print">
               Gerar Proposta Final
             </button>
             

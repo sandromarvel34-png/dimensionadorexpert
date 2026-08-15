@@ -80,7 +80,64 @@
 
 /* Print Styles */
 @media print {
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+  
   .no-print { display: none !important; }
-  body { background: white !important; }
-  .card-panel { border: none !important; shadow: none !important; }
+  
+  body { 
+    background: white !important; 
+    font-size: 10pt !important;
+  }
+
+  .card-panel { 
+    border: 1px solid #E2E8F0 !important; 
+    box-shadow: none !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    break-inside: avoid;
+  }
+
+  .max-w-7xl {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Reduzir espaçamentos para caber em menos páginas */
+  .py-8 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+  .space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem !important; }
+  
+  /* Garantir que o grid de proposta seja amigável para impressão */
+  .grid-cols-3 {
+    display: block !important;
+  }
+
+  .lg\:col-span-2 {
+    width: 100% !important;
+  }
+
+  /* Ajustar inputs para parecerem texto na impressão */
+  input, textarea {
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .btn-primary, .btn-secondary, button {
+    display: none !important;
+  }
+
+  /* Esconder elementos de UI que não fazem sentido na proposta impressa */
+  .group-hover\:opacity-100 {
+    display: none !important;
+  }
+
+  /* Títulos e textos menores */
+  h1 { font-size: 18pt !important; margin-bottom: 0.5rem !important; }
+  h3 { font-size: 14pt !important; margin-top: 0.5rem !important; }
+  .text-3xl { font-size: 18pt !important; }
+  .text-4xl { font-size: 22pt !important; }
 }
