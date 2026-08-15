@@ -147,7 +147,6 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'siemens-3va250', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA250', commercialCode: '3VA250', description: 'Disjuntor 3VA1, 250A', nominalCurrent: 250, voltage: 440, price: 780.00 },
   { id: 'siemens-3va400', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA400', commercialCode: '3VA400', description: 'Disjuntor 3VA1, 400A', nominalCurrent: 400, voltage: 440, price: 1180.00 },
 ];
-];
 
 export const getProductsByCategory = (category: string) => 
   MANUFACTURER_CATALOG.filter(p => p.category === category);
