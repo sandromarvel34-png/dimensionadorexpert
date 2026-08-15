@@ -21,7 +21,7 @@ export const ResultsView = () => {
           <h1 className="text-4xl font-bold text-foreground tracking-tight">Resultado do Dimensionamento</h1>
           <div className="flex flex-wrap gap-2 text-metadata font-semibold uppercase tracking-widest text-[10px]">
             <span className="bg-primary text-white px-2 py-1 rounded">
-              {currentInputs.dataSource === 'catalog' ? `Catálogo WEG: ${currentInputs.motorCatalogData?.model}` : 'Fonte: Dados da Placa'}
+              {currentInputs.dataSource === 'catalog' ? `Catálogo WEG: ${currentInputs.motorCatalogData?.line} - ${currentInputs.motorCatalogData?.model}` : 'Fonte: Dados da Placa'}
             </span>
             <span className="bg-muted px-2 py-1 rounded">{currentInputs.power} {currentInputs.powerUnit}</span>
             <span className="bg-muted px-2 py-1 rounded">{currentInputs.voltage} V</span>
@@ -61,6 +61,27 @@ export const ResultsView = () => {
             </p>
           </div>
         </div>
+        
+        {currentInputs.dataSource === 'catalog' && currentInputs.motorCatalogData && (
+          <div className="mt-8 pt-8 border-t border-border grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Carcaça</p>
+              <p className="text-xl font-bold text-foreground">{currentInputs.motorCatalogData.frame || '—'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Rotação</p>
+              <p className="text-xl font-bold text-foreground">{currentInputs.motorCatalogData.rpm ? `${currentInputs.motorCatalogData.rpm} RPM` : '—'}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Polos</p>
+              <p className="text-xl font-bold text-foreground">{currentInputs.motorCatalogData.poles}P</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Tipo</p>
+              <p className="text-xl font-bold text-foreground capitalize">{currentInputs.motorCatalogData.speedType.toLowerCase()}</p>
+            </div>
+          </div>
+        )}
         
         <div className="mt-8 pt-8 border-t border-border grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
           <div>
