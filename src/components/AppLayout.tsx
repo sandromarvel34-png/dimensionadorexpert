@@ -26,17 +26,17 @@ export const AppLayout = () => {
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
               <button 
                 onClick={() => setView('dashboard')} 
-                className={cn("transition-colors hover:text-primary", view === 'dashboard' ? "text-primary" : "text-muted-foreground")}
+                className={cn("transition-colors hover:text-primary cursor-pointer", view === 'dashboard' ? "text-primary" : "text-muted-foreground")}
               >
-                Histórico
+                Dashboard
               </button>
               <button 
                 onClick={() => setView('proposal')} 
-                className={cn("transition-colors hover:text-primary", view === 'proposal' ? "text-primary" : "text-muted-foreground")}
+                className={cn("transition-colors hover:text-primary cursor-pointer", view === 'proposal' ? "text-primary" : "text-muted-foreground")}
               >
                 Propostas
               </button>
-              <button className="text-muted-foreground hover:text-primary transition-colors">Configurações</button>
+              <button className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">Configurações</button>
             </nav>
           </div>
           <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors cursor-pointer">
@@ -52,8 +52,12 @@ export const AppLayout = () => {
         {view === 'proposal' && <ProposalFlow />}
       </main>
 
-      <footer className="py-12 text-center text-metadata">
-        © 2026 Dimensionador de Comandos Elétricos. Recurso de apoio técnico.
+      <footer className="py-12 border-t border-border mt-12">
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="text-center text-metadata max-w-2xl mx-auto leading-relaxed">
+            Ferramenta de apoio ao dimensionamento. Os resultados não substituem projeto elétrico ou avaliação de profissional habilitado.
+          </p>
+        </div>
       </footer>
       <Toaster />
     </div>
