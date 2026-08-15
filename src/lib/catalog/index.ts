@@ -39,6 +39,13 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'weg-cwm18', manufacturer: 'WEG', category: 'contator', model: 'CWM18', commercialCode: '10045414', description: 'Contator de potência CWM, 18A, AC-3', nominalCurrent: 18, voltage: 690, price: 115.00 },
   { id: 'weg-cwm25', manufacturer: 'WEG', category: 'contator', model: 'CWM25', commercialCode: '10045415', description: 'Contator de potência CWM, 25A, AC-3', nominalCurrent: 25, voltage: 690, price: 145.00 },
   { id: 'weg-cwm32', manufacturer: 'WEG', category: 'contator', model: 'CWM32', commercialCode: '10045416', description: 'Contator de potência CWM, 32A, AC-3', nominalCurrent: 32, voltage: 690, price: 185.00 },
+  { id: 'weg-cwm40', manufacturer: 'WEG', category: 'contator', model: 'CWM40', commercialCode: '10045417', description: 'Contator de potência CWM, 40A, AC-3', nominalCurrent: 40, voltage: 690, price: 245.00 },
+  { id: 'weg-cwm50', manufacturer: 'WEG', category: 'contator', model: 'CWM50', commercialCode: '10045418', description: 'Contator de potência CWM, 50A, AC-3', nominalCurrent: 50, voltage: 690, price: 325.00 },
+  { id: 'weg-cwm65', manufacturer: 'WEG', category: 'contator', model: 'CWM65', commercialCode: '10045419', description: 'Contator de potência CWM, 65A, AC-3', nominalCurrent: 65, voltage: 690, price: 415.00 },
+  { id: 'weg-cwm80', manufacturer: 'WEG', category: 'contator', model: 'CWM80', commercialCode: '10045420', description: 'Contator de potência CWM, 80A, AC-3', nominalCurrent: 80, voltage: 690, price: 525.00 },
+  { id: 'weg-cwm105', manufacturer: 'WEG', category: 'contator', model: 'CWM105', commercialCode: '10045421', description: 'Contator de potência CWM, 105A, AC-3', nominalCurrent: 105, voltage: 690, price: 685.00 },
+  { id: 'weg-cwm150', manufacturer: 'WEG', category: 'contator', model: 'CWM150', commercialCode: '10045422', description: 'Contator de potência CWM, 150A, AC-3', nominalCurrent: 150, voltage: 690, price: 945.00 },
+  { id: 'weg-cwm250', manufacturer: 'WEG', category: 'contator', model: 'CWM250', commercialCode: '10045423', description: 'Contator de potência CWM, 250A, AC-3', nominalCurrent: 250, voltage: 690, price: 1450.00 },
 
   // Contatores Schneider TeSys
   { id: 'schneider-tesys-d9', manufacturer: 'Schneider', category: 'contator', model: 'LC1D09', commercialCode: 'LC1D09M7', description: 'Contator TeSys D, 9A, AC-3', nominalCurrent: 9, voltage: 690, price: 155.00 },
