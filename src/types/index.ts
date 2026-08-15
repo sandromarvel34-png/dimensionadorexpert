@@ -12,6 +12,17 @@ export interface TechnicalReference {
 }
 
 export interface CalculationInputs {
+  dataSource: 'manual' | 'catalog';
+  motorCatalogData?: {
+    manufacturer: 'WEG';
+    line: string;
+    model: string;
+    nominalCurrent: number;
+    powerFactor: number;
+    efficiency: number;
+    power: number;
+    powerUnit: PowerUnit;
+  };
   power: number;
   powerUnit: PowerUnit;
   voltage: number;
@@ -21,7 +32,7 @@ export interface CalculationInputs {
   maxVoltageDrop: number; // em %
   quantity: number;
   preferredManufacturer?: string | undefined;
-  installationMethod?: string; // NBR 5410: B1, A1, etc.
+  installationMethod?: string;
   groupingFactor?: number;
   ambientTempFactor?: number;
   powerFactor?: number;
