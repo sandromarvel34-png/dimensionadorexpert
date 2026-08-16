@@ -249,8 +249,8 @@ export const findCompatibleProduct = (
 ) => {
   const products = findCompatibleProducts(category, current, manufacturer);
   
-  // Se não encontrou do fabricante específico e não é "any", tenta qualquer um como fallback técnico
-  if (products.length === 0 && manufacturer && manufacturer !== 'any') {
+  // Se não encontrou do fabricante específico, tenta qualquer um como fallback técnico
+  if (products.length === 0) {
     const fallbacks = findCompatibleProducts(category, current, undefined);
     return fallbacks.length > 0 ? fallbacks[0] : null;
   }
