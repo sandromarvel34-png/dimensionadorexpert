@@ -69,7 +69,7 @@ export const ResultsView = () => {
             onClick={goToProposal}
             className="h-14 px-8 text-lg font-black uppercase tracking-tight shadow-xl shadow-primary/20 group"
           >
-            Montar Orçamento <ShoppingCart className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            Criar Orçamento <ShoppingCart className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
@@ -210,9 +210,11 @@ export const ResultsView = () => {
                             <p className="text-xs font-bold text-foreground">{product.commercialCode}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Preço Sugerido</p>
-                            <p className="text-lg font-black text-foreground">
-                              {product.price ? `R$ ${product.price.toFixed(2)}` : 'R$ —'}
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1 text-green-600">
+                              ✓ Compatível
+                            </p>
+                            <p className="text-xs font-bold text-foreground">
+                              Atende aos requisitos
                             </p>
                           </div>
                         </div>
@@ -238,7 +240,7 @@ export const ResultsView = () => {
           onClick={goToProposal}
           className="h-20 px-16 text-2xl font-black uppercase tracking-tight shadow-2xl shadow-primary/30"
         >
-          Finalizar Orçamento →
+          Criar Orçamento →
         </Button>
       </div>
     </div>
