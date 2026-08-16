@@ -213,11 +213,12 @@ export class CalculationEngine {
     const compatibleProducts: Record<string, Record<string, ManufacturerProduct[]>> = {};
 
     requirements.forEach(req => {
-      compatibleProducts[req.label] = {};
+      const brandMap: Record<string, ManufacturerProduct[]> = {};
       manufacturers.forEach(brand => {
         const found = findCompatibleProducts(req.category, req.current || 0, brand);
-        compatibleProducts[req.label][brand] = found;
+        brandMap[brand] = found;
       });
+      compatibleProducts[req.label] = brandMap;
     });
 
     // Manter legibilidade para o frontend existente (compatibilidade retrógrada parcial)
