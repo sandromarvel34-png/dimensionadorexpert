@@ -13,6 +13,7 @@ interface AppState {
   setView: (view: 'dashboard' | 'wizard' | 'results' | 'proposal') => void;
   setStep: (step: number) => void;
   setCalculation: (inputs: CalculationInputs, results: CalculationResults) => void;
+  setSelectedProducts: (products: Record<string, any>) => void;
   addToHistory: (item: any) => void;
   openHistoryItem: (item: any) => void;
 }
