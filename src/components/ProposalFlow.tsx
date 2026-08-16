@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Plus, Trash2, Printer, Save, Zap } from 'lucide-react';
 
 export const ProposalFlow = () => {
-  const { setView, currentResults, currentInputs } = useAppStore();
+  const { setView, currentResults, currentInputs, selectedProducts } = useAppStore();
   const [clientData, setClientData] = useState({
     name: '',
     doc: '',
@@ -19,103 +19,25 @@ export const ProposalFlow = () => {
   const [items, setItems] = useState<any[]>(() => {
     if (!currentResults) return [];
     
-    const initialItems = [
-      { id: '1', desc: `Cabo Flexível ${currentResults.finalCableSection}mm²`, qtd: currentInputs?.distance || 1, unit: 'm', price: 0 }
+    // Cabo é fixo baseado no cálculo
+    const initialItems: any[] = [
+      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: currentInputs?.distance || 1, unit: 'm', price: 0 }
     ];
 
-    if (currentResults.protections.breaker) {
-      initialItems.push({ 
-        id: '2', 
-        desc: `Disjuntor Termomagnético ${currentResults.protections.breaker.model}`, 
-        qtd: 1, 
-        unit: 'un', 
-        price: currentResults.protections.breaker.price || 0 
-      });
-    }
+    // Mapear produtos selecionados independentes
+    Object.entries(selectedProducts).forEach(([label, product]: [string, any]) => {
+      // Encontrar o requisito técnico para obter a quantidade
+      const req = currentResults.technicalRequirements.find(r => r.label === label);
+      const qty = req?.quantity || 1;
 
-    if (currentResults.protections.motorBreaker) {
-      initialItems.push({ 
-        id: 'mb', 
-        desc: `Disjuntor Motor ${currentResults.protections.motorBreaker.model}`, 
-        qtd: 1, 
-        unit: 'un', 
-        price: currentResults.protections.motorBreaker.price || 0 
+      initialItems.push({
+        id: Math.random().toString(36).substr(2, 9),
+        desc: `${product.manufacturer} ${product.model}`,
+        qtd: qty,
+        unit: 'un',
+        price: product.price || 0
       });
-    }
-
-    if (currentResults.protections.diazedFuse) {
-      initialItems.push({ 
-        id: 'fd', 
-        desc: `Fusível Diazed ${currentResults.protections.diazedFuse.model}`, 
-        qtd: 1, 
-        unit: 'un', 
-        price: 0 
-      });
-    }
-
-    if (currentResults.protections.nhFuse) {
-      initialItems.push({ 
-        id: 'fnh', 
-        desc: `Fusível NH ${currentResults.protections.nhFuse.model}`, 
-        qtd: 1, 
-        unit: 'un', 
-        price: 0 
-      });
-    }
-
-    if (currentResults.protections.softStarter) {
-      initialItems.push({ 
-        id: 'ssw', 
-        desc: `Soft-Starter ${currentResults.protections.softStarter.model}`, 
-        qtd: 1, 
-        unit: 'un', 
-        price: currentResults.protections.softStarter.price || 0 
-      });
-    }
-
-    if (currentResults.protections.inverter) {
-      initialItems.push({ 
-        id: 'cfw', 
-        desc: `Inversor de Frequência ${currentResults.protections.inverter.model}`, 
-        qtd: 1, 
-        unit: 'un', 
-        price: currentResults.protections.inverter.price || 0 
-      });
-    }
-
-    if (currentResults.protections.contactor && currentResults.protections.contactor.length > 0) {
-      const contactor = currentResults.protections.contactor[0];
-      const count = currentResults.protections.contactor.length;
-      if (contactor) {
-        initialItems.push({ 
-          id: '3', 
-          desc: count > 1 ? `Contator de Potência ${contactor.model} (Conjunto c/ ${count})` : `Contator de Potência ${contactor.model}`, 
-          qtd: count, 
-          unit: 'un', 
-          price: 0 
-        });
-      }
-    }
-
-    if (currentResults.protections.thermalRelay) {
-      initialItems.push({ 
-        id: '4', 
-        desc: `Relé Térmico de Sobrecarga ${currentResults.protections.thermalRelay.model}`, 
-        qtd: 1, 
-        unit: 'un', 
-        price: 0 
-      });
-    }
-
-    if (currentResults.protections.timerRelay) {
-      initialItems.push({ 
-        id: '5', 
-        desc: `Relé de Tempo Eletrônico ${currentResults.protections.timerRelay.model}`, 
-        qtd: 1, 
-        unit: 'un', 
-        price: 0 
-      });
-    }
+    });
 
     return initialItems;
   });
