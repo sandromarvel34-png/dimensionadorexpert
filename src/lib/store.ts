@@ -44,6 +44,9 @@ export const useAppStore = create<AppState>()(
         set((state) => ({ 
           currentInputs: inputs, 
           currentResults: results,
+          selectedManufacturer: inputs.preferredManufacturer && inputs.preferredManufacturer !== 'any' 
+            ? inputs.preferredManufacturer as any 
+            : state.selectedManufacturer,
           selectedProducts: {}, // Reset selection on new calculation
           view: 'results',
           history: [historyItem, ...state.history].slice(0, 50)
