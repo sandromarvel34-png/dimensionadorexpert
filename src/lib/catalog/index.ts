@@ -180,6 +180,19 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
 
   // Relés de Tempo Siemens Sirius 3RP
   { id: 'siemens-3rp-1', manufacturer: 'Siemens', category: 'releTempo', model: '3RP25', commercialCode: '3RP25', description: 'Relé de tempo Sirius', nominalCurrent: 0, price: 115.00 },
+  
+  // Itens Auxiliares
+  { id: 'weg-btn-green', manufacturer: 'WEG', category: 'auxiliar', model: 'CSW-BF1', commercialCode: '10046000', description: 'Botão Faceado Verde (Liga)', nominalCurrent: 0, price: 25.00 },
+  { id: 'weg-btn-red', manufacturer: 'WEG', category: 'auxiliar', model: 'CSW-BF2', commercialCode: '10046001', description: 'Botão Faceado Vermelho (Desliga)', nominalCurrent: 0, price: 25.00 },
+  { id: 'weg-pilot-green', manufacturer: 'WEG', category: 'auxiliar', model: 'CSW-SD1', commercialCode: '10046002', description: 'Sinaleiro LED Verde', nominalCurrent: 0, price: 15.00 },
+  { id: 'weg-pilot-red', manufacturer: 'WEG', category: 'auxiliar', model: 'CSW-SD2', commercialCode: '10046003', description: 'Sinaleiro LED Vermelho', nominalCurrent: 0, price: 15.00 },
+  { id: 'weg-terminal-10', manufacturer: 'WEG', category: 'auxiliar', model: 'BTWP', commercialCode: '10046004', description: 'Borne de Passagem 10mm²', nominalCurrent: 0, price: 3.50 },
+  
+  { id: 'siemens-btn-green', manufacturer: 'Siemens', category: 'auxiliar', model: '3SU1', commercialCode: '3SU1', description: 'Botão Sirius Act Verde', nominalCurrent: 0, price: 45.00 },
+  { id: 'siemens-btn-red', manufacturer: 'Siemens', category: 'auxiliar', model: '3SU1-R', commercialCode: '3SU1-R', description: 'Botão Sirius Act Vermelho', nominalCurrent: 0, price: 45.00 },
+  
+  { id: 'schneider-btn-green', manufacturer: 'Schneider', category: 'auxiliar', model: 'XB4', commercialCode: 'XB4', description: 'Botão Harmony XB4 Verde', nominalCurrent: 0, price: 48.00 },
+  { id: 'schneider-btn-red', manufacturer: 'Schneider', category: 'auxiliar', model: 'XB4-R', commercialCode: 'XB4-R', description: 'Botão Harmony XB4 Vermelho', nominalCurrent: 0, price: 48.00 },
 ];
 
 export const getProductsByCategory = (category: string) => 
