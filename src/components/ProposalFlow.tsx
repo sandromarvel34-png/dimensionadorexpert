@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Plus, Trash2, Printer, Save, Zap } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export const ProposalFlow = () => {
   const { setView, currentResults, currentInputs, selectedManufacturer, setSelectedManufacturer } = useAppStore();
