@@ -175,6 +175,7 @@ export class CalculationEngine {
     const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
 
     const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
+    
     // 1. Determinar Requisitos Técnicos
     const requirements: TechnicalRequirement[] = [];
     
@@ -213,9 +214,9 @@ export class CalculationEngine {
 
     requirements.forEach(req => {
       compatibleProducts[req.label] = {};
-      manufacturers.forEach(mfr => {
-        const found = findCompatibleProducts(req.category, req.current || 0, mfr);
-        compatibleProducts[req.label][mfr] = found;
+      manufacturers.forEach(brand => {
+        const found = findCompatibleProducts(req.category, req.current || 0, brand);
+        compatibleProducts[req.label][brand] = found;
       });
     });
 
@@ -261,6 +262,30 @@ export class CalculationEngine {
       timerRelay = findCompatibleProduct('releTempo', 0, mfr) || null;
     }
 
+    const refs: TechnicalReference[] = [
+      {
+        id: 'ref1',
+        standardName: 'ABNT NBR 5410',
+        version: '2004',
+        section: '6.2.5',
+        description: 'Dimensionamento de condutores pela queda de tensão admissível.'
+      },
+      {
+        id: 'ref2',
+        standardName: 'ABNT NBR 5410',
+        version: '2004',
+        section: 'Tabela 6.1',
+        description: 'Seção mínima para circuitos de força: 2,5 mm².'
+      },
+      {
+        id: 'ref3',
+        standardName: 'ABNT NBR 5410',
+        version: '2004',
+        section: '6.2.5.5',
+        description: `Fatores de correção aplicados: Agrupamento de Circuitos (${fGroup}) e Temperatura (${fTemp}).`
+      }
+    ];
+
     return {
       nominalCurrent: In,
       cableByAmpacity: secAmp,
@@ -283,5 +308,7 @@ export class CalculationEngine {
       },
       references: refs
     };
+  }
+}
   }
 }
