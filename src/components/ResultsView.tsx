@@ -7,27 +7,16 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 export const ResultsView = () => {
-  const { currentResults, currentInputs, setView, selectedProducts, setSelectedProducts } = useAppStore();
+  const { currentResults, currentInputs, setView, selectedManufacturer, setSelectedManufacturer } = useAppStore();
 
   if (!currentResults || !currentInputs) return null;
 
-  const handleSelectProduct = (label: string, product: ManufacturerProduct) => {
-    setSelectedProducts({
-      ...selectedProducts,
-      [label]: product
-    });
+  const handleSelectManufacturer = (mfr: 'WEG' | 'Siemens' | 'Schneider') => {
+    setSelectedManufacturer(mfr);
   };
 
   const goToProposal = () => {
-    // Verificar se todos os itens obrigatórios foram selecionados
-    const missing = currentResults.technicalRequirements
-      .filter(req => !req.isOptional)
-      .filter(req => !selectedProducts[req.label]);
-
-    if (missing.length > 0) {
-      toast.error(`Por favor, selecione uma opção para: ${missing.map(m => m.label).join(', ')}`);
-      return;
-    }
+    setView('proposal');
 
     // Armazenar no estado (ou passar para o ProposalFlow)
     // Opcionalmente podemos salvar no Zustand
@@ -131,11 +120,22 @@ export const ResultsView = () => {
       {/* Comparison Grid */}
       <div className="space-y-8">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black text-foreground tracking-tight uppercase">Escolha de Componentes Compatíveis</h2>
-          <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest">
-            <span className="flex items-center gap-1 text-primary"><Factory className="w-3 h-3" /> Base WEG</span>
-            <span className="flex items-center gap-1 text-blue-600"><Factory className="w-3 h-3" /> Base Siemens</span>
-            <span className="flex items-center gap-1 text-green-600"><Factory className="w-3 h-3" /> Base Schneider</span>
+          <h2 className="text-2xl font-black text-foreground tracking-tight uppercase">Base de Fabricantes Compatíveis</h2>
+          <div className="flex items-center gap-4">
+            {['WEG', 'Siemens', 'Schneider'].map((mfr) => (
+              <button
+                key={mfr}
+                onClick={() => handleSelectManufacturer(mfr as any)}
+                className={cn(
+                  "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border-2 transition-all",
+                  selectedManufacturer === mfr 
+                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                    : "bg-white text-muted-foreground border-slate-200 hover:border-slate-300"
+                )}
+              >
+                <Factory className="w-3 h-3 inline mr-1" /> {mfr}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -158,23 +158,22 @@ export const ResultsView = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {['WEG', 'Siemens', 'Schneider'].map(mfr => {
                   const products = currentResults.compatibleProducts[req.label]?.[mfr] || [];
-                  const product = products[0]; // Pegamos o primeiro (menor bitola compatível)
-                  const isSelected = selectedProducts[req.label]?.id === product?.id;
+                  const product = products[0];
+                  const isMfrSelected = selectedManufacturer === mfr;
 
                   return (
                     <div 
                       key={mfr}
-                      onClick={() => product && handleSelectProduct(req.label, product)}
                       className={cn(
-                        "card-panel border-2 transition-all cursor-pointer relative group",
+                        "card-panel border-2 transition-all relative group",
                         product 
-                          ? isSelected 
+                          ? isMfrSelected 
                             ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" 
-                            : "border-slate-200 hover:border-slate-300 bg-white"
-                          : "border-slate-100 bg-slate-50/50 grayscale opacity-60 cursor-not-allowed"
+                            : "border-slate-200 bg-white opacity-80"
+                          : "border-slate-100 bg-slate-50/50 grayscale opacity-40 cursor-not-allowed"
                       )}
                     >
-                      {isSelected && (
+                      {isMfrSelected && product && (
                         <div className="absolute top-4 right-4 text-primary">
                           <CheckCircle2 className="w-6 h-6 fill-current" />
                         </div>
