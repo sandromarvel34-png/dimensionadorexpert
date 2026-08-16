@@ -26,7 +26,6 @@ export const ProposalFlow = () => {
 
     // Mapear produtos selecionados independentes
     Object.entries(selectedProducts).forEach(([label, product]: [string, any]) => {
-      // Encontrar o requisito técnico para obter a quantidade
       const req = currentResults.technicalRequirements.find(r => r.label === label);
       const qty = req?.quantity || 1;
 
@@ -38,6 +37,25 @@ export const ProposalFlow = () => {
         price: product.price || 0
       });
     });
+
+    // Inclusão dinâmica de materiais auxiliares conforme tipo de partida/comando (Requisito #10)
+    // Isso deve ser movido para uma matriz de composição configurável no futuro
+    if (currentInputs.starterType === 'direta' || currentInputs.starterType === 'reversao' || currentInputs.starterType === 'estrelaTriangulo') {
+      initialItems.push({ id: 'panel', desc: 'Painel Metálico com Placa de Montagem', qtd: 1, unit: 'un', price: 0 });
+      initialItems.push({ id: 'btn-on', desc: 'Botão de Comando Verde (NA)', qtd: currentInputs.starterType === 'reversao' ? 2 : 1, unit: 'un', price: 0 });
+      initialItems.push({ id: 'btn-off', desc: 'Botão de Comando Vermelho (NF)', qtd: 1, unit: 'un', price: 0 });
+      initialItems.push({ id: 'led-on', desc: 'Sinaleiro LED Verde', qtd: 1, unit: 'un', price: 0 });
+      initialItems.push({ id: 'led-fail', desc: 'Sinaleiro LED Vermelho', qtd: 1, unit: 'un', price: 0 });
+      initialItems.push({ id: 'term', desc: 'Bornes de Passagem (Conjunto)', qtd: 1, unit: 'cj', price: 0 });
+      initialItems.push({ id: 'din', desc: 'Trilho DIN Metálico', qtd: 1, unit: 'm', price: 0 });
+      initialItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 10, unit: 'm', price: 0 });
+    }
+
+    if (currentInputs.starterType === 'estrelaTriangulo') {
+      // Itens específicos já mapeados via selectedProducts (ex: relé de tempo)
+    }
+
+    return initialItems;
 
     return initialItems;
   });

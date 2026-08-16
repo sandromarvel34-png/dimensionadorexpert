@@ -202,11 +202,8 @@ export class CalculationEngine {
       requirements.push({ category: 'inverter', current: In * fs, quantity: 1, label: 'Inversor de Frequência' });
     }
 
-    // Itens Auxiliares (Exemplo de Matriz de Composição)
-    requirements.push({ category: 'auxiliar', quantity: 1, label: 'Botão Liga' });
-    requirements.push({ category: 'auxiliar', quantity: 1, label: 'Botão Desliga' });
-    requirements.push({ category: 'auxiliar', quantity: 1, label: 'Sinaleiro Funcionamento' });
-    requirements.push({ category: 'auxiliar', quantity: 1, label: 'Sinaleiro Falha' });
+    // Requisitos técnicos baseados estritamente no dimensionamento
+    // Materiais auxiliares não entram nesta etapa (requisito #7)
 
     // 2. Buscar Produtos Compatíveis por Fabricante (Independente)
     const manufacturers = ['WEG', 'Siemens', 'Schneider'];
