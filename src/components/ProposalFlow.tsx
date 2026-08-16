@@ -25,35 +25,35 @@ export const ProposalFlow = () => {
     const cableQty = (currentInputs.distance || 1) * multiplier;
 
     const initialItems: any[] = [
-      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: cableQty, unit: 'm', price: 0 }
+      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: cableQty, unit: 'm', price: '' }
     ];
 
-    // Mapear produtos baseados no fabricante selecionado (agora selecionado no topo da proposta)
+    // Mapear produtos baseados no fabricante selecionado
     currentResults.technicalRequirements.forEach(req => {
       const product = currentResults.compatibleProducts[req.label]?.[selectedManufacturer]?.[0];
       if (product) {
         initialItems.push({
           id: Math.random().toString(36).substr(2, 9),
-          desc: `${product.manufacturer} ${product.model}`,
+          desc: `${req.category === 'contator' ? 'Contator ' : req.category === 'disjuntorMotor' ? 'Disjuntor Motor ' : req.category === 'releTermico' ? 'Relé Térmico ' : ''}${product.manufacturer} ${product.model}`,
           qtd: req.quantity || 1,
           unit: 'un',
-          price: product.price || 0
+          price: ''
         });
       }
     });
 
     // Inclusão dinâmica de materiais auxiliares conforme tipo de partida/comando (Requisito #10)
     if (currentInputs.starterType === 'direta' || currentInputs.starterType === 'reversao' || currentInputs.starterType === 'estrelaTriangulo') {
-      initialItems.push({ id: 'panel', desc: 'Painel Metálico com Placa de Montagem', qtd: 1, unit: 'un', price: 0 });
-      initialItems.push({ id: 'btn-on', desc: 'Botão de Comando Verde (NA)', qtd: currentInputs.starterType === 'reversao' ? 2 : 1, unit: 'un', price: 0 });
-      initialItems.push({ id: 'btn-off', desc: 'Botão de Comando Vermelho (NF)', qtd: 1, unit: 'un', price: 0 });
-      initialItems.push({ id: 'led-on', desc: 'Sinaleiro LED Verde (Em operação)', qtd: 1, unit: 'un', price: 0 });
-      initialItems.push({ id: 'led-fail', desc: 'Sinaleiro LED Vermelho (Falha)', qtd: 1, unit: 'un', price: 0 });
-      initialItems.push({ id: 'term-force', desc: 'Bornes de Passagem - Força', qtd: 6, unit: 'un', price: 0 });
-      initialItems.push({ id: 'term-cmd', desc: 'Bornes de Passagem - Comando', qtd: 12, unit: 'un', price: 0 });
-      initialItems.push({ id: 'din', desc: 'Trilho DIN Metálico', qtd: 1, unit: 'm', price: 0 });
-      initialItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 15, unit: 'm', price: 0 });
-      initialItems.push({ id: 'canaleta', desc: 'Canaleta Recortada 30x50mm', qtd: 2, unit: 'm', price: 0 });
+      initialItems.push({ id: 'panel', desc: 'Painel Metálico com Placa de Montagem', qtd: 1, unit: 'un', price: '' });
+      initialItems.push({ id: 'btn-on', desc: 'Botão de Comando Verde (NA)', qtd: currentInputs.starterType === 'reversao' ? 2 : 1, unit: 'un', price: '' });
+      initialItems.push({ id: 'btn-off', desc: 'Botão de Comando Vermelho (NF)', qtd: 1, unit: 'un', price: '' });
+      initialItems.push({ id: 'led-on', desc: 'Sinaleiro LED Verde (Em operação)', qtd: 1, unit: 'un', price: '' });
+      initialItems.push({ id: 'led-fail', desc: 'Sinaleiro LED Vermelho (Falha)', qtd: 1, unit: 'un', price: '' });
+      initialItems.push({ id: 'term-force', desc: 'Bornes de Passagem - Força', qtd: 6, unit: 'un', price: '' });
+      initialItems.push({ id: 'term-cmd', desc: 'Bornes de Passagem - Comando', qtd: 12, unit: 'un', price: '' });
+      initialItems.push({ id: 'din', desc: 'Trilho DIN Metálico', qtd: 1, unit: 'm', price: '' });
+      initialItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 15, unit: 'm', price: '' });
+      initialItems.push({ id: 'canaleta', desc: 'Canaleta Recortada 30x50mm', qtd: 2, unit: 'm', price: '' });
     }
 
     return initialItems;
@@ -119,7 +119,7 @@ export const ProposalFlow = () => {
                     const cableQty = (currentInputs.distance || 1) * multiplier;
                     
                     const newItems: any[] = [
-                      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: cableQty, unit: 'm', price: 0 }
+                      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: cableQty, unit: 'm', price: '' }
                     ];
 
                     currentResults.technicalRequirements.forEach(req => {
@@ -127,26 +127,26 @@ export const ProposalFlow = () => {
                       if (product) {
                         newItems.push({
                           id: Math.random().toString(36).substr(2, 9),
-                          desc: `${product.manufacturer} ${product.model}`,
+                          desc: `${req.category === 'contator' ? 'Contator ' : req.category === 'disjuntorMotor' ? 'Disjuntor Motor ' : req.category === 'releTermico' ? 'Relé Térmico ' : ''}${product.manufacturer} ${product.model}`,
                           qtd: req.quantity || 1,
                           unit: 'un',
-                          price: product.price || 0
+                          price: ''
                         });
                       }
                     });
 
                     // Auxiliares
                     if (currentInputs.starterType === 'direta' || currentInputs.starterType === 'reversao' || currentInputs.starterType === 'estrelaTriangulo') {
-                      newItems.push({ id: 'panel', desc: 'Painel Metálico com Placa de Montagem', qtd: 1, unit: 'un', price: 0 });
-                      newItems.push({ id: 'btn-on', desc: 'Botão de Comando Verde (NA)', qtd: currentInputs.starterType === 'reversao' ? 2 : 1, unit: 'un', price: 0 });
-                      newItems.push({ id: 'btn-off', desc: 'Botão de Comando Vermelho (NF)', qtd: 1, unit: 'un', price: 0 });
-                      newItems.push({ id: 'led-on', desc: 'Sinaleiro LED Verde (Em operação)', qtd: 1, unit: 'un', price: 0 });
-                      newItems.push({ id: 'led-fail', desc: 'Sinaleiro LED Vermelho (Falha)', qtd: 1, unit: 'un', price: 0 });
-                      newItems.push({ id: 'term-force', desc: 'Bornes de Passagem - Força', qtd: 6, unit: 'un', price: 0 });
-                      newItems.push({ id: 'term-cmd', desc: 'Bornes de Passagem - Comando', qtd: 12, unit: 'un', price: 0 });
-                      newItems.push({ id: 'din', desc: 'Trilho DIN Metálico', qtd: 1, unit: 'm', price: 0 });
-                      newItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 15, unit: 'm', price: 0 });
-                      newItems.push({ id: 'canaleta', desc: 'Canaleta Recortada 30x50mm', qtd: 2, unit: 'm', price: 0 });
+                      newItems.push({ id: 'panel', desc: 'Painel Metálico com Placa de Montagem', qtd: 1, unit: 'un', price: '' });
+                      newItems.push({ id: 'btn-on', desc: 'Botão de Comando Verde (NA)', qtd: currentInputs.starterType === 'reversao' ? 2 : 1, unit: 'un', price: '' });
+                      newItems.push({ id: 'btn-off', desc: 'Botão de Comando Vermelho (NF)', qtd: 1, unit: 'un', price: '' });
+                      newItems.push({ id: 'led-on', desc: 'Sinaleiro LED Verde (Em operação)', qtd: 1, unit: 'un', price: '' });
+                      newItems.push({ id: 'led-fail', desc: 'Sinaleiro LED Vermelho (Falha)', qtd: 1, unit: 'un', price: '' });
+                      newItems.push({ id: 'term-force', desc: 'Bornes de Passagem - Força', qtd: 6, unit: 'un', price: '' });
+                      newItems.push({ id: 'term-cmd', desc: 'Bornes de Passagem - Comando', qtd: 12, unit: 'un', price: '' });
+                      newItems.push({ id: 'din', desc: 'Trilho DIN Metálico', qtd: 1, unit: 'm', price: '' });
+                      newItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 15, unit: 'm', price: '' });
+                      newItems.push({ id: 'canaleta', desc: 'Canaleta Recortada 30x50mm', qtd: 2, unit: 'm', price: '' });
                     }
                     setItems(newItems);
                   }
