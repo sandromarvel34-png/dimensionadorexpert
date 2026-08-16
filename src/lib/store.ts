@@ -25,6 +25,7 @@ export const useAppStore = create<AppState>()(
       step: 1,
       currentInputs: null,
       currentResults: null,
+      selectedProducts: {},
       history: [],
 
       setView: (view) => set({ view }),
@@ -40,14 +41,17 @@ export const useAppStore = create<AppState>()(
         set((state) => ({ 
           currentInputs: inputs, 
           currentResults: results,
+          selectedProducts: {}, // Reset selection on new calculation
           view: 'results',
           history: [historyItem, ...state.history].slice(0, 50)
         }));
       },
+      setSelectedProducts: (products) => set({ selectedProducts: products }),
       openHistoryItem: (item) => {
         set({ 
           currentInputs: item, 
-          currentResults: item.nominalCurrent ? item : null, // If item contains results, load them
+          currentResults: item.nominalCurrent ? item : null, 
+          selectedProducts: {},
           view: item.nominalCurrent ? 'results' : 'wizard' 
         });
       },
