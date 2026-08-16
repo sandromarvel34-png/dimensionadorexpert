@@ -180,39 +180,55 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
 
   // Relés de Tempo Siemens Sirius 3RP
   { id: 'siemens-3rp-1', manufacturer: 'Siemens', category: 'releTempo', model: '3RP25', commercialCode: '3RP25', description: 'Relé de tempo Sirius', nominalCurrent: 0, price: 115.00 },
+  
+  // Itens Auxiliares
+  { id: 'weg-btn-green', manufacturer: 'WEG', category: 'auxiliar', model: 'CSW-BF1', commercialCode: '10046000', description: 'Botão Faceado Verde (Liga)', nominalCurrent: 0, price: 25.00 },
+  { id: 'weg-btn-red', manufacturer: 'WEG', category: 'auxiliar', model: 'CSW-BF2', commercialCode: '10046001', description: 'Botão Faceado Vermelho (Desliga)', nominalCurrent: 0, price: 25.00 },
+  { id: 'weg-pilot-green', manufacturer: 'WEG', category: 'auxiliar', model: 'CSW-SD1', commercialCode: '10046002', description: 'Sinaleiro LED Verde', nominalCurrent: 0, price: 15.00 },
+  { id: 'weg-pilot-red', manufacturer: 'WEG', category: 'auxiliar', model: 'CSW-SD2', commercialCode: '10046003', description: 'Sinaleiro LED Vermelho', nominalCurrent: 0, price: 15.00 },
+  { id: 'weg-terminal-10', manufacturer: 'WEG', category: 'auxiliar', model: 'BTWP', commercialCode: '10046004', description: 'Borne de Passagem 10mm²', nominalCurrent: 0, price: 3.50 },
+  
+  { id: 'siemens-btn-green', manufacturer: 'Siemens', category: 'auxiliar', model: '3SU1', commercialCode: '3SU1', description: 'Botão Sirius Act Verde', nominalCurrent: 0, price: 45.00 },
+  { id: 'siemens-btn-red', manufacturer: 'Siemens', category: 'auxiliar', model: '3SU1-R', commercialCode: '3SU1-R', description: 'Botão Sirius Act Vermelho', nominalCurrent: 0, price: 45.00 },
+  
+  { id: 'schneider-btn-green', manufacturer: 'Schneider', category: 'auxiliar', model: 'XB4', commercialCode: 'XB4', description: 'Botão Harmony XB4 Verde', nominalCurrent: 0, price: 48.00 },
+  { id: 'schneider-btn-red', manufacturer: 'Schneider', category: 'auxiliar', model: 'XB4-R', commercialCode: 'XB4-R', description: 'Botão Harmony XB4 Vermelho', nominalCurrent: 0, price: 48.00 },
 ];
 
 export const getProductsByCategory = (category: string) => 
   MANUFACTURER_CATALOG.filter(p => p.category === category);
 
-export const findCompatibleProduct = (
+export const findCompatibleProducts = (
   category: string, 
-  current: number, 
+  current: number,
   manufacturer?: string
-) => {
+): ManufacturerProduct[] => {
   const mfr = (manufacturer === 'any' || !manufacturer) ? undefined : manufacturer;
-  // Filtrar por categoria e fabricante (se fornecido)
+  
   const filtered = MANUFACTURER_CATALOG.filter(p => 
     p.category === category && 
     (mfr ? p.manufacturer.toLowerCase() === mfr.toLowerCase() : true)
   );
 
   if (category === 'releTermico') {
-    // Para relé térmico, a corrente deve estar DENTRO da faixa de ajuste
-    // Procuramos o relé cuja faixa de ajuste contém a corrente nominal (ajuste)
-    return filtered.find(p => 
-      p.adjustmentRange && 
-      current >= p.adjustmentRange.min && 
-      current <= p.adjustmentRange.max
-    ) || filtered.find(p => p.nominalCurrent && p.nominalCurrent >= current); // Fallback caso a faixa não esteja preenchida perfeitamente
-  } else if (category === 'releTempo') {
-    // Relé de tempo geralmente não depende de corrente nominal para proteção, apenas presença
-    return filtered[0];
+    return filtered.filter(p => 
+      (p.adjustmentRange && current >= p.adjustmentRange.min && current <= p.adjustmentRange.max) ||
+      (p.nominalCurrent && p.nominalCurrent >= current)
+    ).sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
+  } else if (category === 'releTempo' || category === 'auxiliar') {
+    return filtered;
   } else {
-    // Para disjuntores e contatores, pegamos o primeiro com nominalCurrent >= current
-    // Ordenamos por nominalCurrent para garantir que pegamos o menor componente compatível
     return filtered
       .filter(p => p.nominalCurrent && p.nominalCurrent >= current)
-      .sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0))[0];
+      .sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
   }
+};
+
+export const findCompatibleProduct = (
+  category: string, 
+  current: number, 
+  manufacturer?: string
+) => {
+  const products = findCompatibleProducts(category, current, manufacturer);
+  return products.length > 0 ? products[0] : null;
 };

@@ -1,235 +1,245 @@
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCircle2, Factory, Shield, Info, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
+import { ManufacturerProduct } from '@/types';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export const ResultsView = () => {
-  const { currentResults, currentInputs, setView } = useAppStore();
+  const { currentResults, currentInputs, setView, selectedProducts, setSelectedProducts } = useAppStore();
 
   if (!currentResults || !currentInputs) return null;
 
+  const handleSelectProduct = (label: string, product: ManufacturerProduct) => {
+    setSelectedProducts({
+      ...selectedProducts,
+      [label]: product
+    });
+  };
+
+  const goToProposal = () => {
+    // Verificar se todos os itens obrigatórios foram selecionados
+    const missing = currentResults.technicalRequirements
+      .filter(req => !req.isOptional)
+      .filter(req => !selectedProducts[req.label]);
+
+    if (missing.length > 0) {
+      toast.error(`Por favor, selecione uma opção para: ${missing.map(m => m.label).join(', ')}`);
+      return;
+    }
+
+    // Armazenar no estado (ou passar para o ProposalFlow)
+    // Opcionalmente podemos salvar no Zustand
+    setView('proposal');
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 space-y-10">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8">
-        <div className="space-y-3">
+    <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="space-y-4">
           <button 
             onClick={() => setView('wizard')}
-            className="btn-ghost px-0 h-auto gap-2 text-sm font-semibold hover:bg-transparent"
+            className="flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> Voltar ao formulário
+            <ArrowLeft className="w-4 h-4" /> REVISAR DADOS TÉCNICOS
           </button>
-          <h1 className="text-4xl font-bold text-foreground tracking-tight">Resultado do Dimensionamento</h1>
-          <div className="flex flex-wrap gap-2 text-metadata font-semibold uppercase tracking-widest text-[10px]">
-            <span className="bg-primary text-white px-2 py-1 rounded">
-              {currentInputs.dataSource === 'catalog' ? `Catálogo WEG: ${currentInputs.motorCatalogData?.line} - ${currentInputs.motorCatalogData?.model}` : 'Fonte: Dados da Placa'}
+          <h1 className="text-4xl font-black text-foreground tracking-tight uppercase">Dimensionamento Concluído</h1>
+          <div className="flex flex-wrap gap-2">
+            <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+              {currentInputs.power} {currentInputs.powerUnit} • {currentInputs.voltage}V
             </span>
-            <span className="bg-muted px-2 py-1 rounded">{currentInputs.power} {currentInputs.powerUnit}</span>
-            <span className="bg-muted px-2 py-1 rounded">{currentInputs.voltage} V</span>
-            <span className="bg-muted px-2 py-1 rounded">{currentInputs.phase}</span>
-            <span className="bg-muted px-2 py-1 rounded">{currentInputs.distance} m</span>
-            <span className="bg-muted px-2 py-1 rounded">Partida {currentInputs.starterType}</span>
+            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+              Partida {currentInputs.starterType}
+            </span>
+            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+              {currentInputs.distance} Metros
+            </span>
           </div>
         </div>
-        <button 
-          onClick={() => setView('proposal')}
-          className="btn-primary"
-        >
-          Criar Proposta →
-        </button>
-      </div>
-
-      {/* Main Stats Card */}
-      <div className="card-panel">
-        <h3 className="text-label uppercase tracking-widest mb-6">Resumo Técnico</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-          <div className="space-y-2">
-            <p className="text-label uppercase tracking-widest text-[10px]">Corrente Nominal (In)</p>
-            <p className="text-4xl font-bold text-foreground">{currentResults.nominalCurrent.toFixed(1)} <span className="text-lg font-medium text-muted-foreground">A</span></p>
-          </div>
-          <div className="space-y-2">
-            <p className="text-label uppercase tracking-widest text-[10px]">Queda Calculada</p>
-            <p className="text-4xl font-bold text-foreground">{currentResults.voltageDropCalculated ? currentResults.voltageDropCalculated.toFixed(2) : '0.00'} <span className="text-lg font-medium text-muted-foreground">%</span></p>
-          </div>
-          <div className="space-y-2 bg-primary/5 p-5 rounded-2xl border border-primary/10 lg:col-span-2">
-            <p className="text-primary text-[10px] font-bold uppercase tracking-widest mb-1">Resultado Final (NBR 5410)</p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-result-value">{currentResults.finalCableSection}</p>
-              <span className="text-2xl font-bold text-primary/60">mm²</span>
-            </div>
-            <p className="text-xs text-primary/80 mt-2 font-semibold">
-              Critério Dominante: {currentResults.limitingCriterion === 'ampacity' ? 'Capacidade de Corrente' : 'Queda de Tensão'}
+        <div className="flex items-center gap-4">
+          <div className="hidden lg:block text-right">
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Status da Solução</p>
+            <p className="text-sm font-bold text-green-600 flex items-center justify-end gap-1">
+              <CheckCircle2 className="w-4 h-4" /> 100% Compatível NBR 5410
             </p>
           </div>
-        </div>
-        
-        {currentInputs.dataSource === 'catalog' && currentInputs.motorCatalogData && (
-          <div className="mt-8 pt-8 border-t border-border grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Carcaça</p>
-              <p className="text-xl font-bold text-foreground">{currentInputs.motorCatalogData.frame || '—'}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Rotação</p>
-              <p className="text-xl font-bold text-foreground">{currentInputs.motorCatalogData.rpm ? `${currentInputs.motorCatalogData.rpm} RPM` : '—'}</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Polos</p>
-              <p className="text-xl font-bold text-foreground">{currentInputs.motorCatalogData.poles}P</p>
-            </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Tipo</p>
-              <p className="text-xl font-bold text-foreground capitalize">{currentInputs.motorCatalogData.speedType.toLowerCase()}</p>
-            </div>
-          </div>
-        )}
-        
-        <div className="mt-8 pt-8 border-t border-border grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
-          <div>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Por Ampacidade</p>
-            <p className="text-xl font-bold text-foreground">{currentResults.cableByAmpacity} mm²</p>
-          </div>
-          <div>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Por Distância</p>
-            <p className="text-xl font-bold text-foreground">{currentResults.cableByVoltageDrop} mm²</p>
-          </div>
-          <div className="col-span-2 md:col-span-1">
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Seção Mínima</p>
-            <p className="text-xl font-bold text-foreground">2.5 mm²</p>
-          </div>
+          <Button 
+            onClick={goToProposal}
+            className="h-14 px-8 text-lg font-black uppercase tracking-tight shadow-xl shadow-primary/20 group"
+          >
+            Montar Orçamento <ShoppingCart className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </Button>
         </div>
       </div>
 
-      {/* Components Grid */}
-      <div className="space-y-6">
-        <h3 className="text-card-title">Componentes Dimensionados</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {/* Cable */}
-          <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
-            <p className="text-label uppercase tracking-widest text-[10px]">Condutor</p>
+      {/* Cable Summary */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 card-panel relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
+            <Shield className="w-32 h-32" />
+          </div>
+          <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">Condutor Recomendado</h3>
+          <div className="flex items-end gap-4 mb-8">
+            <span className="text-7xl font-black text-foreground leading-none">{currentResults.finalCableSection}</span>
+            <span className="text-2xl font-black text-muted-foreground mb-2">mm²</span>
+          </div>
+          <div className="grid grid-cols-3 gap-8 border-t border-slate-100 pt-8">
             <div>
-              <p className="text-2xl font-bold text-foreground">{currentResults.finalCableSection} mm²</p>
-              <p className="text-metadata font-semibold mt-1">Cobre • PVC 70°C</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Pela Corrente</p>
+              <p className="text-xl font-bold">{currentResults.cableByAmpacity} mm²</p>
+            </div>
+            <div>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Pela Distância</p>
+              <p className="text-xl font-bold">{currentResults.cableByVoltageDrop} mm²</p>
+            </div>
+            <div>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Queda Final</p>
+              <p className="text-xl font-bold text-primary">{currentResults.voltageDropCalculated.toFixed(2)}%</p>
             </div>
           </div>
+        </div>
 
-          {/* Breaker */}
-          <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
-            <p className="text-label uppercase tracking-widest text-[10px]">Disjuntor</p>
-            <div>
-              <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.breaker?.model || '—'}</p>
-              <p className="text-metadata font-semibold text-primary">{currentResults.protections.breaker?.manufacturer || '—'}</p>
-              <p className="text-metadata mt-1">{currentResults.protections.breaker?.nominalCurrent ? `${currentResults.protections.breaker.nominalCurrent} A` : 'Não encontrado'}</p>
+        <div className="card-panel bg-slate-900 text-white border-0">
+          <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">Resumo Elétrico</h3>
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Corrente (In)</span>
+              <span className="text-2xl font-black">{currentResults.nominalCurrent.toFixed(1)} A</span>
             </div>
-          </div>
-
-          {/* Motor Breaker */}
-          {currentResults.protections.motorBreaker && (
-            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
-              <p className="text-label uppercase tracking-widest text-[10px]">Disjuntor Motor</p>
-              <div>
-                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.motorBreaker.model}</p>
-                <p className="text-metadata font-semibold text-primary">{currentResults.protections.motorBreaker.manufacturer}</p>
-                <p className="text-metadata mt-1">Faixa: {currentResults.protections.motorBreaker.adjustmentRange?.min}–{currentResults.protections.motorBreaker.adjustmentRange?.max} A</p>
-              </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Freq. / Sistema</span>
+              <span className="text-xl font-bold">60Hz / 3φ</span>
             </div>
-          )}
-
-          {/* Fuses */}
-          {currentResults.protections.diazedFuse && (
-            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
-              <p className="text-label uppercase tracking-widest text-[10px]">Fusível Diazed</p>
-              <div>
-                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.diazedFuse.model}</p>
-                <p className="text-metadata font-semibold text-primary">{currentResults.protections.diazedFuse.manufacturer}</p>
-                <p className="text-metadata mt-1">{currentResults.protections.diazedFuse.nominalCurrent} A</p>
-              </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Carga Máxima Ib</span>
+              <span className="text-xl font-bold">{(currentResults.nominalCurrent * 1.25).toFixed(1)} A</span>
             </div>
-          )}
-
-          {currentResults.protections.nhFuse && (
-            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
-              <p className="text-label uppercase tracking-widest text-[10px]">Fusível NH</p>
-              <div>
-                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.nhFuse.model}</p>
-                <p className="text-metadata font-semibold text-primary">{currentResults.protections.nhFuse.manufacturer}</p>
-                <p className="text-metadata mt-1">{currentResults.protections.nhFuse.nominalCurrent} A</p>
-              </div>
-            </div>
-          )}
-
-          {/* Soft-Starter / Inverter */}
-          {currentResults.protections.softStarter && (
-            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group border-primary/20">
-              <p className="text-label uppercase tracking-widest text-[10px]">Soft-Starter</p>
-              <div>
-                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.softStarter.model}</p>
-                <p className="text-metadata font-semibold text-primary">{currentResults.protections.softStarter.manufacturer}</p>
-                <p className="text-metadata mt-1">{currentResults.protections.softStarter.description}</p>
-              </div>
-            </div>
-          )}
-
-          {currentResults.protections.inverter && (
-            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group border-primary/20">
-              <p className="text-label uppercase tracking-widest text-[10px]">Inversor de Frequência</p>
-              <div>
-                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.inverter.model}</p>
-                <p className="text-metadata font-semibold text-primary">{currentResults.protections.inverter.manufacturer}</p>
-                <p className="text-metadata mt-1">{currentResults.protections.inverter.description}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Contactor */}
-          <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
-            <p className="text-label uppercase tracking-widest text-[10px]">
-              Contator {currentResults.protections.contactor && currentResults.protections.contactor.length > 1 ? `(x${currentResults.protections.contactor.length})` : ''}
-            </p>
-            <div>
-              <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.contactor?.[0]?.model || '—'}</p>
-              <p className="text-metadata font-semibold text-primary">{currentResults.protections.contactor?.[0]?.manufacturer || '—'}</p>
-              <p className="text-metadata mt-1">
-                {currentResults.protections.contactor?.[0]?.nominalCurrent 
-                  ? `${currentResults.protections.contactor[0].nominalCurrent} A (AC-3)${currentResults.protections.contactor.length > 1 ? ` • ${currentResults.protections.contactor.length} un` : ''}` 
-                  : 'Não encontrado'}
+            <div className="pt-4 border-t border-white/10">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">
+                <Info className="w-3 h-3" /> Referência Técnica
+              </p>
+              <p className="text-xs text-slate-300 leading-relaxed italic">
+                Cálculos baseados na NBR 5410:2004 para métodos de instalação B1 e fatores de correção aplicados.
               </p>
             </div>
           </div>
-
-          {/* Thermal Relay */}
-          <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group">
-            <p className="text-label uppercase tracking-widest text-[10px]">Relé Térmico</p>
-            <div>
-              <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.thermalRelay?.model || '—'}</p>
-              <p className="text-metadata font-semibold text-primary">{currentResults.protections.thermalRelay?.manufacturer || '—'}</p>
-              <p className="text-metadata mt-1">{currentResults.protections.thermalRelay?.adjustmentRange ? `Faixa: ${currentResults.protections.thermalRelay.adjustmentRange.min}–${currentResults.protections.thermalRelay.adjustmentRange.max} A` : 'Não encontrado'}</p>
-            </div>
-          </div>
-
-          {/* Timer Relay (Conditional) */}
-          {currentResults.protections.timerRelay && (
-            <div className="card-panel flex flex-col justify-between h-48 hover:border-primary transition-all group border-primary/20">
-              <p className="text-label uppercase tracking-widest text-[10px]">Relé de Tempo</p>
-              <div>
-                <p className="text-xl font-bold text-foreground leading-tight mb-1">{currentResults.protections.timerRelay.model}</p>
-                <p className="text-metadata font-semibold text-primary">{currentResults.protections.timerRelay.manufacturer}</p>
-                <p className="text-metadata mt-1">{currentResults.protections.timerRelay.description}</p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-6 pt-10">
-        <button 
-          onClick={() => setView('proposal')}
-          className="btn-primary w-full sm:w-80 h-16 text-xl shadow-xl shadow-primary/10"
+      {/* Comparison Grid */}
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-black text-foreground tracking-tight uppercase">Escolha de Componentes Compatíveis</h2>
+          <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest">
+            <span className="flex items-center gap-1 text-primary"><Factory className="w-3 h-3" /> Base WEG</span>
+            <span className="flex items-center gap-1 text-blue-600"><Factory className="w-3 h-3" /> Base Siemens</span>
+            <span className="flex items-center gap-1 text-green-600"><Factory className="w-3 h-3" /> Base Schneider</span>
+          </div>
+        </div>
+
+        <div className="space-y-12">
+          {currentResults.technicalRequirements.map((req, idx) => (
+            <div key={idx} className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-xs">
+                  {idx + 1}
+                </div>
+                <h3 className="text-lg font-black text-foreground uppercase tracking-tight">{req.label}</h3>
+                {req.isOptional && (
+                  <span className="text-[9px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full uppercase">Opcional</span>
+                )}
+                {req.current && (
+                  <span className="text-[9px] font-black text-primary uppercase">Requisito: {req.current.toFixed(1)}A</span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {['WEG', 'Siemens', 'Schneider'].map(mfr => {
+                  const products = currentResults.compatibleProducts[req.label]?.[mfr] || [];
+                  const product = products[0]; // Pegamos o primeiro (menor bitola compatível)
+                  const isSelected = selectedProducts[req.label]?.id === product?.id;
+
+                  return (
+                    <div 
+                      key={mfr}
+                      onClick={() => product && handleSelectProduct(req.label, product)}
+                      className={cn(
+                        "card-panel border-2 transition-all cursor-pointer relative group",
+                        product 
+                          ? isSelected 
+                            ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" 
+                            : "border-slate-200 hover:border-slate-300 bg-white"
+                          : "border-slate-100 bg-slate-50/50 grayscale opacity-60 cursor-not-allowed"
+                      )}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-4 right-4 text-primary">
+                          <CheckCircle2 className="w-6 h-6 fill-current" />
+                        </div>
+                      )}
+                      
+                      <div className="mb-4">
+                        <p className={cn(
+                          "text-[9px] font-black uppercase tracking-[0.2em] mb-1",
+                          mfr === 'WEG' ? "text-primary" : mfr === 'Siemens' ? "text-blue-600" : "text-green-600"
+                        )}>
+                          {mfr}
+                        </p>
+                        {product ? (
+                          <>
+                            <p className="text-lg font-black text-foreground group-hover:text-primary transition-colors leading-tight">
+                              {product.model}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground font-bold mt-1 line-clamp-2">
+                              {product.description}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-xs font-bold text-slate-400 italic py-4">
+                            Nenhum produto compatível encontrado na base {mfr}.
+                          </p>
+                        )}
+                      </div>
+
+                      {product && (
+                        <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Código</p>
+                            <p className="text-xs font-bold text-foreground">{product.commercialCode}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Preço Sugerido</p>
+                            <p className="text-lg font-black text-foreground">
+                              {product.price ? `R$ ${product.price.toFixed(2)}` : 'R$ —'}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Action Footer */}
+      <div className="pt-12 border-t border-slate-200 flex flex-col items-center gap-6">
+        <div className="text-center space-y-2">
+          <p className="text-lg font-black text-foreground uppercase tracking-tight">Solução Técnica Validada</p>
+          <p className="text-sm text-muted-foreground max-w-xl mx-auto">
+            Ao prosseguir, você irá para a revisão final onde poderá editar quantidades, adicionar mão de obra e incluir os dados do cliente para a proposta comercial.
+          </p>
+        </div>
+        <Button 
+          onClick={goToProposal}
+          className="h-20 px-16 text-2xl font-black uppercase tracking-tight shadow-2xl shadow-primary/30"
         >
-          Criar Proposta Comercial →
-        </button>
-        <p className="text-metadata text-slate-400 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-green-500" /> Dimensionamento em conformidade com NBR 5410
-        </p>
+          Finalizar Orçamento →
+        </Button>
       </div>
     </div>
   );
