@@ -7,16 +7,15 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
 export const ResultsView = () => {
-  const { currentResults, currentInputs, setView } = useAppStore();
-  const [selectedProducts, setSelectedProducts] = useState<Record<string, ManufacturerProduct>>({});
+  const { currentResults, currentInputs, setView, selectedProducts, setSelectedProducts } = useAppStore();
 
   if (!currentResults || !currentInputs) return null;
 
   const handleSelectProduct = (label: string, product: ManufacturerProduct) => {
-    setSelectedProducts(prev => ({
-      ...prev,
+    setSelectedProducts({
+      ...selectedProducts,
       [label]: product
-    }));
+    });
   };
 
   const goToProposal = () => {
