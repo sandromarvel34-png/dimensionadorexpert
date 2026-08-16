@@ -128,6 +128,16 @@ a[href*="lovable.app"] {
   h3 { font-size: 8pt !important; margin-bottom: 0.2rem !important; }
   p, span, td, th { font-size: 7.5pt !important; line-height: 1.15 !important; }
   
+  /* Remove number arrows in print and proposal inputs */
+  .no-arrows::-webkit-inner-spin-button,
+  .no-arrows::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .no-arrows {
+    -moz-appearance: textfield;
+  }
+  
   /* Compact tables for print */
   table { width: 100% !important; border-collapse: collapse !important; }
   table td, table th { padding: 3px 6px !important; border: 1px solid #E2E8F0 !important; }
