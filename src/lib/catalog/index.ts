@@ -193,6 +193,24 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   
   { id: 'schneider-btn-green', manufacturer: 'Schneider', category: 'auxiliar', model: 'XB4', commercialCode: 'XB4', description: 'Botão Harmony XB4 Verde', nominalCurrent: 0, price: 48.00 },
   { id: 'schneider-btn-red', manufacturer: 'Schneider', category: 'auxiliar', model: 'XB4-R', commercialCode: 'XB4-R', description: 'Botão Harmony XB4 Vermelho', nominalCurrent: 0, price: 48.00 },
+  
+  // Sinaleiros Adicionais
+  { id: 'schneider-pilot-green', manufacturer: 'Schneider', category: 'auxiliar', model: 'XB4-BVB3', commercialCode: 'XB4BVB3', description: 'Sinaleiro Harmony LED Verde', nominalCurrent: 0, price: 35.00 },
+  { id: 'schneider-pilot-red', manufacturer: 'Schneider', category: 'auxiliar', model: 'XB4-BVB4', commercialCode: 'XB4BVB4', description: 'Sinaleiro Harmony LED Vermelho', nominalCurrent: 0, price: 35.00 },
+  { id: 'siemens-pilot-green', manufacturer: 'Siemens', category: 'auxiliar', model: '3SU1-PILOT-G', commercialCode: '3SU1-G', description: 'Sinaleiro Sirius LED Verde', nominalCurrent: 0, price: 32.00 },
+  { id: 'siemens-pilot-red', manufacturer: 'Siemens', category: 'auxiliar', model: '3SU1-PILOT-R', commercialCode: '3SU1-R', description: 'Sinaleiro Sirius LED Vermelho', nominalCurrent: 0, price: 32.00 },
+  
+  // Disjuntores Motor Siemens Sirius 3RV
+  { id: 'siemens-3rv-10', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2011-1JA10', commercialCode: '3RV2011-1JA10', description: 'Disjuntor Motor Sirius, 7-10A', nominalCurrent: 10, adjustmentRange: { min: 7, max: 10 }, voltage: 690, price: 210.00 },
+  { id: 'siemens-3rv-16', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2011-4AA10', commercialCode: '3RV2011-4AA10', description: 'Disjuntor Motor Sirius, 11-16A', nominalCurrent: 16, adjustmentRange: { min: 11, max: 16 }, voltage: 690, price: 225.00 },
+  { id: 'siemens-3rv-20', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2011-4BA10', commercialCode: '3RV2011-4BA10', description: 'Disjuntor Motor Sirius, 14-20A', nominalCurrent: 20, adjustmentRange: { min: 14, max: 20 }, voltage: 690, price: 245.00 },
+  { id: 'siemens-3rv-25', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2021-4DA10', commercialCode: '3RV2021-4DA10', description: 'Disjuntor Motor Sirius, 18-25A', nominalCurrent: 25, adjustmentRange: { min: 18, max: 25 }, voltage: 690, price: 275.00 },
+  
+  // Disjuntores Motor Schneider TeSys GV2
+  { id: 'schneider-gv2me-10', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV2ME14', commercialCode: 'GV2ME14', description: 'Disjuntor Motor TeSys GV2, 6-10A', nominalCurrent: 10, adjustmentRange: { min: 6, max: 10 }, voltage: 690, price: 220.00 },
+  { id: 'schneider-gv2me-14', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV2ME16', commercialCode: 'GV2ME16', description: 'Disjuntor Motor TeSys GV2, 9-14A', nominalCurrent: 14, adjustmentRange: { min: 9, max: 14 }, voltage: 690, price: 235.00 },
+  { id: 'schneider-gv2me-20', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV2ME20', commercialCode: 'GV2ME20', description: 'Disjuntor Motor TeSys GV2, 13-18A', nominalCurrent: 18, adjustmentRange: { min: 13, max: 18 }, voltage: 690, price: 255.00 },
+  { id: 'schneider-gv2me-25', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV2ME22', commercialCode: 'GV2ME22', description: 'Disjuntor Motor TeSys GV2, 17-23A', nominalCurrent: 23, adjustmentRange: { min: 17, max: 23 }, voltage: 690, price: 285.00 },
 ];
 
 export const getProductsByCategory = (category: string) => 
