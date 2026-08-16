@@ -7,6 +7,7 @@ interface AppState {
   step: number;
   currentInputs: CalculationInputs | null;
   currentResults: CalculationResults | null;
+  selectedProducts: Record<string, any>;
   history: any[];
   
   setView: (view: 'dashboard' | 'wizard' | 'results' | 'proposal') => void;
