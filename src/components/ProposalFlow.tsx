@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Plus, Trash2, Printer, Save, Zap } from 'lucide-react';
 
 export const ProposalFlow = () => {
-  const { setView, currentResults, currentInputs, selectedProducts } = useAppStore();
+  const { setView, currentResults, currentInputs, selectedManufacturer, setSelectedManufacturer } = useAppStore();
   const [clientData, setClientData] = useState({
     name: '',
     doc: '',
@@ -19,23 +19,22 @@ export const ProposalFlow = () => {
   const [items, setItems] = useState<any[]>(() => {
     if (!currentResults || !currentInputs) return [];
     
-    // Cabo é fixo baseado no cálculo
     const initialItems: any[] = [
       { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: currentInputs.distance || 1, unit: 'm', price: 0 }
     ];
 
-    // Mapear produtos selecionados independentes
-    Object.entries(selectedProducts).forEach(([label, product]: [string, any]) => {
-      const req = currentResults.technicalRequirements.find(r => r.label === label);
-      const qty = req?.quantity || 1;
-
-      initialItems.push({
-        id: Math.random().toString(36).substr(2, 9),
-        desc: `${product.manufacturer} ${product.model}`,
-        qtd: qty,
-        unit: 'un',
-        price: product.price || 0
-      });
+    // Mapear produtos baseados no fabricante selecionado
+    currentResults.technicalRequirements.forEach(req => {
+      const product = currentResults.compatibleProducts[req.label]?.[selectedManufacturer]?.[0];
+      if (product) {
+        initialItems.push({
+          id: Math.random().toString(36).substr(2, 9),
+          desc: `${product.manufacturer} ${product.model}`,
+          qtd: req.quantity || 1,
+          unit: 'un',
+          price: product.price || 0
+        });
+      }
     });
 
     // Inclusão dinâmica de materiais auxiliares conforme tipo de partida/comando (Requisito #10)
@@ -98,7 +97,28 @@ export const ProposalFlow = () => {
           <h2 className="text-3xl font-bold text-foreground tracking-tight">Proposta Comercial</h2>
           <p className="text-muted-foreground text-lg">Personalize os dados e gere o orçamento profissional.</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg border border-slate-200">
+            {['WEG', 'Siemens', 'Schneider'].map((mfr) => (
+              <button
+                key={mfr}
+                onClick={() => {
+                  setSelectedManufacturer(mfr as any);
+                  toast.info(`Fabricante alterado para ${mfr}`);
+                  // Recalcular itens (opcional, ou apenas avisar que mudar aqui exige refazer a lista se não for automático)
+                  // Para este MVP vamos apenas permitir a troca e o usuário salva.
+                }}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all",
+                  selectedManufacturer === mfr 
+                    ? "bg-white text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {mfr}
+              </button>
+            ))}
+          </div>
           <button onClick={() => window.print()} className="btn-secondary">
             <Printer className="w-5 h-5" /> Imprimir PDF
           </button>

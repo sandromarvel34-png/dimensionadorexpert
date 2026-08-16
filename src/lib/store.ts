@@ -8,12 +8,14 @@ interface AppState {
   currentInputs: CalculationInputs | null;
   currentResults: CalculationResults | null;
   selectedProducts: Record<string, any>;
+  selectedManufacturer: 'WEG' | 'Siemens' | 'Schneider';
   history: any[];
   
   setView: (view: 'dashboard' | 'wizard' | 'results' | 'proposal') => void;
   setStep: (step: number) => void;
   setCalculation: (inputs: CalculationInputs, results: CalculationResults) => void;
   setSelectedProducts: (products: Record<string, any>) => void;
+  setSelectedManufacturer: (manufacturer: 'WEG' | 'Siemens' | 'Schneider') => void;
   addToHistory: (item: any) => void;
   openHistoryItem: (item: any) => void;
 }
@@ -26,6 +28,7 @@ export const useAppStore = create<AppState>()(
       currentInputs: null,
       currentResults: null,
       selectedProducts: {},
+      selectedManufacturer: 'WEG',
       history: [],
 
       setView: (view) => set({ view }),
@@ -47,6 +50,7 @@ export const useAppStore = create<AppState>()(
         }));
       },
       setSelectedProducts: (products) => set({ selectedProducts: products }),
+      setSelectedManufacturer: (manufacturer) => set({ selectedManufacturer: manufacturer }),
       openHistoryItem: (item) => {
         set({ 
           currentInputs: item, 
