@@ -20,11 +20,15 @@ export const ProposalFlow = () => {
   const [items, setItems] = useState<any[]>(() => {
     if (!currentResults || !currentInputs) return [];
     
+    // Regra: se trifásico 3x, se monofásico 2x a distância
+    const multiplier = currentInputs.phase === 'trifasico' ? 3 : 2;
+    const cableQty = (currentInputs.distance || 1) * multiplier;
+
     const initialItems: any[] = [
-      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: currentInputs.distance || 1, unit: 'm', price: 0 }
+      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: cableQty, unit: 'm', price: 0 }
     ];
 
-    // Mapear produtos baseados no fabricante selecionado
+    // Mapear produtos baseados no fabricante selecionado (agora selecionado no topo da proposta)
     currentResults.technicalRequirements.forEach(req => {
       const product = currentResults.compatibleProducts[req.label]?.[selectedManufacturer]?.[0];
       if (product) {
@@ -108,8 +112,44 @@ export const ProposalFlow = () => {
                 onClick={() => {
                   setSelectedManufacturer(mfr as any);
                   toast.info(`Fabricante alterado para ${mfr}`);
-                  // Recalcular itens (opcional, ou apenas avisar que mudar aqui exige refazer a lista se não for automático)
-                  // Para este MVP vamos apenas permitir a troca e o usuário salva.
+                  
+                  // Atualizar a lista de itens baseada no novo fabricante
+                  if (currentResults && currentInputs) {
+                    const multiplier = currentInputs.phase === 'trifasico' ? 3 : 2;
+                    const cableQty = (currentInputs.distance || 1) * multiplier;
+                    
+                    const newItems: any[] = [
+                      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: cableQty, unit: 'm', price: 0 }
+                    ];
+
+                    currentResults.technicalRequirements.forEach(req => {
+                      const product = currentResults.compatibleProducts[req.label]?.[mfr as any]?.[0];
+                      if (product) {
+                        newItems.push({
+                          id: Math.random().toString(36).substr(2, 9),
+                          desc: `${product.manufacturer} ${product.model}`,
+                          qtd: req.quantity || 1,
+                          unit: 'un',
+                          price: product.price || 0
+                        });
+                      }
+                    });
+
+                    // Auxiliares
+                    if (currentInputs.starterType === 'direta' || currentInputs.starterType === 'reversao' || currentInputs.starterType === 'estrelaTriangulo') {
+                      newItems.push({ id: 'panel', desc: 'Painel Metálico com Placa de Montagem', qtd: 1, unit: 'un', price: 0 });
+                      newItems.push({ id: 'btn-on', desc: 'Botão de Comando Verde (NA)', qtd: currentInputs.starterType === 'reversao' ? 2 : 1, unit: 'un', price: 0 });
+                      newItems.push({ id: 'btn-off', desc: 'Botão de Comando Vermelho (NF)', qtd: 1, unit: 'un', price: 0 });
+                      newItems.push({ id: 'led-on', desc: 'Sinaleiro LED Verde (Em operação)', qtd: 1, unit: 'un', price: 0 });
+                      newItems.push({ id: 'led-fail', desc: 'Sinaleiro LED Vermelho (Falha)', qtd: 1, unit: 'un', price: 0 });
+                      newItems.push({ id: 'term-force', desc: 'Bornes de Passagem - Força', qtd: 6, unit: 'un', price: 0 });
+                      newItems.push({ id: 'term-cmd', desc: 'Bornes de Passagem - Comando', qtd: 12, unit: 'un', price: 0 });
+                      newItems.push({ id: 'din', desc: 'Trilho DIN Metálico', qtd: 1, unit: 'm', price: 0 });
+                      newItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 15, unit: 'm', price: 0 });
+                      newItems.push({ id: 'canaleta', desc: 'Canaleta Recortada 30x50mm', qtd: 2, unit: 'm', price: 0 });
+                    }
+                    setItems(newItems);
+                  }
                 }}
                 className={cn(
                   "px-3 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all",
