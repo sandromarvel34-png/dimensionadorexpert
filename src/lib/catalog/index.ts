@@ -211,6 +211,33 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'schneider-gv2me-14', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV2ME16', commercialCode: 'GV2ME16', description: 'Disjuntor Motor TeSys GV2, 9-14A', nominalCurrent: 14, adjustmentRange: { min: 9, max: 14 }, voltage: 690, price: 235.00 },
   { id: 'schneider-gv2me-20', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV2ME20', commercialCode: 'GV2ME20', description: 'Disjuntor Motor TeSys GV2, 13-18A', nominalCurrent: 18, adjustmentRange: { min: 13, max: 18 }, voltage: 690, price: 255.00 },
   { id: 'schneider-gv2me-25', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV2ME22', commercialCode: 'GV2ME22', description: 'Disjuntor Motor TeSys GV2, 17-23A', nominalCurrent: 23, adjustmentRange: { min: 17, max: 23 }, voltage: 690, price: 285.00 },
+  // Siemens Diazed/NH
+  { id: 'siemens-diazed-16', manufacturer: 'Siemens', category: 'fusivel', model: '5SA251', commercialCode: '5SA251', description: 'Fusível Diazed retardado, 16A', nominalCurrent: 16, voltage: 500, price: 18.00 },
+  { id: 'siemens-diazed-25', manufacturer: 'Siemens', category: 'fusivel', model: '5SA271', commercialCode: '5SA271', description: 'Fusível Diazed retardado, 25A', nominalCurrent: 25, voltage: 500, price: 22.00 },
+  { id: 'siemens-nh-63', manufacturer: 'Siemens', category: 'fusivel', model: '3NA3822', commercialCode: '3NA3822', description: 'Fusível NH00, 63A', nominalCurrent: 63, voltage: 500, price: 55.00 },
+  { id: 'siemens-nh-100', manufacturer: 'Siemens', category: 'fusivel', model: '3NA3830', commercialCode: '3NA3830', description: 'Fusível NH00, 100A', nominalCurrent: 100, voltage: 500, price: 95.00 },
+  
+  // Schneider Diazed/NH (TeSys)
+  { id: 'schneider-df-16', manufacturer: 'Schneider', category: 'fusivel', model: 'DF2CA16', commercialCode: 'DF2CA16', description: 'Fusível cilíndrico, 16A', nominalCurrent: 16, voltage: 500, price: 25.00 },
+  { id: 'schneider-df-25', manufacturer: 'Schneider', category: 'fusivel', model: 'DF2CA25', commercialCode: 'DF2CA25', description: 'Fusível cilíndrico, 25A', nominalCurrent: 25, voltage: 500, price: 28.00 },
+  { id: 'schneider-nh-63', manufacturer: 'Schneider', category: 'fusivel', model: 'NH00-63A', commercialCode: 'NH00-63A', description: 'Fusível NH00, 63A', nominalCurrent: 63, voltage: 500, price: 65.00 },
+  { id: 'schneider-nh-100', manufacturer: 'Schneider', category: 'fusivel', model: 'NH00-100A', commercialCode: 'NH00-100A', description: 'Fusível NH00, 100A', nominalCurrent: 100, voltage: 500, price: 110.00 },
+  
+  // Siemens Sirius 3RV (Disjuntores Motor adicionais para cobrir ranges)
+  { id: 'siemens-3rv-32', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2021-4EA10', commercialCode: '3RV2021-4EA10', description: 'Disjuntor Motor Sirius, 27-32A', nominalCurrent: 32, adjustmentRange: { min: 27, max: 32 }, voltage: 690, price: 310.00 },
+  { id: 'siemens-3rv-40', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2021-4FA10', commercialCode: '3RV2021-4FA10', description: 'Disjuntor Motor Sirius, 34-40A', nominalCurrent: 40, adjustmentRange: { min: 34, max: 40 }, voltage: 690, price: 340.00 },
+  { id: 'siemens-3rv-50', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2031-4HB10', commercialCode: '3RV2031-4HB10', description: 'Disjuntor Motor Sirius, 36-50A', nominalCurrent: 50, adjustmentRange: { min: 36, max: 50 }, voltage: 690, price: 420.00 },
+  { id: 'siemens-3rv-63', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2031-4JB10', commercialCode: '3RV2031-4JB10', description: 'Disjuntor Motor Sirius, 45-63A', nominalCurrent: 63, adjustmentRange: { min: 45, max: 63 }, voltage: 690, price: 480.00 },
+  { id: 'siemens-3rv-80', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2031-4KB10', commercialCode: '3RV2031-4KB10', description: 'Disjuntor Motor Sirius, 57-80A', nominalCurrent: 80, adjustmentRange: { min: 57, max: 80 }, voltage: 690, price: 550.00 },
+  { id: 'siemens-3rv-100', manufacturer: 'Siemens', category: 'disjuntorMotor', model: '3RV2041-4MA10', commercialCode: '3RV2041-4MA10', description: 'Disjuntor Motor Sirius, 80-100A', nominalCurrent: 100, adjustmentRange: { min: 80, max: 100 }, voltage: 690, price: 680.00 },
+
+  // Schneider TeSys GV2/GV3 (Disjuntores Motor adicionais para cobrir ranges)
+  { id: 'schneider-gv2me-32', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV2ME32', commercialCode: 'GV2ME32', description: 'Disjuntor Motor TeSys GV2, 24-32A', nominalCurrent: 32, adjustmentRange: { min: 24, max: 32 }, voltage: 690, price: 320.00 },
+  { id: 'schneider-gv3p-40', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV3P40', commercialCode: 'GV3P40', description: 'Disjuntor Motor TeSys GV3, 30-40A', nominalCurrent: 40, adjustmentRange: { min: 30, max: 40 }, voltage: 690, price: 480.00 },
+  { id: 'schneider-gv3p-50', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV3P50', commercialCode: 'GV3P50', description: 'Disjuntor Motor TeSys GV3, 37-50A', nominalCurrent: 50, adjustmentRange: { min: 37, max: 50 }, voltage: 690, price: 520.00 },
+  { id: 'schneider-gv3p-65', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV3P65', commercialCode: 'GV3P65', description: 'Disjuntor Motor TeSys GV3, 48-65A', nominalCurrent: 65, adjustmentRange: { min: 48, max: 65 }, voltage: 690, price: 580.00 },
+  { id: 'schneider-gv3p-73', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV3P73', commercialCode: 'GV3P73', description: 'Disjuntor Motor TeSys GV3, 62-73A', nominalCurrent: 73, adjustmentRange: { min: 62, max: 73 }, voltage: 690, price: 650.00 },
+  { id: 'schneider-gv3p-80', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV3P80', commercialCode: 'GV3P80', description: 'Disjuntor Motor TeSys GV3, 70-80A', nominalCurrent: 80, adjustmentRange: { min: 70, max: 80 }, voltage: 690, price: 720.00 },
 ];
 
 export const getProductsByCategory = (category: string) => 
