@@ -17,11 +17,11 @@ export const ProposalFlow = () => {
   });
   
   const [items, setItems] = useState<any[]>(() => {
-    if (!currentResults) return [];
+    if (!currentResults || !currentInputs) return [];
     
     // Cabo é fixo baseado no cálculo
     const initialItems: any[] = [
-      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: currentInputs?.distance || 1, unit: 'm', price: 0 }
+      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: currentInputs.distance || 1, unit: 'm', price: 0 }
     ];
 
     // Mapear produtos selecionados independentes
@@ -39,7 +39,6 @@ export const ProposalFlow = () => {
     });
 
     // Inclusão dinâmica de materiais auxiliares conforme tipo de partida/comando (Requisito #10)
-    // Isso deve ser movido para uma matriz de composição configurável no futuro
     if (currentInputs.starterType === 'direta' || currentInputs.starterType === 'reversao' || currentInputs.starterType === 'estrelaTriangulo') {
       initialItems.push({ id: 'panel', desc: 'Painel Metálico com Placa de Montagem', qtd: 1, unit: 'un', price: 0 });
       initialItems.push({ id: 'btn-on', desc: 'Botão de Comando Verde (NA)', qtd: currentInputs.starterType === 'reversao' ? 2 : 1, unit: 'un', price: 0 });
@@ -50,12 +49,6 @@ export const ProposalFlow = () => {
       initialItems.push({ id: 'din', desc: 'Trilho DIN Metálico', qtd: 1, unit: 'm', price: 0 });
       initialItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 10, unit: 'm', price: 0 });
     }
-
-    if (currentInputs.starterType === 'estrelaTriangulo') {
-      // Itens específicos já mapeados via selectedProducts (ex: relé de tempo)
-    }
-
-    return initialItems;
 
     return initialItems;
   });
