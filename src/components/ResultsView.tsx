@@ -190,7 +190,7 @@ export const ResultsView = () => {
                               ✓ Compatível
                             </p>
                             <p className="text-xs font-bold text-foreground">
-                              Atende aos requisitos
+                                Atende aos requisitos
                             </p>
                           </div>
                         </div>
