@@ -179,10 +179,14 @@ export class CalculationEngine {
     // 1. Determinar Requisitos Técnicos
     const requirements: TechnicalRequirement[] = [];
     
-    // Proteção Principal
-    requirements.push({ category: 'disjuntor', current: In * 1.25 * fs, quantity: 1, label: 'Disjuntor Geral' });
+    // Proteção Principal (Circuito de Força)
+    requirements.push({ category: 'disjuntor', current: In * 1.25 * fs, quantity: 1, label: 'Proteção Principal (Força)' });
     requirements.push({ category: 'disjuntorMotor', current: In * fs, quantity: 1, label: 'Disjuntor Motor' });
     requirements.push({ category: 'fusivel', current: In * 1.5, quantity: 3, label: 'Fusíveis (Conjunto)' });
+
+    // Proteção do Circuito Auxiliar (Comando)
+    // Recomendação: Proteção dedicada para o comando
+    requirements.push({ category: 'disjuntor', current: 6, quantity: 1, label: 'Proteção do Circuito Auxiliar (Comando)' });
 
     // Comando e Partida
     if (inputs.starterType === 'direta') {

@@ -43,11 +43,13 @@ export const ProposalFlow = () => {
       initialItems.push({ id: 'panel', desc: 'Painel Metálico com Placa de Montagem', qtd: 1, unit: 'un', price: 0 });
       initialItems.push({ id: 'btn-on', desc: 'Botão de Comando Verde (NA)', qtd: currentInputs.starterType === 'reversao' ? 2 : 1, unit: 'un', price: 0 });
       initialItems.push({ id: 'btn-off', desc: 'Botão de Comando Vermelho (NF)', qtd: 1, unit: 'un', price: 0 });
-      initialItems.push({ id: 'led-on', desc: 'Sinaleiro LED Verde', qtd: 1, unit: 'un', price: 0 });
-      initialItems.push({ id: 'led-fail', desc: 'Sinaleiro LED Vermelho', qtd: 1, unit: 'un', price: 0 });
-      initialItems.push({ id: 'term', desc: 'Bornes de Passagem (Conjunto)', qtd: 1, unit: 'cj', price: 0 });
+      initialItems.push({ id: 'led-on', desc: 'Sinaleiro LED Verde (Em operação)', qtd: 1, unit: 'un', price: 0 });
+      initialItems.push({ id: 'led-fail', desc: 'Sinaleiro LED Vermelho (Falha)', qtd: 1, unit: 'un', price: 0 });
+      initialItems.push({ id: 'term-force', desc: 'Bornes de Passagem - Força', qtd: 6, unit: 'un', price: 0 });
+      initialItems.push({ id: 'term-cmd', desc: 'Bornes de Passagem - Comando', qtd: 12, unit: 'un', price: 0 });
       initialItems.push({ id: 'din', desc: 'Trilho DIN Metálico', qtd: 1, unit: 'm', price: 0 });
-      initialItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 10, unit: 'm', price: 0 });
+      initialItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 15, unit: 'm', price: 0 });
+      initialItems.push({ id: 'canaleta', desc: 'Canaleta Recortada 30x50mm', qtd: 2, unit: 'm', price: 0 });
     }
 
     return initialItems;
