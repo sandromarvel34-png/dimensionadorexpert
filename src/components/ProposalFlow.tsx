@@ -312,16 +312,12 @@ export const ProposalFlow = () => {
                             <Input value={item.desc} onChange={e => updateItem(item.id, 'desc', e.target.value)} className="h-8 border-transparent bg-transparent focus:bg-white text-sm font-medium print:text-[8pt] print:h-auto print:p-0" />
                           </td>
                           <td className="p-2 print:p-1">
-                            {item.hideQtd ? (
-                              <div className="h-8 flex items-center justify-center text-muted-foreground text-xs">—</div>
-                            ) : (
-                              <Input 
-                                type="number" 
-                                value={item.qtd} 
-                                onChange={e => updateItem(item.id, 'qtd', parseFloat(e.target.value) || 0)} 
-                                className="h-8 w-24 mx-auto text-center border-transparent bg-transparent focus:bg-white text-sm font-bold print:text-[8pt] print:h-auto print:p-0 no-arrows" 
-                              />
-                            )}
+                            <Input 
+                              type="number" 
+                              value={item.qtd} 
+                              onChange={e => updateItem(item.id, 'qtd', parseFloat(e.target.value) || 0)} 
+                              className="h-8 w-24 mx-auto text-center border-transparent bg-transparent focus:bg-white text-sm font-bold print:text-[8pt] print:h-auto print:p-0 no-arrows" 
+                            />
                           </td>
                           <td className="p-2 print:p-1">
                             <Input type="number" value={item.price} onChange={e => updateItem(item.id, 'price', parseFloat(e.target.value) || 0)} className="h-8 w-24 ml-auto text-right border-transparent bg-transparent focus:bg-white text-sm print:text-[8pt] print:h-auto print:p-0" />
