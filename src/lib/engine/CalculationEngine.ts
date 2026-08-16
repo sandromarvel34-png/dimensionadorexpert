@@ -2,9 +2,10 @@ import {
   CalculationInputs, 
   CalculationResults, 
   ManufacturerProduct, 
-  TechnicalReference 
+  TechnicalReference,
+  TechnicalRequirement
 } from '../../types';
-import { findCompatibleProduct } from '../catalog';
+import { findCompatibleProduct, findCompatibleProducts } from '../catalog';
 
 export class CalculationEngine {
   // Constantes físicas (Referência: NBR 5410)
@@ -174,12 +175,51 @@ export class CalculationEngine {
     const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
 
     const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
-    // Dimensionamento dos dispositivos:
-    // Disjuntor: In * 1.25 (proteção contra sobrecarga/partida)
-    // Contator: In (corrente nominal do motor em AC-3)
-    // Relé Térmico: In (ajuste na corrente nominal)
-    // Dimensionamento dos dispositivos:
-    // Disjuntor: In * 1.25 * FS (proteção contra sobrecarga/partida conforme NBR 5410)
+    // 1. Determinar Requisitos Técnicos
+    const requirements: TechnicalRequirement[] = [];
+    
+    // Proteção Principal
+    requirements.push({ category: 'disjuntor', current: In * 1.25 * fs, quantity: 1, label: 'Disjuntor Geral' });
+    requirements.push({ category: 'disjuntorMotor', current: In * fs, quantity: 1, label: 'Disjuntor Motor' });
+    requirements.push({ category: 'fusivel', current: In * 1.5, quantity: 3, label: 'Fusíveis (Conjunto)' });
+
+    // Comando e Partida
+    if (inputs.starterType === 'direta') {
+      requirements.push({ category: 'contator', current: In * fs, quantity: 1, label: 'Contator de Potência (K1)' });
+      requirements.push({ category: 'releTermico', current: In * fs, quantity: 1, label: 'Relé Térmico' });
+    } else if (inputs.starterType === 'reversao') {
+      requirements.push({ category: 'contator', current: In * fs, quantity: 2, label: 'Contatores de Potência (K1, K2)' });
+      requirements.push({ category: 'releTermico', current: In * fs, quantity: 1, label: 'Relé Térmico' });
+    } else if (inputs.starterType === 'estrelaTriangulo') {
+      requirements.push({ category: 'contator', current: In * fs * 0.58, quantity: 3, label: 'Contatores de Potência (K1, K2, K3)' });
+      requirements.push({ category: 'releTermico', current: In * fs * 0.58, quantity: 1, label: 'Relé Térmico' });
+      requirements.push({ category: 'releTempo', quantity: 1, label: 'Relé de Tempo Estrela-Triângulo' });
+    } else if (inputs.starterType === 'softStarter') {
+      requirements.push({ category: 'softStarter', current: In * fs, quantity: 1, label: 'Soft-Starter' });
+      requirements.push({ category: 'contator', current: In * fs, quantity: 1, label: 'Contator de Bypass', isOptional: true });
+    } else if (inputs.starterType === 'inversor') {
+      requirements.push({ category: 'inverter', current: In * fs, quantity: 1, label: 'Inversor de Frequência' });
+    }
+
+    // Itens Auxiliares (Exemplo de Matriz de Composição)
+    requirements.push({ category: 'auxiliar', quantity: 1, label: 'Botão Liga' });
+    requirements.push({ category: 'auxiliar', quantity: 1, label: 'Botão Desliga' });
+    requirements.push({ category: 'auxiliar', quantity: 1, label: 'Sinaleiro Funcionamento' });
+    requirements.push({ category: 'auxiliar', quantity: 1, label: 'Sinaleiro Falha' });
+
+    // 2. Buscar Produtos Compatíveis por Fabricante (Independente)
+    const manufacturers = ['WEG', 'Siemens', 'Schneider'];
+    const compatibleProducts: Record<string, Record<string, ManufacturerProduct[]>> = {};
+
+    requirements.forEach(req => {
+      compatibleProducts[req.label] = {};
+      manufacturers.forEach(mfr => {
+        const found = findCompatibleProducts(req.category, req.current || 0, mfr);
+        compatibleProducts[req.label][mfr] = found;
+      });
+    });
+
+    // Manter legibilidade para o frontend existente (compatibilidade retrógrada parcial)
     const breaker = findCompatibleProduct('disjuntor', In * 1.25 * fs, mfr) || null;
     const motorBreaker = findCompatibleProduct('disjuntorMotor', In * fs, mfr) || null;
     const diazedFuse = findCompatibleProduct('fusivel', In * 1.5, mfr) || null;
@@ -193,7 +233,6 @@ export class CalculationEngine {
       inverter = findCompatibleProduct('inverter', In * fs, mfr) || null;
     }
     
-    // Lista de contatores dependendo do tipo de partida
     let contactors: ManufacturerProduct[] = [];
     if (inputs.starterType === 'direta') {
       const c = findCompatibleProduct('contator', In * fs, mfr);
@@ -202,7 +241,6 @@ export class CalculationEngine {
       const c = findCompatibleProduct('contator', In * fs, mfr);
       if (c) contactors.push(c, { ...c, id: c.id + '-2', description: c.description + ' (K2)' });
     } else if (inputs.starterType === 'estrelaTriangulo') {
-      // Dimensionamento simplificado para estrela-triângulo (In * 0.58)
       const c = findCompatibleProduct('contator', In * fs * 0.58, mfr);
       if (c) {
         contactors.push(
@@ -212,38 +250,12 @@ export class CalculationEngine {
         );
       }
     } else {
-      // Soft-starter ou Inversor
       const c = findCompatibleProduct('contator', In * fs, mfr);
       if (c) contactors.push(c);
     }
 
     const thermalRelay = findCompatibleProduct('releTermico', In * fs, mfr) || null;
 
-    const refs: TechnicalReference[] = [
-      {
-        id: 'ref1',
-        standardName: 'ABNT NBR 5410',
-        version: '2004',
-        section: '6.2.5',
-        description: 'Dimensionamento de condutores pela queda de tensão admissível.'
-      },
-      {
-        id: 'ref2',
-        standardName: 'ABNT NBR 5410',
-        version: '2004',
-        section: 'Tabela 6.1',
-        description: 'Seção mínima para circuitos de força: 2,5 mm².'
-      },
-      {
-        id: 'ref3',
-        standardName: 'ABNT NBR 5410',
-        version: '2004',
-        section: '6.2.5.5',
-        description: `Fatores de correção aplicados: Agrupamento de Circuitos (${fGroup}) e Temperatura (${fTemp}).`
-      }
-    ];
-
-    // Componentes adicionais: Relé de tempo para Estrela-Triângulo
     let timerRelay: ManufacturerProduct | null = null;
     if (inputs.starterType === 'estrelaTriangulo') {
       timerRelay = findCompatibleProduct('releTempo', 0, mfr) || null;
@@ -256,6 +268,8 @@ export class CalculationEngine {
       finalCableSection: finalSection,
       voltageDropCalculated: dropResult.actualDrop,
       limitingCriterion,
+      technicalRequirements: requirements,
+      compatibleProducts,
       protections: {
         breaker,
         motorBreaker,

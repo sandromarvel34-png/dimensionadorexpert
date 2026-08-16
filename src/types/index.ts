@@ -52,7 +52,7 @@ export interface CalculationInputs {
 export interface ManufacturerProduct {
   id: string;
   manufacturer: string;
-  category: 'disjuntor' | 'fusivel' | 'contator' | 'releTermico' | 'releTempo' | 'disjuntorMotor' | 'cabo' | 'softStarter' | 'inverter';
+  category: 'disjuntor' | 'fusivel' | 'contator' | 'releTermico' | 'releTempo' | 'disjuntorMotor' | 'cabo' | 'softStarter' | 'inverter' | 'auxiliar';
   model: string;
   commercialCode: string;
   description: string;
@@ -63,7 +63,38 @@ export interface ManufacturerProduct {
   price?: number;
 }
 
+export interface TechnicalRequirement {
+  category: ManufacturerProduct['category'];
+  current?: number;
+  voltage?: number;
+  quantity: number;
+  label: string;
+  isOptional?: boolean;
+}
+
 export interface CalculationResults {
+  nominalCurrent: number;
+  cableByAmpacity: number; // mm²
+  cableByVoltageDrop: number; // mm²
+  finalCableSection: number; // mm²
+  voltageDropCalculated: number; // %
+  limitingCriterion: 'ampacity' | 'voltageDrop';
+  technicalRequirements: TechnicalRequirement[];
+  compatibleProducts: Record<string, Record<string, ManufacturerProduct[]>>; // Category -> Manufacturer -> Products
+  protections: {
+    breaker?: ManufacturerProduct | null;
+    motorBreaker?: ManufacturerProduct | null;
+    fuse?: ManufacturerProduct | null;
+    diazedFuse?: ManufacturerProduct | null;
+    nhFuse?: ManufacturerProduct | null;
+    contactor?: ManufacturerProduct[] | null;
+    thermalRelay?: ManufacturerProduct | null;
+    timerRelay?: ManufacturerProduct | null;
+    softStarter?: ManufacturerProduct | null;
+    inverter?: ManufacturerProduct | null;
+  };
+  references: TechnicalReference[];
+}
   nominalCurrent: number;
   cableByAmpacity: number; // mm²
   cableByVoltageDrop: number; // mm²
