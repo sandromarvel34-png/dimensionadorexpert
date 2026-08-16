@@ -76,16 +76,16 @@ export const ResultsView = () => {
           </div>
           <div className="grid grid-cols-3 gap-8 border-t border-slate-100 pt-8">
             <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Pela Corrente</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Ampacidade</p>
               <p className="text-xl font-bold">{currentResults.cableByAmpacity} mm²</p>
             </div>
             <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Pela Distância</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Queda de Tensão</p>
               <p className="text-xl font-bold">{currentResults.cableByVoltageDrop} mm²</p>
             </div>
             <div>
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Queda Final</p>
-              <p className="text-xl font-bold text-primary">{currentResults.voltageDropCalculated.toFixed(2)}%</p>
+              <p className="text-xl font-bold text-primary">{isNaN(currentResults.voltageDropCalculated) ? '0.00' : currentResults.voltageDropCalculated.toFixed(2)}%</p>
             </div>
           </div>
         </div>

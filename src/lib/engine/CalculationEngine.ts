@@ -169,6 +169,9 @@ export class CalculationEngine {
     const secAmp = this.getSectionByAmpacity(correctedCurrent);
     const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     
+    // Garantir que a queda calculada seja um número válido para evitar NaN%
+    const voltageDropCalculated = isNaN(dropResult.actualDrop) ? 0 : dropResult.actualDrop;
+    
     // O dimensionamento final DEVE ser a maior bitola entre ampacidade e queda de tensão
     const finalSection = Math.max(secAmp, dropResult.section, this.SECAO_MINIMA_FORCA);
     
@@ -293,7 +296,7 @@ export class CalculationEngine {
       cableByAmpacity: secAmp,
       cableByVoltageDrop: dropResult.section,
       finalCableSection: finalSection,
-      voltageDropCalculated: dropResult.actualDrop,
+      voltageDropCalculated: voltageDropCalculated,
       limitingCriterion,
       technicalRequirements: requirements,
       compatibleProducts,

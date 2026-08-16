@@ -554,21 +554,22 @@ export const CalculatorWizard = () => {
               </div>
             </div>
 
+            {/* Ocultado conforme solicitação #4: O fabricante é escolhido na Proposta Comercial */}
+            <div className="hidden">
+              <Label className="text-foreground font-semibold">Fabricante dos Dispositivos</Label>
+              <Select name="manufacturer" defaultValue={currentInputs?.preferredManufacturer || "WEG"}>
+                <SelectTrigger className="h-11">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  <SelectItem value="any">Qualquer (Melhor preço)</SelectItem>
+                  <SelectItem value="WEG">WEG</SelectItem>
+                  <SelectItem value="Schneider">Schneider</SelectItem>
+                  <SelectItem value="Siemens">Siemens</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-              <div className="space-y-3">
-                <Label className="text-foreground font-semibold">Fabricante dos Dispositivos</Label>
-                <Select name="manufacturer" defaultValue={currentInputs?.preferredManufacturer || "WEG"}>
-                  <SelectTrigger className="h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    <SelectItem value="any">Qualquer (Melhor preço)</SelectItem>
-                    <SelectItem value="WEG">WEG</SelectItem>
-                    <SelectItem value="Schneider">Schneider</SelectItem>
-                    <SelectItem value="Siemens">Siemens</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Método de Instalação</Label>
                 <Select name="groupingType" defaultValue={currentInputs?.groupingType || "bundle"}>
