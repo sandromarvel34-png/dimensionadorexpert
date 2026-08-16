@@ -43,7 +43,7 @@ export const ResultsView = () => {
               Partida {currentInputs.starterType}
             </span>
             <span className="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-              {currentInputs.distance} Metros
+              {currentInputs.distance} m
             </span>
           </div>
         </div>
