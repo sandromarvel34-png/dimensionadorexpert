@@ -61,8 +61,8 @@ export class CalculationEngine {
     unit: string, 
     voltage: number, 
     phase: string = 'trifasico',
-    pf: number = 0.86,
-    eff: number = 0.85
+    pf: number = 0.85,
+    eff: number = 0.90
   ): number {
     let powerKW = power;
     if (unit === 'cv') powerKW = power * 0.7355;
@@ -70,10 +70,11 @@ export class CalculationEngine {
 
     let In: number;
     if (phase === 'trifasico') {
-      // In = P(kW) * 1000 / (sqrt(3) * V * cosphi * rendimento)
+      // In = (P(kW) * 1000) / (sqrt(3) * V * cosphi * rendimento)
       In = (powerKW * 1000) / (Math.sqrt(3) * voltage * pf * eff);
     } else {
       // Monofásico
+      // In = (P(kW) * 1000) / (V * cosphi * rendimento)
       In = (powerKW * 1000) / (voltage * pf * eff);
     }
 
