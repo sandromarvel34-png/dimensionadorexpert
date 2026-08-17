@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Plus, Trash2, Printer, Save, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import katex from 'katex';
 
 export const ProposalFlow = () => {
   const { setView, currentResults, currentInputs, selectedManufacturer, setSelectedManufacturer } = useAppStore();
@@ -269,7 +270,7 @@ export const ProposalFlow = () => {
                     <p className="text-sm font-bold">{currentInputs?.voltage} V</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">In (Corrente)</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n', { throwOnError: false }) }} />
                     <p className="text-sm font-bold text-primary">{currentResults?.nominalCurrent.toFixed(2)} A</p>
                   </div>
                   <div className="space-y-1">
@@ -281,12 +282,12 @@ export const ProposalFlow = () => {
                     <p className="text-sm font-bold capitalize">{currentInputs?.starterType}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">cos φ / η / FS</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('\\cos \\varphi / \\eta / FS', { throwOnError: false }) }} />
                     <p className="text-sm font-bold">{currentInputs?.powerFactor} / {currentInputs?.efficiency} / {currentInputs?.serviceFactor}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Critério</p>
-                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : 'Queda de V'}</p>
+                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : <span dangerouslySetInnerHTML={{ __html: '$\\Delta V$' }} />}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Seção Final</p>
