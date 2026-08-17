@@ -1,5 +1,6 @@
 import { useAppStore } from "@/lib/store";
-import { Zap, LayoutDashboard, FileText, Settings, User } from "lucide-react";
+import { Zap, LayoutDashboard, FileText, Settings, User, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import logoAeAsset from "@/assets/logo-ae.png.asset.json";
 import { cn } from "@/lib/utils";
 import { Dashboard } from "./Dashboard";
@@ -44,8 +45,24 @@ export const AppLayout = () => {
               <button className="text-muted-foreground hover:text-primary transition-colors cursor-pointer">Configurações</button>
             </nav>
           </div>
-          <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors cursor-pointer">
-            <User className="w-5 h-5" />
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const link = document.createElement("a");
+                link.href = "/app-build.zip";
+                link.download = "dimensionador-expert.zip";
+                link.click();
+              }}
+              className="hidden md:flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Baixar App
+            </Button>
+            <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors cursor-pointer">
+              <User className="w-5 h-5" />
+            </div>
           </div>
         </div>
       </header>
