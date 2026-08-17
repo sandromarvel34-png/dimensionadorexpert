@@ -34,15 +34,15 @@ export const ResultsView = () => {
           >
             <ArrowLeft className="w-4 h-4" /> REVISAR DADOS TÉCNICOS
           </button>
-          <h1 className="text-4xl font-black text-foreground tracking-tight uppercase">Dimensionamento Concluído</h1>
+          <h1 className="text-2xl md:text-4xl font-black text-foreground tracking-tight uppercase">Dimensionamento Concluído</h1>
           <div className="flex flex-wrap gap-2">
-            <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+            <span className="bg-primary/10 text-primary border border-primary/20 px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider">
               {currentInputs.power} {currentInputs.powerUnit} • {currentInputs.voltage}V
             </span>
-            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-              Partida {currentInputs.starterType}
+            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider">
+              {currentInputs.starterType}
             </span>
-            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider">
               {currentInputs.distance} m
             </span>
           </div>
@@ -70,9 +70,9 @@ export const ResultsView = () => {
             <Shield className="w-32 h-32" />
           </div>
           <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">Condutor Recomendado</h3>
-          <div className="flex items-end gap-4 mb-8">
-            <span className="text-7xl font-black text-foreground leading-none">{currentResults.finalCableSection}</span>
-            <span className="text-2xl font-black text-muted-foreground mb-2">mm²</span>
+          <div className="flex items-end gap-2 md:gap-4 mb-8">
+            <span className="text-5xl md:text-7xl font-black text-foreground leading-none">{currentResults.finalCableSection}</span>
+            <span className="text-xl md:text-2xl font-black text-muted-foreground mb-2">mm²</span>
           </div>
           <div className="grid grid-cols-3 gap-8 border-t border-slate-100 pt-8">
             <div>
@@ -113,7 +113,7 @@ export const ResultsView = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Corrente (In)</span>
-              <span className="text-2xl font-black">{currentResults.nominalCurrent.toFixed(1)} A</span>
+              <span className="text-xl md:text-2xl font-black">{currentResults.nominalCurrent.toFixed(1)} A</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Freq. / Sistema</span>
