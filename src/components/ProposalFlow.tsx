@@ -269,7 +269,7 @@ export const ProposalFlow = () => {
                     <p className="text-sm font-bold">{currentInputs?.voltage} V</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">In (Corrente)</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n', { throwOnError: false }) }} />
                     <p className="text-sm font-bold text-primary">{currentResults?.nominalCurrent.toFixed(2)} A</p>
                   </div>
                   <div className="space-y-1">
@@ -281,12 +281,12 @@ export const ProposalFlow = () => {
                     <p className="text-sm font-bold capitalize">{currentInputs?.starterType}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: `$\\cos \\varphi$ / $\\eta$ / $FS$` }} />
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('\\cos \\varphi / \\eta / FS', { throwOnError: false }) }} />
                     <p className="text-sm font-bold">{currentInputs?.powerFactor} / {currentInputs?.efficiency} / {currentInputs?.serviceFactor}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Critério</p>
-                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : 'Queda de V'}</p>
+                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : <span>$\Delta V$</span>}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Seção Final</p>

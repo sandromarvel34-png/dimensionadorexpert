@@ -113,7 +113,7 @@ export const ResultsView = () => {
           <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">Resumo Elétrico</h3>
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">$I_n$</span>
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n', { throwOnError: false }) }} />
               <span className="text-xl md:text-2xl font-black">{currentResults.nominalCurrent.toFixed(1)} A</span>
             </div>
             <div className="flex justify-between items-center">
@@ -121,7 +121,7 @@ export const ResultsView = () => {
               <span className="text-xl font-bold">60Hz / 3$\phi$</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">$I_b$ (Carga Máxima)</span>
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_b \\text{ (Carga Máxima)}', { throwOnError: false }) }} />
               <span className="text-xl font-bold">{(currentResults.nominalCurrent * 1.25 * (currentInputs.serviceFactor || 1)).toFixed(1)} A</span>
             </div>
             <div className="pt-4 border-t border-white/10">
