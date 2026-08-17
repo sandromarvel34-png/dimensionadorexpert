@@ -18,6 +18,12 @@ export const ProposalFlow = () => {
     email: ''
   });
   
+  const [commercialData, setCommercialData] = useState({
+    serviceDescription: '',
+    technicianName: '',
+    executingCompany: ''
+  });
+  
   const [items, setItems] = useState<any[]>(() => {
     if (!currentResults || !currentInputs) return [];
     
@@ -102,6 +108,16 @@ export const ProposalFlow = () => {
   };
 
   const handleSave = () => {
+    // Save to local storage
+    const proposalData = {
+      clientData,
+      commercialData,
+      items,
+      labor,
+      costs,
+      date: new Date().toISOString()
+    };
+    localStorage.setItem('last_proposal', JSON.stringify(proposalData));
     toast.success('Proposta salva com sucesso!');
   };
 
@@ -216,6 +232,16 @@ export const ProposalFlow = () => {
                 <Input value={clientData.email} onChange={e => setClientData({...clientData, email: e.target.value})} placeholder="cliente@email.com" />
               </div>
             </div>
+            
+            <div className="space-y-2 mt-4">
+              <Label className="text-label uppercase tracking-widest text-[10px]">Descrição do Serviço</Label>
+              <Textarea 
+                value={commercialData.serviceDescription} 
+                onChange={e => setCommercialData({...commercialData, serviceDescription: e.target.value})} 
+                placeholder="Ex: Instalação de comando elétrico para acionamento de motor trifásico de 50 CV, incluindo montagem de painel, fiação e testes de funcionamento." 
+                className="min-h-[100px]"
+              />
+            </div>
           </div>
 
           {/* PDF Preview Container */}
@@ -233,6 +259,20 @@ export const ProposalFlow = () => {
                 <div className="text-left sm:text-right">
                   <h2 className="text-lg md:text-xl font-bold text-foreground">PROPOSTA TÉCNICA</h2>
                   <p className="text-metadata font-bold">{new Date().toLocaleDateString('pt-BR')}</p>
+                  {commercialData.technicianName && (
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1">
+                      {commercialData.executingCompany ? `${commercialData.executingCompany} — ` : ''}
+                      Técnico: {commercialData.technicianName}
+                    </p>
+              )}
+              
+              {/* Service Description in PDF */}
+              {commercialData.serviceDescription && (
+                <div className="mb-6 p-4 bg-primary/5 rounded-xl border border-primary/10 print:mb-4">
+                  <p className="text-[10px] text-primary uppercase font-bold tracking-widest mb-1">Descrição do Serviço</p>
+                  <p className="text-sm text-foreground whitespace-pre-line">{commercialData.serviceDescription}</p>
+                </div>
+              )}
                 </div>
               </div>
 
@@ -309,7 +349,7 @@ export const ProposalFlow = () => {
               </div>
 
               {/* Materials Table */}
-              <div className="mb-6 print:mb-4">
+              <div className="mb-6 print:mb-4 print-page-break">
                 <div className="flex justify-between items-end mb-4">
                   <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em]">Lista de Materiais e Equipamentos</h3>
                   <button onClick={addItem} className="text-xs font-bold text-primary hover:underline no-print flex items-center gap-1">
@@ -329,7 +369,7 @@ export const ProposalFlow = () => {
                     </thead>
                     <tbody className="divide-y divide-border">
                       {items.map((item) => (
-                        <tr key={item.id} className="group hover:bg-muted/30 transition-colors">
+                        <tr key={item.id} className="group hover:bg-muted/30 transition-colors break-inside-avoid">
                           <td className="p-2 print:p-1">
                             <Input value={item.desc} onChange={e => updateItem(item.id, 'desc', e.target.value)} className="h-8 border-transparent bg-transparent focus:bg-white text-sm font-medium print:text-[8pt] print:h-auto print:p-0" />
                           </td>
@@ -414,8 +454,16 @@ export const ProposalFlow = () => {
                 <div className="text-[9px] text-muted-foreground max-w-sm leading-relaxed print:text-[7pt]">
                   * Proposta válida por {costs.validity} dias. Dimensionamento realizado seguindo rigorosamente as prescrições da NBR 5410 para motores de indução. O instalador deve conferir as condições reais do local antes da execução.
                 </div>
-                <div className="text-center w-48 print:w-32">
-                  <div className="border-b border-foreground h-10 mb-2 print:h-6 print:mb-1"></div>
+                <div className="text-center w-64 print:w-48">
+                  <div className="text-[10px] font-bold uppercase tracking-widest mb-1 print:text-[8pt]">
+                    {commercialData.technicianName}
+                  </div>
+                  {commercialData.executingCompany && (
+                    <div className="text-[9px] text-muted-foreground uppercase mb-1 print:text-[7pt]">
+                      {commercialData.executingCompany}
+                    </div>
+                  )}
+                  <div className="border-b border-foreground h-1 w-full mb-2 print:h-1 print:mb-1"></div>
                   <p className="text-[10px] font-bold uppercase tracking-widest print:text-[7pt]">Assinatura do Técnico</p>
                 </div>
               </div>
@@ -429,6 +477,22 @@ export const ProposalFlow = () => {
             <h3 className="text-card-title">Configurações Comerciais</h3>
             
             <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-widest text-[10px]">Técnico Responsável</Label>
+                <Input 
+                  value={commercialData.technicianName} 
+                  onChange={e => setCommercialData({...commercialData, technicianName: e.target.value})} 
+                  placeholder="Nome completo do técnico" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-widest text-[10px]">Empresa Executora (Opcional)</Label>
+                <Input 
+                  value={commercialData.executingCompany} 
+                  onChange={e => setCommercialData({...commercialData, executingCompany: e.target.value})} 
+                  placeholder="Nome da empresa" 
+                />
+              </div>
               <div className="space-y-2">
                 <Label className="text-label uppercase tracking-widest text-[10px]">Validade da Proposta (Dias)</Label>
                 <Input type="number" value={costs.validity} onChange={e => setCosts({...costs, validity: parseInt(e.target.value) || 30})} />

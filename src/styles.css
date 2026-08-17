@@ -114,6 +114,11 @@ a[href*="lovable.app"] {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
+
+  .print-page-break {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
   
   .card-panel { 
     border: 1px solid #E2E8F0 !important; 
