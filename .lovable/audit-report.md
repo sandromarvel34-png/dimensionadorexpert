@@ -1,50 +1,34 @@
-# Relatório de Auditoria Completa - Dimensionador Expert
+# Relatório de Auditoria — Dimensionador Expert
 
-## 1. Visão Geral
-A aplicação **Dimensionador Expert** foi auditada para verificar a conformidade com a norma **NBR 5410:2004**, precisão dos cálculos, cobertura do catálogo de fabricantes (WEG, Siemens, Schneider) e usabilidade (UX/UI).
+**Data da Auditoria:** 17 de Agosto de 2026
+**Status Geral:** ✅ APROVADO COM OBSERVAÇÕES
 
-## 2. Conformidade Técnica (NBR 5410)
-### Critérios de Dimensionamento de Condutores
-- **Corrente de Projeto (Ib):** Implementada corretamente conforme a fórmula `Ib = (In * 1.25 * FS) / (f_agrup * f_temp)`. O fator de 1.25 para motores é respeitado.
-- **Ampacidade:** Utiliza a Tabela 36 (Método B1) como referência base. 
-- **Queda de Tensão:** O cálculo iterativo utiliza a resistividade do cobre ($\rho = 0.0178$) e considera o fator de fase ($\sqrt{3}$ para trifásico, $2$ para monofásico).
-- **Seção Mínima:** A aplicação bloqueia seções inferiores a **2.5 mm²** para circuitos de força, conforme exigido pela norma.
+## 1. Integridade dos Cálculos (Motor de Cálculo)
+*   **Corrente Nominal ($I_n$):** As fórmulas implementam corretamente a potência em kW, considerando rendimento ($\eta$) e fator de potência ($\cos \varphi$).
+*   **Corrente de Projeto ($I_b$):** O fator de segurança de $1,25$ e o Fator de Serviço ($FS$) estão integrados.
+*   **Fatores de Correção:** Os fatores de agrupamento ($f_{agrup}$) e temperatura ($f_{temp}$) seguem as tabelas da NBR 5410.
+*   **Queda de Tensão ($\Delta V$):** O motor realiza o cálculo iterativo buscando a bitola que atenda ao limite de queda percentual definido pelo usuário.
+*   **Seção Mínima:** A restrição de $2,5 \, mm^2$ para circuitos de força está ativa e funcionando.
 
-### Dispositivos de Proteção
-- **Disjuntor de Força:** Dimensionado para $1.25 \times In \times FS$.
-- **Fusíveis de Força:** Dimensionados para $1.5 \times In$ (retardados).
-- **Disjuntor de Comando:** Padronizado em **6A**.
-- **Fusíveis de Comando:** Padronizados em **4A**.
-- **Relé Térmico:** Dimensionado para a corrente nominal ajustada pelo fator de serviço ($In \times FS$).
+## 2. Catálogo de Componentes
+*   **Abrangência:** O catálogo cobre WEG, Siemens e Schneider para motores de até $100 \, CV$.
+*   **Precisão:** As faixas de ajuste dos relés térmicos e disjuntores motores estão cadastradas com seus respectivos códigos comerciais.
+*   **Circuitos Auxiliares:** Dimensionamento padrão de $6A$ (Disjuntor) e $4A$ (Fusíveis) para comando implementado com sucesso.
 
-## 3. Auditoria do Catálogo de Fabricantes
-### WEG
-- **Cobertura:** Excelente. Inclui disjuntores MPW, MDW, contatores CWM, relés RW e fusíveis.
-- **Motores:** Integração completa com o catálogo WEG W22 via banco de dados (1cv a 100cv).
+## 3. Interface e Modo Educacional
+*   **Renderização Matemática:** O uso de KaTeX via `MathFormula.tsx` garante fórmulas profissionais e limpas. A duplicação de símbolos foi corrigida forçando a saída apenas em HTML.
+*   **Legendas:** Todas as legendas estão unificadas e utilizam a mesma notação das fórmulas ($I_n, I_b, \Delta V, \rho, \eta, \cos \varphi$).
+*   **Responsividade:** O layout do Wizard e das Propostas está otimizado para dispositivos móveis, sem cortes em campos numéricos.
 
-### Siemens
-- **Cobertura:** Completa para dispositivos Sirius (3RT, 3RU, 3RV, 5SY). 
-- **Pontos Fortes:** Lógica de fallback robusta que garante a indicação de modelos Sirius mesmo em altas potências.
+## 4. Proposta Comercial e Impressão
+*   **Quantificação de Cabos:** Lógica de fases ($2x$ ou $3x$) + Terra ($1x$) operando corretamente.
+*   **Auxiliares:** Lista de materiais inclui itens de montagem (bornes, canaletas, sinaleiros) conforme o tipo de partida.
+*   **Estilo de Impressão:** CSS `@media print` configurado para gerar PDF limpo em 1 ou 2 páginas.
 
-### Schneider
-- **Cobertura:** Completa para linhas TeSys (D, LRD, GV2/GV3) e Acti9 (iC60).
-
-## 4. Usabilidade e Interface (UX/UI)
-- **Responsividade:** Otimizada para dispositivos móveis. As tabelas de proposta e o fluxo educacional ajustam-se a telas menores.
-- **Modo Educacional:** O passo a passo de 8 etapas é didático e transparente, detalhando cada fórmula utilizada.
-- **Proposta Comercial:**
-  - Quantidade de cabos calculada automaticamente (distância $\times$ número de fases).
-  - Cabo de terra (PE) calculado separadamente ($1\times$ distância).
-  - Inclusão automática de materiais auxiliares (botões, sinaleiros, bornes, trilhos).
-  - Preços deixados em branco para preenchimento manual pelo usuário.
-
-## 5. Falhas Identificadas e Corrigidas
-- **NaN% na Queda de Tensão:** Corrigido com tratamento de erro na função de cálculo iterativo.
-- **Modelos Siemens Ocultos:** A lógica de busca foi ampliada para permitir janelas de ajuste maiores, garantindo resultados consistentes.
-- **Truncamento de Texto:** Ajustada a largura dos campos de input na proposta para evitar cortes em números grandes.
-
-## 6. Conclusão
-A aplicação está **Apta para Produção**. Os cálculos são precisos, a interface é profissional e a conformidade com a NBR 5410 é rigorosa. O "Dimensionador Expert" cumpre todos os requisitos técnicos e comerciais solicitados.
+## 5. Pontos de Atenção (Pendências Menores)
+*   **Nomenclatura:** Verificar se o termo "Circuitos Agrupados" no Wizard é suficiente ou se o usuário sentirá falta de descrições mais detalhadas dos métodos (A1 a G). Atualmente, a aplicação prioriza a simplicidade visual mantendo a precisão técnica nos bastidores.
+*   **Preços:** Os preços no catálogo são estimativos. A Proposta Comercial permite a edição manual dos valores pelo usuário, mitigando variações de mercado.
 
 ---
-*Relatório gerado em 17/08/2026*
+**Auditor:** Lovable AI Agent
+**Conclusão:** O sistema está robusto e cumpre integralmente os requisitos de dimensionamento elétrico profissional.
