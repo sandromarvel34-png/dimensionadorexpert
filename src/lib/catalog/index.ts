@@ -255,10 +255,10 @@ export const findCompatibleProducts = (
     (mfr ? p.manufacturer.toLowerCase() === mfr.toLowerCase() : true)
   );
 
-  if (category === 'releTermico') {
+  if (category === 'releTermico' || category === 'disjuntorMotor') {
     return filtered.filter(p => 
       (p.adjustmentRange && current >= p.adjustmentRange.min && current <= p.adjustmentRange.max) ||
-      (p.nominalCurrent && p.nominalCurrent >= current)
+      (p.nominalCurrent && p.nominalCurrent >= current && p.nominalCurrent <= current * 1.4)
     ).sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
   } else if (category === 'releTempo' || category === 'auxiliar') {
     return filtered;

@@ -1,37 +1,33 @@
-# Auditoria da Aplicação: Dimensionador de Comandos Elétricos
+# Auditoria Completa da Aplicação "Dimensionador de Comandos Elétricos Pro"
 
-## 1. Divergências Visuais vs. Referências
+## 1. Falhas Técnicas e Erros Encontrados
 
-### Resultados (ResultsView)
-- **Cabeçalho de Resultados:** Nas imagens, a seção de "Condutor Recomendado" e "Resumo Elétrico" tem um design mais limpo com ícones de escudo e cores contrastantes. A implementação atual segue a estrutura, mas pode precisar de ajustes finos em paddings e tipografia para igualar a densidade da imagem.
-- **Grades de Fabricantes:** A imagem mostra 3 cards horizontais para cada categoria (WEG, Siemens, Schneider). A implementação atual faz isso, mas alguns itens como "Disjuntor Motor" e "Fusíveis" estão aparecendo como "Nenhum produto compatível" para Siemens/Schneider, indicando falta de dados no catálogo local para certas faixas de potência.
+### A. Motor de Cálculo (NBR 5410)
+- **Fator de Agrupamento (FCA):** O `CalculationEngine.ts` define `bundle: 1.00`, mas para circuitos agrupados no mesmo eletroduto/canaleta, a NBR 5410 especifica fatores redutores (ex: 2 circuitos = 0.80). O código aplica o fator, mas o usuário não visualiza claramente qual tabela está sendo usada na seleção.
+- **Queda de Tensão:** A fórmula atual no `CalculationEngine.ts` usa uma aproximação resistiva pura (`RHO * dist * In * pf`). Para condutores maiores (> 35mm²), a reatância indutiva torna-se relevante e deve ser considerada para precisão profissional em longas distâncias.
+- **Seção Mínima:** O código garante 2.5mm² para força, mas não impõe a seção mínima de 1.5mm² para circuitos de comando (cabo de comando).
+- **Proteção de Comando:** O motor adiciona um disjuntor de 6A para comando, mas não há um seletor no catálogo para esse item específico em todas as marcas de forma consistente.
 
-### Proposta Comercial (ProposalFlow)
-- **Botões de Fabricante:** Na imagem, os botões de troca de marca (WEG, Siemens, Schneider) estão no topo do documento. A implementação atual tem isso, mas a transição de itens ao trocar de marca precisa ser 100% fluida, garantindo que o modelo mude instantaneamente na lista.
-- **Cabo de Comando 1.0mm²:** O requisito de ocultar a quantidade e manter valor fixo 15 foi implementado no código, mas precisa ser validado visualmente na impressão.
-- **Formulário de Configurações:** A barra lateral direita (Validade, Valor Hora, etc.) está presente, mas a estilização dos inputs e o botão "Imprimir Documento" precisam de maior fidelidade com o azul vibrante da referência.
+### B. Catálogo de Produtos
+- **Falta de Profundidade (Alta Potência):** O catálogo local (`src/lib/catalog/index.ts`) possui dados limitados para motores > 50cv. Disjuntores de caixa moldada (DWB, NSX, 3VA) estão presentes mas com poucos modelos, o que pode causar o erro "Nenhum produto compatível" para potências intermediárias.
+- **Disjuntor Motor vs Fusível:** O sistema sugere ambos, mas tecnicamente em muitos projetos se usa um *ou* outro. A interface não permite a escolha da estratégia de proteção.
+- **Relés Térmicos Siemens/Schneider:** A lógica de busca por `adjustmentRange` falha se o campo não estiver preenchido exatamente como o motor de cálculo espera (corrente nominal no centro do range).
 
----
+### C. Interface e UX (Wizard & Resultados)
+- **Persistência de Dados:** Ao clicar em "Voltar", alguns estados do formulário (como o motor selecionado no catálogo) podem se perder se não estiverem devidamente sincronizados com o Zustand no `useEffect` inicial do Wizard.
+- **Visualização de Quantidades:** O erro de "truncamento" em campos de quantidade (ex: 240 aparecendo como 24) foi mitigado, mas ainda pode ocorrer em telas mobile devido ao padding excessivo dos inputs do Shadcn UI.
+- **Tradução:** Termos como "Single", "Dahlander" no banco de dados do motor não estão mapeados para labels amigáveis em português na interface de seleção.
 
-## 2. Falhas Técnicas e Erros Identificados
+### D. Fluxo de Proposta e Impressão
+- **Cálculo de Cabos:** O multiplicador (3x para trifásico) é aplicado apenas ao cabo de força. Cabos de aterramento (PE) e cabos de comando não seguem uma lógica de metragem configurável, sendo fixos ou manuais.
+- **Layout A4:** Em propostas com muitos itens, o rodapé de assinatura pode "quebrar" para uma terceira página, violando o requisito de 1-2 páginas.
+- **Preços Zerados:** Como os preços no catálogo são estáticos e defasados, o usuário é forçado a preencher item por item. Falta uma função de "Preço Global Estimado" ou integração com índices de mercado.
 
-### Catálogo de Produtos
-- **Falta de Modelos:** Para motores de alta potência (>50cv), as linhas Schneider TeSys GV e Siemens Sirius 3RV/3RT precisam de mais entradas para evitar a mensagem de "Nenhum produto compatível".
-- **Disjuntor Motor vs Proteção Principal:** Em partidas de grande porte, o software deve sugerir Disjuntores de Caixa Moldada (ex: WEG DWB) em vez de apenas mini-disjuntores (MDW).
+## 2. Erros Críticos de Código
+- **NaN% em Resultados:** O `ResultsView` tenta tratar `NaN`, mas se `currentResults` for carregado de um histórico antigo sem o campo `voltageDropCalculated`, a tela pode quebrar.
+- **Fator de Serviço (FS):** O motor de cálculo usa `In * 1.25 * fs`. Em algumas normas, o fator 1.25 já engloba sobrecargas leves, e aplicar FS cumulativamente pode superdimensionar excessivamente (ex: 1.25 * 1.15 = 1.43x a corrente nominal).
 
-### Cálculo e Lógica (Engine)
-- **Queda de Tensão:** O loop iterativo no `CalculationEngine` está correto, mas a exibição do "Critério Limitante" precisa ser mais clara: "Dimensionado por Ampacidade" ou "Dimensionado por Queda de Tensão".
-- **Quantidade de Cabos:** O multiplicador (3x para trifásico, 2x para monofásico) foi corrigido, mas o arredondamento em grandes metragens (ex: 240m) deve ser verificado para garantir que o input de quantidade suporte 3+ dígitos sem truncar visualmente.
-
-### Usabilidade (UX)
-- **Persistência de Dados:** Ao clicar em "Voltar", alguns campos do formulário manual podem resetar se o `useAppStore` não capturar o `onChange` imediatamente.
-- **Impressão A4:** O layout de 1-2 páginas é crítico. A tabela de materiais precisa de `page-break-inside: avoid` para não separar a descrição da quantidade em páginas diferentes.
-
----
-
-## 3. Plano de Ação
-
-1.  **Enriquecimento do Catálogo:** Adicionar faixas de 50cv a 100cv para Siemens e Schneider no `src/lib/catalog/index.ts`.
-2.  **Refinamento do ProposalFlow:** Ajustar o CSS para garantir que o número "240" (ou maiores) apareça sem cortes no input de quantidade.
-3.  **Ajuste de Auxiliares:** Garantir que o Cabo de Comando 1.0mm² tenha a QTD fixa e o campo de input desabilitado/oculto na proposta.
-4.  **Sincronização de Marcas:** Refinar o `useEffect` que reconstrói a lista de itens ao trocar o `selectedManufacturer` na Proposta.
+## 3. Próximos Passos Recomendados
+1.  **Refinar Catálogo:** Inserir curvas completas de disjuntores motor para Siemens (3RV) e Schneider (GV).
+2.  **Ajuste de Impressão:** Utilizar `@media print` para forçar a escala do memorial técnico.
+3.  **Lógica de Cabos:** Adicionar seletor para inclusão ou não do cabo de aterramento no cálculo de metragem.
