@@ -264,7 +264,15 @@ export const ProposalFlow = () => {
                       {commercialData.executingCompany ? `${commercialData.executingCompany} — ` : ''}
                       Técnico: {commercialData.technicianName}
                     </p>
-                  )}
+              )}
+              
+              {/* Service Description in PDF */}
+              {commercialData.serviceDescription && (
+                <div className="mb-6 p-4 bg-primary/5 rounded-xl border border-primary/10 print:mb-4">
+                  <p className="text-[10px] text-primary uppercase font-bold tracking-widest mb-1">Descrição do Serviço</p>
+                  <p className="text-sm text-foreground whitespace-pre-line">{commercialData.serviceDescription}</p>
+                </div>
+              )}
                 </div>
               </div>
 
