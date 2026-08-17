@@ -112,15 +112,15 @@ export const EducationalFlow = () => {
             <MathFormula
               title="Cálculo da Queda de Tensão"
               legend={[
-                { symbol: '\\Delta V_{(\\%)}', label: 'Queda de tensão percentual' },
-                { symbol: '\\rho', label: 'Resistividade do Cobre (0,0178 Ω·mm²/m)' },
+                { symbol: '\\Delta V', label: 'Queda de tensão percentual' },
+                { symbol: '\\rho', label: 'Resistividade do Cobre' },
                 { symbol: 'L', label: 'Comprimento (m)' },
                 { symbol: 'I_n', label: 'Corrente nominal (A)' },
                 { symbol: 'S', label: 'Seção do condutor (mm²)' },
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`\\Delta V_{(\\%)} = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100`}
+              {`\\Delta V = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Calculada</p>
@@ -206,7 +206,7 @@ export const EducationalFlow = () => {
               </div>
               <div className="space-y-2">
                 <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \\cdot FS$ em regime AC-3.</p>
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir exatamente o valor de $I_n \\cdot FS$.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de $I_n \\cdot FS$.</p>
               </div>
             </div>
           </div>
