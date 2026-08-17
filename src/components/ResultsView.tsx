@@ -6,6 +6,7 @@ import { ManufacturerProduct } from '@/types';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MathFormula } from '@/components/MathFormula';
+import katex from 'katex';
 
 export const ResultsView = () => {
   const { currentResults, currentInputs, setView, selectedManufacturer, setSelectedManufacturer } = useAppStore();
@@ -118,7 +119,7 @@ export const ResultsView = () => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Freq. / Sistema</span>
-              <span className="text-xl font-bold">60Hz / 3$\phi$</span>
+              <span className="text-xl font-bold" dangerouslySetInnerHTML={{ __html: '60Hz / 3$\\phi$' }} />
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_b \\text{ (Carga Máxima)}', { throwOnError: false }) }} />

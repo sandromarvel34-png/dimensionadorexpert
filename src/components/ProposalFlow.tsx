@@ -286,7 +286,7 @@ export const ProposalFlow = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Critério</p>
-                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : <span>$\Delta V$</span>}</p>
+                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : <span dangerouslySetInnerHTML={{ __html: '$\\Delta V$' }} />}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Seção Final</p>
