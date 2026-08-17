@@ -134,22 +134,44 @@ export const EducationalFlow = () => {
         return (
           <div className="space-y-6 text-left w-full">
             <p className="text-slate-600">Dimensionamento das proteções contra curto-circuito e sobrecarga.</p>
-            <ul className="space-y-4">
-              <li className="bg-white p-4 rounded-lg border flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-sm">Disjuntor de Força</p>
-                  <p className="text-xs text-slate-500 italic">Critério: 1.25 * In * FS</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white p-4 rounded-lg border space-y-2 shadow-sm">
+                <div className="flex justify-between items-start">
+                  <p className="font-bold text-sm uppercase text-slate-700">Circuito Principal (Força)</p>
                 </div>
-                <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)}A</span>
-              </li>
-              <li className="bg-white p-4 rounded-lg border flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-sm">Fusíveis</p>
-                  <p className="text-xs text-slate-500 italic">Critério: 1.5 * In (Pico de Partida)</p>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-500">Disjuntor (1.25 * In * FS)</span>
+                    <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)}A</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-500">Fusíveis (1.5 * In)</span>
+                    <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.5).toFixed(1)}A</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-100">
+                    <span className="text-slate-500">Disjuntor Motor (In * FS)</span>
+                    <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)}A</span>
+                  </div>
                 </div>
-                <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.5).toFixed(1)}A</span>
-              </li>
-            </ul>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border space-y-2 shadow-sm">
+                <div className="flex justify-between items-start">
+                  <p className="font-bold text-sm uppercase text-slate-700">Circuito Auxiliar (Comando)</p>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-500">Disjuntor de Comando</span>
+                    <span className="font-black text-primary">6A</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-500">Fusíveis de Comando</span>
+                    <span className="font-black text-primary">4A</span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 italic pt-2">Valores padronizados para proteção de bobinas e sinalização.</p>
+                </div>
+              </div>
+            </div>
           </div>
         );
       case 7:
