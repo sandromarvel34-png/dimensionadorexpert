@@ -281,7 +281,7 @@ export const ProposalFlow = () => {
                     <p className="text-sm font-bold capitalize">{currentInputs?.starterType}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">cos φ / η / FS</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: `$\\cos \\varphi$ / $\\eta$ / $FS$` }} />
                     <p className="text-sm font-bold">{currentInputs?.powerFactor} / {currentInputs?.efficiency} / {currentInputs?.serviceFactor}</p>
                   </div>
                   <div className="space-y-1">

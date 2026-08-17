@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronLeft, ChevronRight, CheckCircle2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CalculationEngine } from '@/lib/engine/CalculationEngine';
+import { MathFormula } from '@/components/MathFormula';
 
 export const EducationalFlow = () => {
   const { currentInputs, currentResults, setView } = useAppStore();
@@ -26,7 +27,7 @@ export const EducationalFlow = () => {
   const pf = currentInputs.powerFactor || 0.85;
   const eff = currentInputs.efficiency || 0.90;
   const fs = currentInputs.serviceFactor || 1.0;
-  const phaseFactor = currentInputs.phase === 'trifasico' ? '√3' : '2';
+  const phaseFactor = currentInputs.phase === 'trifasico' ? '\\sqrt{3}' : '2';
 
   const renderStepContent = () => {
     switch (step) {
@@ -58,23 +59,35 @@ export const EducationalFlow = () => {
         return (
           <div className="space-y-6 text-left w-full">
             <div className="space-y-2">
-              <p className="font-bold text-sm text-primary uppercase">1. Corrente Nominal (In):</p>
-              <div className="bg-slate-900 text-white p-4 rounded-lg font-mono text-sm">
-                In = P(kW) * 1000 / ({phaseFactor} * V * cosφ * η)
-                <br />
-                In = {currentResults.nominalCurrent.toFixed(2)} A
-              </div>
+              <p className="font-bold text-sm text-primary uppercase">1. Corrente Nominal (I_n):</p>
+              <MathFormula
+                title="Cálculo da Corrente Nominal"
+                legend={[
+                  { symbol: 'I_n', label: 'Corrente nominal (A)' },
+                  { symbol: 'P_{(kW)}', label: 'Potência ativa em kW' },
+                  { symbol: 'V', label: 'Tensão de linha (V)' },
+                  { symbol: '\\cos \\varphi', label: 'Fator de potência' },
+                  { symbol: '\\eta', label: 'Rendimento do motor' }
+                ]}
+              >
+                {`I_n = \\frac{P_{(kW)} \\cdot 1000}{${phaseFactor} \\cdot V \\cdot \\cos \\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)} \\text{ A}`}
+              </MathFormula>
             </div>
             <div className="space-y-2">
-              <p className="font-bold text-sm text-primary uppercase">2. Corrente de Projeto Corrigida (Ib):</p>
+              <p className="font-bold text-sm text-primary uppercase">2. Corrente de Projeto Corrigida (I_b):</p>
               <p className="text-sm text-slate-600">Aplicamos o fator de segurança de 1.25 (NBR 5410) e o Fator de Serviço (FS).</p>
-              <div className="bg-slate-900 text-white p-4 rounded-lg font-mono text-sm">
-                Ib = (In * 1.25 * FS) / (f_agrup * f_temp)
-                <br />
-                Ib = ({currentResults.nominalCurrent.toFixed(2)} * 1.25 * {fs}) / (f_corr)
-                <br />
-                Ib = {(currentResults.nominalCurrent * 1.25 * fs / (currentInputs.groupingFactor || 1 * (currentInputs.ambientTempFactor || 1))).toFixed(2)} A
-              </div>
+              <MathFormula
+                title="Cálculo da Corrente de Projeto"
+                legend={[
+                  { symbol: 'I_b', label: 'Corrente de projeto corrigida (A)' },
+                  { symbol: 'I_n', label: 'Corrente nominal (A)' },
+                  { symbol: 'FS', label: 'Fator de serviço' },
+                  { symbol: 'f_{agrup}', label: 'Fator de agrupamento' },
+                  { symbol: 'f_{temp}', label: 'Fator de temperatura' }
+                ]}
+              >
+                {`I_b = \\frac{I_n \\cdot 1.25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1.25 \\cdot ${fs}}{${(currentInputs.groupingFactor || 1).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${(currentResults.nominalCurrent * 1.25 * fs / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
+              </MathFormula>
             </div>
           </div>
         );
@@ -96,11 +109,19 @@ export const EducationalFlow = () => {
         return (
           <div className="space-y-6 text-left w-full">
             <p className="text-slate-600">Verificamos se a queda de tensão na distância de **{currentInputs.distance}m** está dentro do limite de **{currentInputs.maxVoltageDrop}%**.</p>
-            <div className="bg-slate-900 text-white p-4 rounded-lg font-mono text-sm">
-              ΔV(%) = ({phaseFactor} * ρ * L * In * cosφ) / (S * V) * 100
-              <br />
-              ρ (Cobre) = 0,0178 Ω·mm²/m
-            </div>
+            <MathFormula
+              title="Cálculo da Queda de Tensão"
+              legend={[
+                { symbol: '\\Delta V_{(\\%)}', label: 'Queda de tensão percentual' },
+                { symbol: '\\rho', label: 'Resistividade do Cobre (0,0178 Ω·mm²/m)' },
+                { symbol: 'L', label: 'Comprimento (m)' },
+                { symbol: 'I_n', label: 'Corrente nominal (A)' },
+                { symbol: 'S', label: 'Seção do condutor (mm²)' },
+                { symbol: 'V', label: 'Tensão nominal (V)' }
+              ]}
+            >
+              {`\\Delta V_{(\\%)} = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100`}
+            </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Calculada</p>
               <p className="text-3xl font-black text-primary">{currentResults.voltageDropCalculated.toFixed(2)}%</p>
@@ -141,15 +162,15 @@ export const EducationalFlow = () => {
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Disjuntor (1.25 * In * FS)</span>
+                    <span className="text-slate-500">Disjuntor ($1,25 \\cdot I_n \\cdot FS$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)}A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Fusíveis (1.5 * In)</span>
+                    <span className="text-slate-500">Fusíveis ($1,5 \\cdot I_n$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.5).toFixed(1)}A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-100">
-                    <span className="text-slate-500">Disjuntor Motor (In * FS)</span>
+                    <span className="text-slate-500">Disjuntor Motor ($I_n \\cdot FS$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)}A</span>
                   </div>
                 </div>
@@ -184,8 +205,8 @@ export const EducationalFlow = () => {
                 <span className="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-black uppercase">{currentInputs.starterType}</span>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar In * FS em regime AC-3.</p>
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir exatamente o valor de In * FS.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \\cdot FS$ em regime AC-3.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir exatamente o valor de $I_n \\cdot FS$.</p>
               </div>
             </div>
           </div>

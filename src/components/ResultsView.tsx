@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ManufacturerProduct } from '@/types';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { MathFormula } from '@/components/MathFormula';
 
 export const ResultsView = () => {
   const { currentResults, currentInputs, setView, selectedManufacturer, setSelectedManufacturer } = useAppStore();
@@ -112,16 +113,16 @@ export const ResultsView = () => {
           <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">Resumo Elétrico</h3>
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Corrente (In)</span>
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">$I_n$</span>
               <span className="text-xl md:text-2xl font-black">{currentResults.nominalCurrent.toFixed(1)} A</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Freq. / Sistema</span>
-              <span className="text-xl font-bold">60Hz / 3φ</span>
+              <span className="text-xl font-bold">60Hz / 3$\phi$</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Carga Máxima Ib</span>
-              <span className="text-xl font-bold">{(currentResults.nominalCurrent * 1.25).toFixed(1)} A</span>
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">$I_b$ (Carga Máxima)</span>
+              <span className="text-xl font-bold">{(currentResults.nominalCurrent * 1.25 * (currentInputs.serviceFactor || 1)).toFixed(1)} A</span>
             </div>
             <div className="pt-4 border-t border-white/10">
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">
