@@ -97,7 +97,7 @@ export const ProposalFlow = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-12 print:p-0 print:py-0">
-      <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-8 print:hidden">
+      <div className="mb-6 md:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 md:gap-8 print:hidden">
         <div className="space-y-2">
           <button 
             onClick={() => setView('results')}
@@ -105,8 +105,8 @@ export const ProposalFlow = () => {
           >
             <ArrowLeft className="w-4 h-4" /> Voltar aos resultados
           </button>
-          <h2 className="text-3xl font-bold text-foreground tracking-tight">Proposta Comercial</h2>
-          <p className="text-muted-foreground text-lg">Personalize os dados e gere o orçamento profissional.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">Proposta Comercial</h2>
+          <p className="text-muted-foreground text-base md:text-lg">Personalize e gere o orçamento profissional.</p>
         </div>
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg border border-slate-200">
@@ -202,18 +202,18 @@ export const ProposalFlow = () => {
 
           {/* PDF Preview Container */}
           <div className="bg-white border border-border rounded-[14px] shadow-2xl overflow-hidden print:border-0 print:shadow-none print:rounded-none">
-            <div className="p-10 print:p-0 print:block">
+            <div className="p-4 md:p-10 print:p-0 print:block">
               {/* PDF Header */}
-              <div className="flex justify-between items-start mb-10 border-b pb-8 border-slate-100">
+              <div className="flex flex-col sm:flex-row justify-between items-start mb-10 border-b pb-8 border-slate-100 gap-4">
                 <div className="flex items-center gap-3 text-primary">
-                  <Zap className="w-10 h-10 fill-current" />
+                  <Zap className="w-8 h-8 md:w-10 md:h-10 fill-current" />
                   <div>
-                    <h1 className="text-2xl font-black uppercase tracking-tighter">Calculadora Elétrica Pro</h1>
-                    <p className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Memorial e Orçamento Técnico</p>
+                    <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter">Dimensionador Expert</h1>
+                    <p className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Memorial e Orçamento Técnico</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <h2 className="text-xl font-bold text-foreground">PROPOSTA TÉCNICA</h2>
+                <div className="text-left sm:text-right">
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">PROPOSTA TÉCNICA</h2>
                   <p className="text-metadata font-bold">{new Date().toLocaleDateString('pt-BR')}</p>
                 </div>
               </div>
@@ -242,7 +242,7 @@ export const ProposalFlow = () => {
                     Fonte: {currentInputs?.dataSource === 'catalog' ? 'Catálogo WEG' : 'Dados da Placa'}
                   </span>
                 </div>
-                <div className="grid grid-cols-4 gap-2 p-3 bg-foreground/5 rounded-xl border border-foreground/10 print:grid-cols-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 bg-foreground/5 rounded-xl border border-foreground/10">
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Potência</p>
                     <p className="text-sm font-bold">{currentInputs?.power} {currentInputs?.powerUnit}</p>
@@ -299,14 +299,14 @@ export const ProposalFlow = () => {
                   </button>
                 </div>
                 <div className="border border-border rounded-xl overflow-hidden">
-                  <table className="w-full text-left text-sm">
+                  <table className="w-full text-left text-xs md:text-sm">
                     <thead className="bg-muted/50 border-b border-border">
                       <tr>
-                        <th className="p-3 font-bold text-[10px] uppercase tracking-wider w-1/2">Descrição</th>
-                        <th className="p-3 font-bold text-[10px] uppercase tracking-wider text-center">Qtd</th>
-                        <th className="p-3 font-bold text-[10px] uppercase tracking-wider text-right">Preço Un.</th>
-                        <th className="p-3 font-bold text-[10px] uppercase tracking-wider text-right">Total</th>
-                        <th className="p-3 no-print"></th>
+                        <th className="p-2 md:p-3 font-bold text-[9px] md:text-[10px] uppercase tracking-wider w-1/2">Descrição</th>
+                        <th className="p-2 md:p-3 font-bold text-[9px] md:text-[10px] uppercase tracking-wider text-center">Qtd</th>
+                        <th className="p-2 md:p-3 font-bold text-[9px] md:text-[10px] uppercase tracking-wider text-right">Preço</th>
+                        <th className="p-2 md:p-3 font-bold text-[9px] md:text-[10px] uppercase tracking-wider text-right">Total</th>
+                        <th className="p-2 md:p-3 no-print"></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">

@@ -267,7 +267,7 @@ export const CalculatorWizard = () => {
             
             {dataSource === 'manual' ? (
               <div className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Potência do motor</Label>
                     <div className="flex gap-2">
@@ -300,7 +300,7 @@ export const CalculatorWizard = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Fator de Serviço (FS)</Label>
                     <div className="relative">

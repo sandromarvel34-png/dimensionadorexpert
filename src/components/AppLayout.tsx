@@ -16,15 +16,15 @@ export const AppLayout = () => {
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* SaaS Header */}
       <header className="bg-white border-b border-border sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto h-16 flex items-center justify-between px-6">
-          <div className="flex items-center gap-12">
+        <div className="max-w-7xl mx-auto h-16 flex items-center justify-between px-4 md:px-6">
+          <div className="flex items-center gap-4 md:gap-12">
             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('dashboard')}>
               <div className="h-10 flex items-center transition-transform group-hover:scale-105">
                 <img src={logoAeAsset.url} alt="AE Logo" className="h-8 w-auto object-contain" />
               </div>
               <div className="flex flex-col -space-y-1">
-                <span className="font-bold text-lg tracking-tight text-foreground">Dimensionador Expert</span>
-                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">By Academia do Eletricista</span>
+                <span className="font-bold text-base md:text-lg tracking-tight text-foreground">Dimensionador Expert</span>
+                <span className="text-[8px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-wider">By Academia do Eletricista</span>
               </div>
             </div>
             

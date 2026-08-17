@@ -203,8 +203,8 @@ export const EducationalFlow = () => {
       </div>
 
       <div className="space-y-2 text-center">
-        <h1 className="text-4xl font-black text-foreground uppercase tracking-tight">Como este dimensionamento foi calculado</h1>
-        <p className="text-muted-foreground italic font-medium">Acompanhe cada etapa técnica e entenda as decisões do Dimensionador Expert.</p>
+        <h1 className="text-2xl md:text-4xl font-black text-foreground uppercase tracking-tight">Como este dimensionamento foi calculado</h1>
+        <p className="text-sm md:text-base text-muted-foreground italic font-medium">Acompanhe cada etapa técnica e entenda as decisões do Dimensionador Expert.</p>
       </div>
 
       {/* Progress Stepper */}
@@ -265,7 +265,7 @@ export const EducationalFlow = () => {
           variant="outline" 
           disabled={step === 1}
           onClick={() => setStep(s => s - 1)}
-          className="h-12 px-8 font-black uppercase tracking-tight border-2"
+          className="h-10 md:h-12 px-4 md:px-8 font-black uppercase tracking-tight border-2"
         >
           <ChevronLeft className="w-4 h-4 mr-2" /> Anterior
         </Button>
@@ -286,9 +286,9 @@ export const EducationalFlow = () => {
         <Button 
           disabled={step === steps.length}
           onClick={() => setStep(s => s + 1)}
-          className="h-12 px-8 font-black uppercase tracking-tight shadow-xl shadow-primary/20"
+          className="h-10 md:h-12 px-4 md:px-8 font-black uppercase tracking-tight shadow-xl shadow-primary/20"
         >
-          {step === steps.length ? 'Concluído' : 'Próxima Etapa'} <ChevronRight className="w-4 h-4 ml-2" />
+          {step === steps.length ? 'Concluído' : 'Próxima'} <ChevronRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
     </div>
