@@ -202,7 +202,7 @@ export const EducationalFlow = () => {
             <p className="text-slate-600">Dimensionamento dos componentes de manobra baseados na categoria de emprego AC-3.</p>
             <div className="bg-white p-6 rounded-xl border border-slate-200">
               <div className="flex justify-between items-center mb-4 pb-4 border-b">
-                <span className="font-bold">Starter Type</span>
+                <span className="font-bold">Tipo de Partida</span>
                 <span className="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-black uppercase">{currentInputs.starterType}</span>
               </div>
               <div className="space-y-2">
