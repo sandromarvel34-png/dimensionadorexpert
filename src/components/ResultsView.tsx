@@ -119,7 +119,7 @@ export const ResultsView = () => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Freq. / Sistema</span>
-              <span className="text-xl font-bold">60Hz / 3φ</span>
+              <span className="text-xl font-bold">60Hz / 3{"\u03C6"}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_b \\text{ (Carga Máxima)}', { throwOnError: false }) }} />
