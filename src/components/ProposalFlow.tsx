@@ -454,8 +454,16 @@ export const ProposalFlow = () => {
                 <div className="text-[9px] text-muted-foreground max-w-sm leading-relaxed print:text-[7pt]">
                   * Proposta válida por {costs.validity} dias. Dimensionamento realizado seguindo rigorosamente as prescrições da NBR 5410 para motores de indução. O instalador deve conferir as condições reais do local antes da execução.
                 </div>
-                <div className="text-center w-48 print:w-32">
-                  <div className="border-b border-foreground h-10 mb-2 print:h-6 print:mb-1"></div>
+                <div className="text-center w-64 print:w-48">
+                  <div className="text-[10px] font-bold uppercase tracking-widest mb-1 print:text-[8pt]">
+                    {commercialData.technicianName}
+                  </div>
+                  {commercialData.executingCompany && (
+                    <div className="text-[9px] text-muted-foreground uppercase mb-1 print:text-[7pt]">
+                      {commercialData.executingCompany}
+                    </div>
+                  )}
+                  <div className="border-b border-foreground h-1 w-full mb-2 print:h-1 print:mb-1"></div>
                   <p className="text-[10px] font-bold uppercase tracking-widest print:text-[7pt]">Assinatura do Técnico</p>
                 </div>
               </div>
