@@ -19,6 +19,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
 }) => {
   const html = useMemo(() => {
     try {
+      if (!children) return '';
       return katex.renderToString(children, {
         displayMode,
         throwOnError: false,
@@ -26,7 +27,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
       });
     } catch (e) {
       console.error('KaTeX rendering error:', e);
-      return children;
+      return typeof children === 'string' ? children : '';
     }
   }, [children, displayMode]);
 
@@ -61,7 +62,9 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
               <div key={idx} className="flex items-center gap-2 py-1">
                 <span 
                   className="italic text-primary font-bold text-sm min-w-[30px] inline-flex items-center"
-                  dangerouslySetInnerHTML={{ __html: katex.renderToString(item.symbol, { throwOnError: false, output: 'html' }) }} 
+                  dangerouslySetInnerHTML={{ 
+                    __html: item.symbol ? katex.renderToString(item.symbol, { throwOnError: false, output: 'html' }) : '' 
+                  }} 
                 />
                 <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
                   = {item.label}

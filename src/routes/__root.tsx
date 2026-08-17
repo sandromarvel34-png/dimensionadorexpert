@@ -93,8 +93,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css",
-        integrity: "sha384-GvrOXuhMATgEsSwCs4smav79figatW9nv6llaxQZct7hFX2hBbJ8KWOyT/ig1TPw",
-        crossOrigin: "anonymous",
       },
     ],
   }),
