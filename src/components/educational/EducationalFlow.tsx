@@ -86,7 +86,7 @@ export const EducationalFlow = () => {
                   { symbol: 'f_{temp}', label: 'Fator de temperatura' }
                 ]}
               >
-                {`I_b = \\frac{I_n \\cdot 1.25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1.25 \\cdot ${fs}}{${(currentInputs.groupingFactor || 1).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${(currentResults.nominalCurrent * 1.25 * fs / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
+                {`I_b = \\frac{I_n \\cdot 1{,}25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1{,}25 \\cdot ${fs.toFixed(2)}}{${(currentInputs.groupingFactor || 1).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${(currentResults.nominalCurrent * 1.25 * fs / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
               </MathFormula>
             </div>
           </div>
@@ -162,16 +162,16 @@ export const EducationalFlow = () => {
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Disjuntor ($1,25 \\cdot I_n \\cdot FS$)</span>
-                    <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)}A</span>
+                    <span className="text-slate-500">Disjuntor ($1{,}25 \\cdot I_n \\cdot FS$)</span>
+                    <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Fusíveis ($1,5 \\cdot I_n$)</span>
-                    <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.5).toFixed(1)}A</span>
+                    <span className="text-slate-500">Fusíveis ($1{,}5 \\cdot I_n$)</span>
+                    <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.5).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-100">
                     <span className="text-slate-500">Disjuntor Motor ($I_n \\cdot FS$)</span>
-                    <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)}A</span>
+                    <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)} A</span>
                   </div>
                 </div>
               </div>
@@ -183,11 +183,11 @@ export const EducationalFlow = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500">Disjuntor de Comando</span>
-                    <span className="font-black text-primary">6A</span>
+                    <span className="font-black text-primary">6 A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500">Fusíveis de Comando</span>
-                    <span className="font-black text-primary">4A</span>
+                    <span className="font-black text-primary">4 A</span>
                   </div>
                   <p className="text-[10px] text-slate-400 italic pt-2">Valores padronizados para proteção de bobinas e sinalização.</p>
                 </div>

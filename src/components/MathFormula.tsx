@@ -55,9 +55,9 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
       {legend && legend.length > 0 && (
         <div className="pt-6 border-t border-slate-800/50">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Onde:</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-2 gap-x-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6">
             {legend.map((item, idx) => (
-              <div key={idx} className="flex items-baseline gap-2">
+              <div key={idx} className="flex items-center gap-2 py-1">
                 <span 
                   className="font-serif italic text-primary font-bold text-sm min-w-[20px]"
                   dangerouslySetInnerHTML={{ 
