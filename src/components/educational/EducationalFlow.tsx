@@ -163,15 +163,15 @@ export const EducationalFlow = () => {
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Disjuntor (1,25 · Iₙ · FS)</span>
+                    <span className="text-slate-500">Disjuntor ($1{,}25 \\cdot I_n \\cdot FS$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Fusíveis (1,5 · Iₙ)</span>
+                    <span className="text-slate-500">Fusíveis ($1{,}5 \\cdot I_n$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.5).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-100">
-                    <span className="text-slate-500">Disjuntor Motor (Iₙ · FS)</span>
+                    <span className="text-slate-500">Disjuntor Motor ($I_n \\cdot FS$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)} A</span>
                   </div>
                 </div>
@@ -206,8 +206,8 @@ export const EducationalFlow = () => {
                 <span className="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-black uppercase">{currentInputs.starterType}</span>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \\cdot FS$ em regime AC-3.</p>
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de $I_n \\cdot FS$.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \cdot FS$ em regime AC-3.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de $I_n \cdot FS$.</p>
               </div>
             </div>
           </div>
