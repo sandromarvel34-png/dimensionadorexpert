@@ -1,5 +1,6 @@
 import { useAppStore } from "@/lib/store";
-import { Zap, LayoutDashboard, FileText, Settings, User } from "lucide-react";
+import { Zap, LayoutDashboard, FileText, Settings, User, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import logoAeAsset from "@/assets/logo-ae.png.asset.json";
 import { cn } from "@/lib/utils";
 import { Dashboard } from "./Dashboard";
