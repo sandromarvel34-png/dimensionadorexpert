@@ -21,7 +21,7 @@ export const EducationalFlow = () => {
     { id: 8, title: 'Resultado final', component: 'Conclusão.' },
   ];
 
-  const currentStepData = steps[step - 1];
+  const currentStepData = steps[step - 1]!;
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-12 space-y-8">

@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { CalculationInputs, CalculationResults } from '@/types';
 
 interface AppState {
-  view: 'dashboard' | 'wizard' | 'results' | 'proposal';
+  view: 'dashboard' | 'wizard' | 'results' | 'proposal' | 'educational';
   step: number;
   currentInputs: CalculationInputs | null;
   currentResults: CalculationResults | null;
@@ -11,7 +11,7 @@ interface AppState {
   selectedManufacturer: 'WEG' | 'Siemens' | 'Schneider';
   history: any[];
   
-  setView: (view: 'dashboard' | 'wizard' | 'results' | 'proposal') => void;
+  setView: (view: 'dashboard' | 'wizard' | 'results' | 'proposal' | 'educational') => void;
   setStep: (step: number) => void;
   setCalculation: (inputs: CalculationInputs, results: CalculationResults) => void;
   setSelectedProducts: (products: Record<string, any>) => void;
