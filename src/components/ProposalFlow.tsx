@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Plus, Trash2, Printer, Save, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import katex from 'katex';
 
 export const ProposalFlow = () => {
   const { setView, currentResults, currentInputs, selectedManufacturer, setSelectedManufacturer } = useAppStore();
