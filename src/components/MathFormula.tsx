@@ -60,7 +60,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
               <div key={idx} className="flex items-center gap-2 py-1">
                 <span 
                   className="italic text-primary font-bold text-sm min-w-[30px] inline-flex items-center"
-                  dangerouslySetInnerHTML={{ __html: katex.renderToString(item.symbol, { throwOnError: false }) }} 
+                  dangerouslySetInnerHTML={{ __html: katex.renderToString(item.symbol, { throwOnError: false, output: 'html' }) }} 
                 />
                 <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
                   = {item.label}
