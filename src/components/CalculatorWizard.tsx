@@ -205,7 +205,7 @@ export const CalculatorWizard = () => {
           </button>
         </div>
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Novo Dimensionamento</h1>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Dimensionador Expert</h1>
           <p className="text-muted-foreground text-lg">Informe os dados técnicos do motor e da instalação para iniciar o cálculo.</p>
         </div>
       </div>

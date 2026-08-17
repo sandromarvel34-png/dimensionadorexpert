@@ -1,5 +1,6 @@
 import { useAppStore } from "@/lib/store";
 import { Zap, LayoutDashboard, FileText, Settings, User } from "lucide-react";
+import logoAeAsset from "@/assets/logo-ae.png.asset.json";
 import { cn } from "@/lib/utils";
 import { Dashboard } from "./Dashboard";
 import { CalculatorWizard } from "./CalculatorWizard";
@@ -17,10 +18,13 @@ export const AppLayout = () => {
         <div className="max-w-7xl mx-auto h-16 flex items-center justify-between px-6">
           <div className="flex items-center gap-12">
             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('dashboard')}>
-              <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center transition-transform group-hover:scale-105">
-                <Zap className="w-5 h-5 text-white" />
+              <div className="h-10 flex items-center transition-transform group-hover:scale-105">
+                <img src={logoAeAsset.url} alt="AE Logo" className="h-8 w-auto object-contain" />
               </div>
-              <span className="font-bold text-lg tracking-tight text-foreground">Dimensionador</span>
+              <div className="flex flex-col -space-y-1">
+                <span className="font-bold text-lg tracking-tight text-foreground">Dimensionador Expert</span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">By Academia do Eletricista</span>
+              </div>
             </div>
             
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
