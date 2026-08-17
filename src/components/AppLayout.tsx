@@ -7,6 +7,7 @@ import { CalculatorWizard } from "./CalculatorWizard";
 import { ResultsView } from "./ResultsView";
 import { ProposalFlow } from "./ProposalFlow";
 import { Toaster } from "@/components/ui/sonner";
+import { EducationalFlow } from "./educational/EducationalFlow";
 
 export const AppLayout = () => {
   const { view, setView } = useAppStore();
@@ -54,6 +55,7 @@ export const AppLayout = () => {
         {view === 'wizard' && <CalculatorWizard />}
         {view === 'results' && <ResultsView />}
         {view === 'proposal' && <ProposalFlow />}
+        {view === 'educational' && <EducationalFlow />}
       </main>
 
       <footer className="py-12 border-t border-border mt-12">
