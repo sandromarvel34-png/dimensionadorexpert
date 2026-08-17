@@ -87,7 +87,7 @@ export const EducationalFlow = () => {
                   { symbol: 'f_{temp}', label: 'Fator de temperatura' }
                 ]}
               >
-                {`I_b = \\frac{I_n \\cdot 1{,}25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1{,}25 \\cdot ${fs.toFixed(2)}}{${(currentInputs.groupingFactor || 1).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${(currentResults.nominalCurrent * 1.25 * fs / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
+                {`I_b = \\frac{I_n \\cdot 1{,}25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1{,}25 \\cdot ${fs.toFixed(2)}}{${(currentInputs.groupingFactor || 1).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${((currentResults.nominalCurrent * 1.25 * fs) / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
               </MathFormula>
             </div>
           </div>
@@ -163,11 +163,11 @@ export const EducationalFlow = () => {
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Disjuntor ($1.25 \cdot I_n \cdot FS$)</span>
+                    <span className="text-slate-500">Disjuntor ($1{","}25 \cdot I_n \cdot FS$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Fusíveis ($1.5 \cdot I_n$)</span>
+                    <span className="text-slate-500">Fusíveis ($1{","}5 \cdot I_n$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.5).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-100">
@@ -220,15 +220,15 @@ export const EducationalFlow = () => {
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Selecionados para $0,58 \cdot I_n \cdot FS$.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Selecionados para $0{","}58 \cdot I_n \cdot FS$.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator (K3):</span> Selecionado para $0,33 \cdot I_n \cdot FS$.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator (K3):</span> Selecionado para $0{","}33 \cdot I_n \cdot FS$.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir $0,58 \cdot I_n \cdot FS$.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir $0{","}58 \cdot I_n \cdot FS$.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
