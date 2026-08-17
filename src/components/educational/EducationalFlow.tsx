@@ -64,7 +64,7 @@ export const EducationalFlow = () => {
                 title="Cálculo da Corrente Nominal"
                 legend={[
                   { symbol: 'I_n', label: 'Corrente nominal (A)' },
-                  { symbol: 'P_{(kW)}', label: 'Potência ativa em kW' },
+                  { symbol: 'P_{(kW)}', label: 'Potência ativa (kW)' },
                   { symbol: 'V', label: 'Tensão de linha (V)' },
                   { symbol: '\\cos \\varphi', label: 'Fator de potência' },
                   { symbol: '\\eta', label: 'Rendimento do motor' }
@@ -88,14 +88,6 @@ export const EducationalFlow = () => {
               >
                 {`I_b = \\frac{I_n \\cdot 1{,}25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1{,}25 \\cdot ${fs.toFixed(2)}}{${(currentInputs.groupingFactor || 1).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${(currentResults.nominalCurrent * 1.25 * fs / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
               </MathFormula>
-              <div className="mt-4 p-4 bg-slate-800 rounded-lg">
-                <p className="text-white font-mono text-sm">
-                  {`Ib = fagrup · ftemp · In · 1,25 · FS = ${(currentInputs.groupingFactor || 1).toFixed(2)} · ${(currentInputs.ambientTempFactor || 1).toFixed(2)} · ${currentResults.nominalCurrent.toFixed(2)} · 1,25 · ${fs.toFixed(2)}`}
-                </p>
-                <p className="text-primary font-black text-lg mt-1">
-                  {`= ${(currentResults.nominalCurrent * 1.25 * fs / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} A`}
-                </p>
-              </div>
             </div>
           </div>
         );
@@ -120,15 +112,15 @@ export const EducationalFlow = () => {
             <MathFormula
               title="Cálculo da Queda de Tensão"
               legend={[
-                { symbol: '\\Delta V_{(\\%)}', label: 'Queda de tensão percentual' },
-                { symbol: '\\rho', label: 'Resistividade do Cobre (0,0178 Ω·mm²/m)' },
+                { symbol: '\\Delta V', label: 'Queda de tensão (%)' },
+                { symbol: '\\rho', label: 'Resistividade do Cobre' },
                 { symbol: 'L', label: 'Comprimento (m)' },
-                { symbol: 'I_n', label: 'Corrente nominal (A)' },
+                { symbol: 'I_n', label: 'Corrente nominal' },
                 { symbol: 'S', label: 'Seção do condutor (mm²)' },
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`\\Delta V_{(\\%)} = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100`}
+              {`\\Delta V = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Calculada</p>
@@ -206,7 +198,7 @@ export const EducationalFlow = () => {
       case 7:
         return (
           <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Dimensionamento dos componentes de manobra baseados na categoria de emprego **AC-3**.</p>
+            <p className="text-slate-600">Dimensionamento dos componentes de manobra baseados na categoria de emprego AC-3.</p>
             <div className="bg-white p-6 rounded-xl border border-slate-200">
               <div className="flex justify-between items-center mb-4 pb-4 border-b">
                 <span className="font-bold">Starter Type</span>
@@ -214,7 +206,7 @@ export const EducationalFlow = () => {
               </div>
               <div className="space-y-2">
                 <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \\cdot FS$ em regime AC-3.</p>
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir exatamente o valor de $I_n \\cdot FS$.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de $I_n \\cdot FS$.</p>
               </div>
             </div>
           </div>
