@@ -297,7 +297,7 @@ export const findCompatibleProducts = (
   if (category === 'releTermico' || category === 'disjuntorMotor') {
     return filtered.filter(p => 
       (p.adjustmentRange && current >= p.adjustmentRange.min && current <= p.adjustmentRange.max) ||
-      (p.nominalCurrent && p.nominalCurrent >= current && p.nominalCurrent <= current * 1.4)
+      (p.nominalCurrent && p.nominalCurrent >= current && p.nominalCurrent <= current * 1.5)
     ).sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
   } else if (category === 'releTempo' || category === 'auxiliar') {
     return filtered;
