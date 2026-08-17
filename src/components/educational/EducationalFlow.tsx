@@ -58,7 +58,7 @@ export const EducationalFlow = () => {
       case 2:
         return (
           <div className="space-y-6 text-left w-full">
-            <div className="space-y-2">
+            <div className="space-y-4">
               <p className="font-bold text-sm text-primary uppercase">1. Corrente Nominal (I_n):</p>
               <MathFormula
                 title="Cálculo da Corrente Nominal"
@@ -73,7 +73,8 @@ export const EducationalFlow = () => {
                 {`I_n = \\frac{P_{(kW)} \\cdot 1000}{${phaseFactor} \\cdot V \\cdot \\cos \\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)} \\text{ A}`}
               </MathFormula>
             </div>
-            <div className="space-y-2">
+            
+            <div className="space-y-4">
               <p className="font-bold text-sm text-primary uppercase">2. Corrente de Projeto Corrigida (I_b):</p>
               <p className="text-sm text-slate-600">Aplicamos o fator de segurança de 1.25 (NBR 5410) e o Fator de Serviço (FS).</p>
               <MathFormula
@@ -94,7 +95,7 @@ export const EducationalFlow = () => {
       case 3:
         return (
           <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Consultamos a **Tabela 36 da NBR 5410** (Método B1) para encontrar um cabo que suporte a corrente **Ib**.</p>
+            <p className="text-slate-600">Consultamos a **Tabela 36 da NBR 5410** (Método {currentInputs.groupingType || 'B1'}) para encontrar um cabo que suporte a corrente **Ib**.</p>
             <div className="bg-white p-6 rounded-xl border border-primary/20 shadow-sm">
               <p className="text-sm font-bold text-slate-500 uppercase mb-4">Resultado da Ampacidade:</p>
               <div className="flex items-end gap-2">
@@ -112,15 +113,15 @@ export const EducationalFlow = () => {
             <MathFormula
               title="Cálculo da Queda de Tensão"
               legend={[
-                { symbol: '\\Delta V', label: 'Queda de tensão (%)' },
+                { symbol: '\\Delta V', label: 'Queda de tensão percentual' },
                 { symbol: '\\rho', label: 'Resistividade do Cobre' },
                 { symbol: 'L', label: 'Comprimento (m)' },
-                { symbol: 'I_n', label: 'Corrente nominal' },
+                { symbol: 'I_n', label: 'Corrente nominal (A)' },
                 { symbol: 'S', label: 'Seção do condutor (mm²)' },
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`\\Delta V = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100`}
+              {`\\Delta V = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100 = ${currentResults.voltageDropCalculated.toFixed(2)}\\%`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Calculada</p>
@@ -162,15 +163,15 @@ export const EducationalFlow = () => {
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Disjuntor (1,25 · Iₙ · FS)</span>
+                    <span className="text-slate-500">Disjuntor ($1,25 \cdot I_n \cdot FS$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Fusíveis (1,5 · Iₙ)</span>
+                    <span className="text-slate-500">Fusíveis ($1,5 \cdot I_n$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.5).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-100">
-                    <span className="text-slate-500">Disjuntor Motor (Iₙ · FS)</span>
+                    <span className="text-slate-500">Disjuntor Motor ($I_n \cdot FS$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)} A</span>
                   </div>
                 </div>
@@ -201,12 +202,12 @@ export const EducationalFlow = () => {
             <p className="text-slate-600">Dimensionamento dos componentes de manobra baseados na categoria de emprego AC-3.</p>
             <div className="bg-white p-6 rounded-xl border border-slate-200">
               <div className="flex justify-between items-center mb-4 pb-4 border-b">
-                <span className="font-bold">Starter Type</span>
+                <span className="font-bold">Tipo de Partida</span>
                 <span className="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-black uppercase">{currentInputs.starterType}</span>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \\cdot FS$ em regime AC-3.</p>
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de $I_n \\cdot FS$.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \cdot FS$ em regime AC-3.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de $I_n \cdot FS$.</p>
               </div>
             </div>
           </div>
