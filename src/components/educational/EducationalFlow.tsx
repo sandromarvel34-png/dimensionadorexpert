@@ -87,7 +87,7 @@ export const EducationalFlow = () => {
                   { symbol: 'f_{temp}', label: 'Fator de temperatura' }
                 ]}
               >
-                {`I_b = \\frac{I_n \\cdot 1{,}25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1{,}25 \\cdot ${fs.toFixed(2)}}{${(currentInputs.groupingFactor || 1).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${(currentResults.nominalCurrent * 1.25 * fs / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
+                {`I_b = \\frac{I_n \\cdot 1{,}25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1{,}25 \\cdot ${fs.toFixed(2)}}{${(currentInputs.groupingFactor || 1).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${((currentResults.nominalCurrent * 1.25 * fs) / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
               </MathFormula>
             </div>
           </div>
