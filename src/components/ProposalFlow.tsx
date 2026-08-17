@@ -206,8 +206,16 @@ export const ProposalFlow = () => {
           <button onClick={handleSave} className="btn-primary">
             <Save className="w-5 h-5" /> Salvar Proposta
           </button>
-        </div>
-      </div>
+            <div className="space-y-2 mt-4">
+              <Label className="text-label uppercase tracking-widest text-[10px]">Descrição do Serviço</Label>
+              <Textarea 
+                value={commercialData.serviceDescription} 
+                onChange={e => setCommercialData({...commercialData, serviceDescription: e.target.value})} 
+                placeholder="Ex: Instalação de comando elétrico para acionamento de motor trifásico de 50 CV, incluindo montagem de painel, fiação e testes de funcionamento." 
+                className="min-h-[100px]"
+              />
+            </div>
+          </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2 space-y-8 print:col-span-3">
