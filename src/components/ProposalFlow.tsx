@@ -33,12 +33,21 @@ export const ProposalFlow = () => {
     ];
 
     // Mapear produtos baseados no fabricante selecionado
+    // A ordem aqui seguirá a ordem do CalculationEngine, mas garantimos os principais primeiro
     currentResults.technicalRequirements.forEach(req => {
       const product = currentResults.compatibleProducts[req.label]?.[selectedManufacturer]?.[0];
       if (product) {
+        let categoryPrefix = '';
+        if (req.category === 'contator') categoryPrefix = 'Contator ';
+        else if (req.category === 'disjuntorMotor') categoryPrefix = 'Disjuntor Motor ';
+        else if (req.category === 'releTermico') categoryPrefix = 'Relé Térmico ';
+        else if (req.category === 'releTempo') categoryPrefix = 'Relé de Tempo ';
+        else if (req.category === 'fusivel') categoryPrefix = 'Fusível ';
+        else if (req.category === 'disjuntor') categoryPrefix = 'Disjuntor ';
+
         initialItems.push({
           id: Math.random().toString(36).substr(2, 9),
-          desc: `${req.category === 'contator' ? 'Contator ' : req.category === 'disjuntorMotor' ? 'Disjuntor Motor ' : req.category === 'releTermico' ? 'Relé Térmico ' : ''}${product.manufacturer} ${product.model}`,
+          desc: `${categoryPrefix}${product.manufacturer} ${product.model}`,
           qtd: req.quantity || 1,
           unit: 'un',
           price: ''
@@ -129,9 +138,17 @@ export const ProposalFlow = () => {
                     currentResults.technicalRequirements.forEach(req => {
                       const product = currentResults.compatibleProducts[req.label]?.[mfr as any]?.[0];
                       if (product) {
+                        let categoryPrefix = '';
+                        if (req.category === 'contator') categoryPrefix = 'Contator ';
+                        else if (req.category === 'disjuntorMotor') categoryPrefix = 'Disjuntor Motor ';
+                        else if (req.category === 'releTermico') categoryPrefix = 'Relé Térmico ';
+                        else if (req.category === 'releTempo') categoryPrefix = 'Relé de Tempo ';
+                        else if (req.category === 'fusivel') categoryPrefix = 'Fusível ';
+                        else if (req.category === 'disjuntor') categoryPrefix = 'Disjuntor ';
+
                         newItems.push({
                           id: Math.random().toString(36).substr(2, 9),
-                          desc: `${req.category === 'contator' ? 'Contator ' : req.category === 'disjuntorMotor' ? 'Disjuntor Motor ' : req.category === 'releTermico' ? 'Relé Térmico ' : ''}${product.manufacturer} ${product.model}`,
+                          desc: `${categoryPrefix}${product.manufacturer} ${product.model}`,
                           qtd: req.quantity || 1,
                           unit: 'un',
                           price: ''
