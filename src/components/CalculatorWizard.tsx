@@ -125,7 +125,7 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingType: 'bundle',
+        groupingType: formData.get('groupingType') as string,
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: selectedMotor.power_factor,
@@ -156,7 +156,7 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingType: 'bundle', // Valor padrão fixo já que removemos a seleção
+        groupingType: formData.get('groupingType') as string,
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: pf,
@@ -569,8 +569,22 @@ export const CalculatorWizard = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-8">
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+              <div className="space-y-3">
+                <Label className="text-foreground font-semibold">Método de Instalação</Label>
+                <Select name="groupingType" defaultValue={currentInputs?.groupingType || "bundle"}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="bundle">Circuitos agrupados</SelectItem>
+                    <SelectItem value="layer_wall">Instalados sobre parede</SelectItem>
+                    <SelectItem value="layer_floor">Instalados no piso</SelectItem>
+                    <SelectItem value="tray_perforated">Em bandeja perfurada</SelectItem>
+                    <SelectItem value="tray_unperforated">Em bandeja não perfurada</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Número de Circuitos Agrupados</Label>
                 <Select name="groupingCount" defaultValue={currentInputs?.groupingCount?.toString() || "1"}>
