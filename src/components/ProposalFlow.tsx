@@ -108,6 +108,16 @@ export const ProposalFlow = () => {
   };
 
   const handleSave = () => {
+    // Save to local storage
+    const proposalData = {
+      clientData,
+      commercialData,
+      items,
+      labor,
+      costs,
+      date: new Date().toISOString()
+    };
+    localStorage.setItem('last_proposal', JSON.stringify(proposalData));
     toast.success('Proposta salva com sucesso!');
   };
 
