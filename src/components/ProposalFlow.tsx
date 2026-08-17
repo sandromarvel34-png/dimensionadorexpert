@@ -349,7 +349,7 @@ export const ProposalFlow = () => {
               </div>
 
               {/* Materials Table */}
-              <div className="mb-6 print:mb-4">
+              <div className="mb-6 print:mb-4 print-page-break">
                 <div className="flex justify-between items-end mb-4">
                   <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em]">Lista de Materiais e Equipamentos</h3>
                   <button onClick={addItem} className="text-xs font-bold text-primary hover:underline no-print flex items-center gap-1">
