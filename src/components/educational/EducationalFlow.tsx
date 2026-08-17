@@ -197,18 +197,70 @@ export const EducationalFlow = () => {
           </div>
         );
       case 7:
+        const fsStep7 = currentInputs.serviceFactor || 1.0;
+        const starterType = currentInputs.starterType;
+        
+        let starterLabel = "Direta";
+        let starterLogic = (
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
+              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \cdot FS$ em regime AC-3.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
+              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de $I_n \cdot FS$.</p>
+            </div>
+          </div>
+        );
+
+        if (starterType === 'estrelaTriangulo') {
+          starterLabel = "Estrela-Triângulo";
+          starterLogic = (
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Selecionados para $0,58 \cdot I_n \cdot FS$.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator (K3):</span> Selecionado para $0,33 \cdot I_n \cdot FS$.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir $0,58 \cdot I_n \cdot FS$.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé de Tempo:</span> Ajustado para a rampa de aceleração (típico 5-10s).</p>
+              </div>
+            </div>
+          );
+        } else if (starterType === 'reversao') {
+          starterLabel = "Reversão";
+          starterLogic = (
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Dimensionados para $I_n \cdot FS$ com intertravamento.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Proteção única configurada para $I_n \cdot FS$.</p>
+              </div>
+            </div>
+          );
+        }
+
         return (
           <div className="space-y-6 text-left w-full">
             <p className="text-slate-600">Dimensionamento dos componentes de manobra baseados na categoria de emprego AC-3.</p>
-            <div className="bg-white p-6 rounded-xl border border-slate-200">
-              <div className="flex justify-between items-center mb-4 pb-4 border-b">
-                <span className="font-bold">Tipo de Partida</span>
-                <span className="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-black uppercase">{currentInputs.starterType}</span>
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+              <div className="flex justify-between items-center mb-6 pb-4 border-b">
+                <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Método de Partida</span>
+                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">{starterLabel}</span>
               </div>
-              <div className="space-y-2">
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \cdot FS$ em regime AC-3.</p>
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de $I_n \cdot FS$.</p>
-              </div>
+              {starterLogic}
             </div>
           </div>
         );

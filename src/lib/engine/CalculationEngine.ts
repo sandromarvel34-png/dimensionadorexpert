@@ -207,7 +207,8 @@ export class CalculationEngine {
       requirements.push({ category: 'contator', current: In * fs, quantity: 2, label: 'Contatores de Potência (K1, K2)' });
       requirements.push({ category: 'releTermico', current: In * fs, quantity: 1, label: 'Relé Térmico' });
     } else if (inputs.starterType === 'estrelaTriangulo') {
-      requirements.push({ category: 'contator', current: In * fs * 0.58, quantity: 3, label: 'Contatores de Potência (K1, K2, K3)' });
+      requirements.push({ category: 'contator', current: In * fs * 0.58, quantity: 2, label: 'Contatores de Potência (K1, K2)' });
+      requirements.push({ category: 'contator', current: In * fs * 0.33, quantity: 1, label: 'Contator de Estrela (K3)' });
       requirements.push({ category: 'releTermico', current: In * fs * 0.58, quantity: 1, label: 'Relé Térmico' });
       requirements.push({ category: 'releTempo', quantity: 1, label: 'Relé de Tempo Estrela-Triângulo' });
     } else if (inputs.starterType === 'softStarter') {
