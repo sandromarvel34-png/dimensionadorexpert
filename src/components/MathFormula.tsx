@@ -22,6 +22,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
       return katex.renderToString(children, {
         displayMode,
         throwOnError: false,
+        output: 'html',
       });
     } catch (e) {
       console.error('KaTeX rendering error:', e);

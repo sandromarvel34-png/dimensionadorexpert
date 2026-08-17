@@ -159,7 +159,7 @@ export class CalculationEngine {
     }
     
     // Fatores de correção (Default 1.0 se não informados)
-    const typeFactor = CalculationEngine.GROUPING_TYPES[inputs.groupingType || ''] || 1.0;
+    const typeFactor = CalculationEngine.GROUPING_TYPES[inputs.groupingType || 'B1'] || 1.0;
     const countFactor = CalculationEngine.GROUPING_COUNT_FACTORS[inputs.groupingCount?.toString() || '1'] || 1.0;
     const fGroup = typeFactor * countFactor;
     const fTemp = inputs.ambientTempFactor || 1.0;

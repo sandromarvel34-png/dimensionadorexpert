@@ -58,7 +58,7 @@ export const EducationalFlow = () => {
       case 2:
         return (
           <div className="space-y-6 text-left w-full">
-            <div className="space-y-2">
+            <div className="space-y-4">
               <p className="font-bold text-sm text-primary uppercase">1. Corrente Nominal (I_n):</p>
               <MathFormula
                 title="Cálculo da Corrente Nominal"
@@ -73,7 +73,8 @@ export const EducationalFlow = () => {
                 {`I_n = \\frac{P_{(kW)} \\cdot 1000}{${phaseFactor} \\cdot V \\cdot \\cos \\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)} \\text{ A}`}
               </MathFormula>
             </div>
-            <div className="space-y-2">
+            
+            <div className="space-y-4">
               <p className="font-bold text-sm text-primary uppercase">2. Corrente de Projeto Corrigida (I_b):</p>
               <p className="text-sm text-slate-600">Aplicamos o fator de segurança de 1.25 (NBR 5410) e o Fator de Serviço (FS).</p>
               <MathFormula
