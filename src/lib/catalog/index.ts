@@ -300,8 +300,10 @@ export const findCompatibleProducts = (
       (p.nominalCurrent && p.nominalCurrent >= current && p.nominalCurrent <= current * 2.0)
     ).sort((a, b) => {
       // Priorizar os que têm range de ajuste
-      if (p.adjustmentRange && !b.adjustmentRange) return -1;
-      if (!p.adjustmentRange && b.adjustmentRange) return 1;
+      const hasRangeA = !!a.adjustmentRange;
+      const hasRangeB = !!b.adjustmentRange;
+      if (hasRangeA && !hasRangeB) return -1;
+      if (!hasRangeA && hasRangeB) return 1;
       return (a.nominalCurrent || 0) - (b.nominalCurrent || 0);
     });
   } else if (category === 'releTempo' || category === 'auxiliar' || category === 'softStarter' || category === 'inverter') {
