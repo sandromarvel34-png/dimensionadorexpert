@@ -205,11 +205,11 @@ export const EducationalFlow = () => {
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar $I_n \cdot FS$ em regime AC-3.</p>
+              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar {"$"}I_n \cdot FS{"$"} em regime AC-3.</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de $I_n \cdot FS$.</p>
+              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de {"$"}I_n \cdot FS{"$"}.</p>
             </div>
           </div>
         );
@@ -242,11 +242,11 @@ export const EducationalFlow = () => {
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Dimensionados para $I_n \cdot FS$ com intertravamento.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Dimensionados para {"$"}I_n \cdot FS{"$"} com intertravamento.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Proteção única configurada para $I_n \cdot FS$.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Proteção única configurada para {"$"}I_n \cdot FS{"$"}.</p>
               </div>
             </div>
           );

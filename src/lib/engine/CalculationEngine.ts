@@ -159,7 +159,8 @@ export class CalculationEngine {
     }
     
     // Fatores de correção (Default 1.0 se não informados)
-    const typeFactor = CalculationEngine.GROUPING_TYPES[inputs.groupingType || 'B1'] || 1.0;
+    const groupingTypeKey = inputs.groupingType || 'B1';
+    const typeFactor = CalculationEngine.GROUPING_TYPES[groupingTypeKey] || 1.0;
     const countFactor = CalculationEngine.GROUPING_COUNT_FACTORS[inputs.groupingCount?.toString() || '1'] || 1.0;
     const fGroup = typeFactor * countFactor;
     const fTemp = inputs.ambientTempFactor || 1.0;
@@ -296,7 +297,7 @@ export class CalculationEngine {
         standardName: 'ABNT NBR 5410',
         version: '2004',
         section: '6.2.5.5',
-        description: `Fatores de correção aplicados: Agrupamento de Circuitos (${fGroup}) e Temperatura (${fTemp}).`
+        description: `Fatores de correção aplicados: Método de Instalação ${groupingTypeKey}, Agrupamento (${fGroup.toFixed(2)}) e Temperatura (${fTemp.toFixed(2)}).`
       }
     ];
 
