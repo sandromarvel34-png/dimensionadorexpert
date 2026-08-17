@@ -119,7 +119,7 @@ export const ResultsView = () => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Freq. / Sistema</span>
-              <span className="text-xl font-bold" dangerouslySetInnerHTML={{ __html: '60Hz / 3$\\phi$' }} />
+              <span className="text-xl font-bold">60Hz / 3φ</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_b \\text{ (Carga Máxima)}', { throwOnError: false }) }} />
@@ -130,7 +130,7 @@ export const ResultsView = () => {
                 <Info className="w-3 h-3" /> Referência Técnica
               </p>
               <p className="text-xs text-slate-300 leading-relaxed italic">
-                Cálculos baseados na NBR 5410:2004 para métodos de instalação B1 e fatores de correção aplicados.
+                Cálculos baseados na NBR 5410:2004 para o método de instalação {currentInputs.groupingType || 'B1'} e fatores de correção aplicados.
               </p>
             </div>
           </div>
