@@ -125,7 +125,7 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingType: formData.get('groupingType') as string,
+        groupingType: 'bundle',
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: selectedMotor.power_factor,
