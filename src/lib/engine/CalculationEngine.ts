@@ -183,13 +183,17 @@ export class CalculationEngine {
     const requirements: TechnicalRequirement[] = [];
     
     // Proteção Principal (Circuito de Força)
-    requirements.push({ category: 'disjuntor', current: In * 1.25 * fs, quantity: 1, label: 'Proteção Principal (Força)' });
-    requirements.push({ category: 'disjuntorMotor', current: In * fs, quantity: 1, label: 'Disjuntor Motor' });
-    requirements.push({ category: 'fusivel', current: In * 1.5, quantity: 3, label: 'Fusíveis (Conjunto)' });
-
+    requirements.push({ category: 'disjuntor', current: In * 1.25 * fs, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' });
+    
     // Proteção do Circuito Auxiliar (Comando)
-    // Recomendação: Proteção dedicada para o comando
-    requirements.push({ category: 'disjuntor', current: 6, quantity: 1, label: 'Proteção do Circuito Auxiliar (Comando)' });
+    requirements.push({ category: 'disjuntor', current: 6, quantity: 1, label: 'Disjuntor do Circuito Auxiliar (Comando)' });
+
+    // Fusíveis
+    requirements.push({ category: 'fusivel', current: In * 1.5, quantity: 3, label: 'Fusíveis do Circuito Principal (Força)' });
+    requirements.push({ category: 'fusivel', current: 4, quantity: 2, label: 'Fusíveis do Circuito Auxiliar (Comando)' });
+
+    // Disjuntor Motor
+    requirements.push({ category: 'disjuntorMotor', current: In * fs, quantity: 1, label: 'Disjuntor Motor' });
 
     // Comando e Partida
     if (inputs.starterType === 'direta') {
