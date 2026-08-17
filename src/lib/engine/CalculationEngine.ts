@@ -30,11 +30,14 @@ export class CalculationEngine {
   };
 
   static readonly GROUPING_TYPES: Record<string, number> = {
-    'bundle': 1.00,
-    'layer_wall': 1.00,
-    'layer_floor': 0.85,
-    'tray_perforated': 0.88,
-    'tray_unperforated': 0.81
+    'A1': 1.00,
+    'A2': 1.00,
+    'B1': 1.00,
+    'B2': 1.00,
+    'C': 1.00,
+    'D': 0.85,
+    'E': 0.88,
+    'F_G': 0.81
   };
 
   static readonly GROUPING_COUNT_FACTORS: Record<string, number> = {

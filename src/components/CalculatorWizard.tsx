@@ -572,16 +572,19 @@ export const CalculatorWizard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Método de Instalação</Label>
-                <Select name="groupingType" defaultValue={currentInputs?.groupingType || "bundle"}>
+                <Select name="groupingType" defaultValue={currentInputs?.groupingType || "B1"}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    <SelectItem value="bundle">Circuitos agrupados</SelectItem>
-                    <SelectItem value="layer_wall">Instalados sobre parede</SelectItem>
-                    <SelectItem value="layer_floor">Instalados no piso</SelectItem>
-                    <SelectItem value="tray_perforated">Em bandeja perfurada</SelectItem>
-                    <SelectItem value="tray_unperforated">Em bandeja não perfurada</SelectItem>
+                    <SelectItem value="A1">Método A1: Condutores ou cabos unipolares em eletroduto embutido em parede.</SelectItem>
+                    <SelectItem value="A2">Método A2: Cabo multipolar em eletroduto embutido em parede.</SelectItem>
+                    <SelectItem value="B1">Método B1: Condutores ou cabos unipolares em eletroduto aparente na parede ou teto.</SelectItem>
+                    <SelectItem value="B2">Método B2: Cabo multipolar em eletroduto aparente.</SelectItem>
+                    <SelectItem value="C">Método C: Cabos unipolares ou multipolares fixados diretamente sobre a parede ou em canaletas fechadas não embutidas.</SelectItem>
+                    <SelectItem value="D">Método D: Cabos unipolares ou multipolares enterrados no solo diretamente ou em eletrodutos enterrados.</SelectItem>
+                    <SelectItem value="E">Método E: Cabos unipolares ou multipolares ao ar livre, fixados em perfilados, prateleiras ou leitos para cabos.</SelectItem>
+                    <SelectItem value="F_G">Métodos F e G: Cabos unipolares dispostos em formação específica (trevo ou espaçados) ao ar livre.</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
