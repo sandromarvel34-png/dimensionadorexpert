@@ -297,10 +297,16 @@ export const findCompatibleProducts = (
   if (category === 'releTermico' || category === 'disjuntorMotor') {
     return filtered.filter(p => 
       (p.adjustmentRange && current >= p.adjustmentRange.min && current <= p.adjustmentRange.max) ||
-      (p.nominalCurrent && p.nominalCurrent >= current && p.nominalCurrent <= current * 1.5)
-    ).sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
-  } else if (category === 'releTempo' || category === 'auxiliar') {
-    return filtered;
+      (p.nominalCurrent && p.nominalCurrent >= current && p.nominalCurrent <= current * 2.0)
+    ).sort((a, b) => {
+      // Priorizar os que têm range de ajuste
+      if (p.adjustmentRange && !b.adjustmentRange) return -1;
+      if (!p.adjustmentRange && b.adjustmentRange) return 1;
+      return (a.nominalCurrent || 0) - (b.nominalCurrent || 0);
+    });
+  } else if (category === 'releTempo' || category === 'auxiliar' || category === 'softStarter' || category === 'inverter') {
+    return filtered.filter(p => !p.nominalCurrent || p.nominalCurrent >= current)
+      .sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
   } else {
     return filtered
       .filter(p => p.nominalCurrent && p.nominalCurrent >= current)
