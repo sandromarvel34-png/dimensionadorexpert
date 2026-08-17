@@ -59,7 +59,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
             {legend.map((item, idx) => (
               <div key={idx} className="flex items-center gap-2 py-1">
                 <span className="font-serif italic text-primary font-bold text-sm min-w-[20px]">
-                  {item.symbol.length > 2 || item.symbol.startsWith('\\') || item.symbol.includes('_') || item.symbol.includes('^') ? (
+                  {(item.symbol.length > 2 && !/^[a-zA-Z0-9]+$/.test(item.symbol)) || item.symbol.startsWith('\\') || item.symbol.includes('_') || item.symbol.includes('^') ? (
                     <span dangerouslySetInnerHTML={{ __html: katex.renderToString(item.symbol, { throwOnError: false }) }} />
                   ) : (
                     item.symbol
