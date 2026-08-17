@@ -266,6 +266,17 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'schneider-nh-250', manufacturer: 'Schneider', category: 'fusivel', model: 'NH2-250A', commercialCode: 'NH2-250A', description: 'Fusível NH2, 250A', nominalCurrent: 250, voltage: 500, price: 235.00 },
   { id: 'schneider-nh-400', manufacturer: 'Schneider', category: 'fusivel', model: 'NH3-400A', commercialCode: 'NH3-400A', description: 'Fusível NH3, 400A', nominalCurrent: 400, voltage: 500, price: 375.00 },
 
+  // Relés Térmicos Schneider LRD de Alta Potência
+  { id: 'schneider-lrd-4365', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD4365', commercialCode: 'LRD4365', description: 'Relé TeSys LRD, 80-104A', nominalCurrent: 104, adjustmentRange: { min: 80, max: 104 }, price: 650.00 },
+  { id: 'schneider-lr9f-150', manufacturer: 'Schneider', category: 'releTermico', model: 'LR9F5369', commercialCode: 'LR9F5369', description: 'Relé Eletrônico TeSys F, 90-150A', nominalCurrent: 150, adjustmentRange: { min: 90, max: 150 }, price: 850.00 },
+  { id: 'schneider-lr9f-225', manufacturer: 'Schneider', category: 'releTermico', model: 'LR9F5371', commercialCode: 'LR9F5371', description: 'Relé Eletrônico TeSys F, 132-225A', nominalCurrent: 225, adjustmentRange: { min: 132, max: 225 }, price: 1100.00 },
+  { id: 'schneider-lr9f-330', manufacturer: 'Schneider', category: 'releTermico', model: 'LR9F7375', commercialCode: 'LR9F7375', description: 'Relé Eletrônico TeSys F, 200-330A', nominalCurrent: 330, adjustmentRange: { min: 200, max: 330 }, price: 1450.00 },
+
+  // Relés Térmicos Siemens Sirius 3RU/3RB de Alta Potência
+  { id: 'siemens-3ru-100-fixed', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2146-4LB0', commercialCode: '3RU2146-4LB0', description: 'Relé Sirius, 70-90A', nominalCurrent: 90, adjustmentRange: { min: 70, max: 90 }, price: 620.00 },
+  { id: 'siemens-3rb-160', manufacturer: 'Siemens', category: 'releTermico', model: '3RB3046-1XB0', commercialCode: '3RB3046-1XB0', description: 'Relé Eletrônico Sirius, 32-115A', nominalCurrent: 115, adjustmentRange: { min: 32, max: 115 }, price: 780.00 },
+  { id: 'siemens-3rb-200', manufacturer: 'Siemens', category: 'releTermico', model: '3RB2056-1FC2', commercialCode: '3RB2056-1FC2', description: 'Relé Eletrônico Sirius, 50-200A', nominalCurrent: 200, adjustmentRange: { min: 50, max: 200 }, price: 1050.00 },
+  { id: 'siemens-3rb-300', manufacturer: 'Siemens', category: 'releTermico', model: '3RB2066-1MC2', commercialCode: '3RB2066-1MC2', description: 'Relé Eletrônico Sirius, 160-630A', nominalCurrent: 630, adjustmentRange: { min: 160, max: 630 }, price: 1650.00 },
 ];
 
 export const getProductsByCategory = (category: string) => 
