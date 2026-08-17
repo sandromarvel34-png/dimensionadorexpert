@@ -163,11 +163,11 @@ export const EducationalFlow = () => {
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Disjuntor ($1,25 \cdot I_n \cdot FS$)</span>
+                    <span className="text-slate-500">Disjuntor ($1{,}25 \cdot I_n \cdot FS$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Fusíveis ($1,5 \cdot I_n$)</span>
+                    <span className="text-slate-500">Fusíveis ($1{,}5 \cdot I_n$)</span>
                     <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.5).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-100">
