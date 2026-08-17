@@ -112,10 +112,10 @@ export const EducationalFlow = () => {
             <MathFormula
               title="Cálculo da Queda de Tensão"
               legend={[
-                { symbol: '\\Delta V', label: 'Queda de tensão percentual' },
+                { symbol: '\\Delta V', label: 'Queda de tensão (%)' },
                 { symbol: '\\rho', label: 'Resistividade do Cobre' },
                 { symbol: 'L', label: 'Comprimento (m)' },
-                { symbol: 'I_n', label: 'Corrente nominal (A)' },
+                { symbol: 'I_n', label: 'Corrente nominal' },
                 { symbol: 'S', label: 'Seção do condutor (mm²)' },
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
@@ -198,7 +198,7 @@ export const EducationalFlow = () => {
       case 7:
         return (
           <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Dimensionamento dos componentes de manobra baseados na categoria de emprego **AC-3**.</p>
+            <p className="text-slate-600">Dimensionamento dos componentes de manobra baseados na categoria de emprego AC-3.</p>
             <div className="bg-white p-6 rounded-xl border border-slate-200">
               <div className="flex justify-between items-center mb-4 pb-4 border-b">
                 <span className="font-bold">Starter Type</span>
