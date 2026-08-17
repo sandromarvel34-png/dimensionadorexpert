@@ -369,7 +369,7 @@ export const ProposalFlow = () => {
                     </thead>
                     <tbody className="divide-y divide-border">
                       {items.map((item) => (
-                        <tr key={item.id} className="group hover:bg-muted/30 transition-colors">
+                        <tr key={item.id} className="group hover:bg-muted/30 transition-colors break-inside-avoid">
                           <td className="p-2 print:p-1">
                             <Input value={item.desc} onChange={e => updateItem(item.id, 'desc', e.target.value)} className="h-8 border-transparent bg-transparent focus:bg-white text-sm font-medium print:text-[8pt] print:h-auto print:p-0" />
                           </td>
