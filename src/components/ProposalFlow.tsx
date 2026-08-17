@@ -240,6 +240,16 @@ export const ProposalFlow = () => {
                 <Input value={clientData.email} onChange={e => setClientData({...clientData, email: e.target.value})} placeholder="cliente@email.com" />
               </div>
             </div>
+            
+            <div className="space-y-2 mt-4">
+              <Label className="text-label uppercase tracking-widest text-[10px]">Descrição do Serviço</Label>
+              <Textarea 
+                value={commercialData.serviceDescription} 
+                onChange={e => setCommercialData({...commercialData, serviceDescription: e.target.value})} 
+                placeholder="Ex: Instalação de comando elétrico para acionamento de motor trifásico de 50 CV, incluindo montagem de painel, fiação e testes de funcionamento." 
+                className="min-h-[100px]"
+              />
+            </div>
           </div>
 
           {/* PDF Preview Container */}
