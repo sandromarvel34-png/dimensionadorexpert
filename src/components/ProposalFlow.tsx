@@ -18,6 +18,12 @@ export const ProposalFlow = () => {
     email: ''
   });
   
+  const [commercialData, setCommercialData] = useState({
+    serviceDescription: '',
+    technicianName: '',
+    executingCompany: ''
+  });
+  
   const [items, setItems] = useState<any[]>(() => {
     if (!currentResults || !currentInputs) return [];
     
