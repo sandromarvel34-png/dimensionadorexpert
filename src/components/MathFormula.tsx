@@ -62,10 +62,10 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
                   {item.symbol.startsWith('\\') || item.symbol.includes('_') || item.symbol.includes('^') ? (
                     <span dangerouslySetInnerHTML={{ __html: katex.renderToString(item.symbol, { throwOnError: false }) }} />
                   ) : (
-                    item.symbol
+                    item.symbol.replace(/[a-z0-9]/gi, '') === '' ? item.symbol : <span dangerouslySetInnerHTML={{ __html: katex.renderToString(item.symbol, { throwOnError: false }) }} />
                   )}
                 </span>
-                <span className="text-[11px] text-slate-400 font-medium">
+                <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
                   = {item.label}
                 </span>
               </div>
