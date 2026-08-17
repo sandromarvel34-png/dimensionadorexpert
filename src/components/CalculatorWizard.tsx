@@ -577,7 +577,7 @@ export const CalculatorWizard = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    <SelectItem value="bundle">Circuitos agrupados</SelectItem>
+                    
                     <SelectItem value="layer_wall">Instalados sobre parede</SelectItem>
                     <SelectItem value="layer_floor">Instalados no piso</SelectItem>
                     <SelectItem value="tray_perforated">Em bandeja perfurada</SelectItem>
