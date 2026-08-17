@@ -271,7 +271,7 @@ export const CalculatorWizard = () => {
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Potência do motor</Label>
                     <div className="flex gap-2">
-                      <Input name="power" type="number" step="0.1" defaultValue={currentInputs?.power?.toString() || "5"} className="h-12 text-base" required />
+                      <Input name="power" type="number" step="0.01" defaultValue={currentInputs?.power?.toString() || "5"} className="h-12 text-base" required />
                       <Select name="powerUnit" defaultValue={currentInputs?.powerUnit || "cv"}>
                         <SelectTrigger className="w-32 h-12">
                           <SelectValue />
@@ -332,7 +332,7 @@ export const CalculatorWizard = () => {
                       </div>
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
-                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency?.toString() || "0.9"} placeholder="Ex: 0.90" className="h-11" required={dataSource === 'manual'} />
+                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency?.toString() || "0.90"} placeholder="Ex: 0.90" className="h-11" required={dataSource === 'manual'} />
                       </div>
                     </div>
                   </div>
@@ -477,7 +477,7 @@ export const CalculatorWizard = () => {
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Rendimento</p>
-                        <p className="text-sm font-semibold text-foreground">{selectedMotor.efficiency}</p>
+                        <p className="text-sm font-semibold text-foreground">{selectedMotor.efficiency?.toFixed(2)}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Polos / Tipo</p>
