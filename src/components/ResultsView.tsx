@@ -1,6 +1,6 @@
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, CheckCircle2, Factory, Shield, Info, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCircle2, Factory, Shield, Info, ShoppingCart, GraduationCap } from 'lucide-react';
 import { useState } from 'react';
 import { ManufacturerProduct } from '@/types';
 import { cn } from '@/lib/utils';
@@ -88,6 +88,24 @@ export const ResultsView = () => {
               <p className="text-xl font-bold text-primary">{isNaN(currentResults.voltageDropCalculated) ? '0.00' : currentResults.voltageDropCalculated.toFixed(2)}%</p>
             </div>
           </div>
+        </div>
+
+        {/* Educational Button Column */}
+        <div className="card-panel bg-primary/5 border-primary/20 flex flex-col items-center justify-center text-center p-8 space-y-4">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+            <GraduationCap className="w-8 h-8 text-primary" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-black text-foreground uppercase tracking-tight">🎓 Aprender o cálculo</h3>
+            <p className="text-sm text-muted-foreground font-medium">Entenda como cada resultado foi obtido passo a passo.</p>
+          </div>
+          <Button 
+            onClick={() => setView('educational')}
+            variant="outline"
+            className="w-full border-primary/30 text-primary hover:bg-primary hover:text-white font-bold"
+          >
+            Ver cálculo passo a passo
+          </Button>
         </div>
 
         <div className="card-panel bg-slate-900 text-white border-0">
