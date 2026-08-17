@@ -259,6 +259,12 @@ export const ProposalFlow = () => {
                 <div className="text-left sm:text-right">
                   <h2 className="text-lg md:text-xl font-bold text-foreground">PROPOSTA TÉCNICA</h2>
                   <p className="text-metadata font-bold">{new Date().toLocaleDateString('pt-BR')}</p>
+                  {commercialData.technicianName && (
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1">
+                      {commercialData.executingCompany ? `${commercialData.executingCompany} — ` : ''}
+                      Técnico: {commercialData.technicianName}
+                    </p>
+                  )}
                 </div>
               </div>
 
