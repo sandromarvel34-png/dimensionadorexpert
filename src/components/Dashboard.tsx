@@ -14,11 +14,11 @@ export const Dashboard = () => {
     <div className="max-w-7xl mx-auto px-6 py-12">
       {/* Hero Section */}
       <div className="mb-16">
-        <p className="text-[11px] font-bold text-primary mb-3 uppercase tracking-[0.2em]">DIMENSIONAMENTO ELÉTRICO</p>
+        <p className="text-[11px] font-bold text-primary mb-3 uppercase tracking-[0.2em]">DIMENSIONADOR EXPERT</p>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div className="space-y-4 max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight leading-tight">
-              Dimensione seus circuitos de motores
+              A solução definitiva para comandos elétricos
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed">
               Informe os dados técnicos do motor e da instalação para obter uma solução completa de dimensionamento.
