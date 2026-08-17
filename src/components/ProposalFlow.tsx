@@ -21,11 +21,15 @@ export const ProposalFlow = () => {
     if (!currentResults || !currentInputs) return [];
     
     // Regra: se trifásico 3x, se monofásico 2x a distância
-    const multiplier = currentInputs.phase === 'trifasico' ? 3 : 2;
-    const cableQty = (currentInputs.distance || 1) * multiplier;
+    const phaseMultiplier = currentInputs.phase === 'trifasico' ? 3 : 2;
+    const cableQty = Math.round((currentInputs.distance || 1) * phaseMultiplier);
+    const groundQty = Math.round(currentInputs.distance || 1); // Adicionando terra separadamente
+
 
     const initialItems: any[] = [
-      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: cableQty, unit: 'm', price: '' }
+      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V (Fases)`, qtd: cableQty, unit: 'm', price: '' },
+      { id: 'cable-ground', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V (Terra)`, qtd: groundQty, unit: 'm', price: '' }
+
     ];
 
     // Mapear produtos baseados no fabricante selecionado
