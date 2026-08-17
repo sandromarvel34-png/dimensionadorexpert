@@ -478,6 +478,22 @@ export const ProposalFlow = () => {
             
             <div className="space-y-4">
               <div className="space-y-2">
+                <Label className="text-label uppercase tracking-widest text-[10px]">Técnico Responsável</Label>
+                <Input 
+                  value={commercialData.technicianName} 
+                  onChange={e => setCommercialData({...commercialData, technicianName: e.target.value})} 
+                  placeholder="Nome completo do técnico" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-label uppercase tracking-widest text-[10px]">Empresa Executora (Opcional)</Label>
+                <Input 
+                  value={commercialData.executingCompany} 
+                  onChange={e => setCommercialData({...commercialData, executingCompany: e.target.value})} 
+                  placeholder="Nome da empresa" 
+                />
+              </div>
+              <div className="space-y-2">
                 <Label className="text-label uppercase tracking-widest text-[10px]">Validade da Proposta (Dias)</Label>
                 <Input type="number" value={costs.validity} onChange={e => setCosts({...costs, validity: parseInt(e.target.value) || 30})} />
               </div>
