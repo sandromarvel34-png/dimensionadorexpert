@@ -95,7 +95,7 @@ export const EducationalFlow = () => {
       case 3:
         return (
           <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Consultamos a **Tabela 36 da NBR 5410** (Método B1) para encontrar um cabo que suporte a corrente **Ib**.</p>
+            <p className="text-slate-600">Consultamos a **Tabela 36 da NBR 5410** (Método {currentInputs.groupingType || 'B1'}) para encontrar um cabo que suporte a corrente **Ib**.</p>
             <div className="bg-white p-6 rounded-xl border border-primary/20 shadow-sm">
               <p className="text-sm font-bold text-slate-500 uppercase mb-4">Resultado da Ampacidade:</p>
               <div className="flex items-end gap-2">
@@ -113,15 +113,15 @@ export const EducationalFlow = () => {
             <MathFormula
               title="Cálculo da Queda de Tensão"
               legend={[
-                { symbol: '\\Delta V', label: 'Queda de tensão (%)' },
+                { symbol: '\\Delta V', label: 'Queda de tensão percentual' },
                 { symbol: '\\rho', label: 'Resistividade do Cobre' },
                 { symbol: 'L', label: 'Comprimento (m)' },
-                { symbol: 'I_n', label: 'Corrente nominal' },
+                { symbol: 'I_n', label: 'Corrente nominal (A)' },
                 { symbol: 'S', label: 'Seção do condutor (mm²)' },
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`\\Delta V = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100`}
+              {`\\Delta V = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100 = ${currentResults.voltageDropCalculated.toFixed(2)}\\%`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Calculada</p>
