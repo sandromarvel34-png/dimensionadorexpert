@@ -127,10 +127,10 @@ export class CalculationEngine {
     const fGroup = CalculationEngine.GROUPING_COUNT_FACTORS[inputs.groupingCount?.toString() || '1'] || 1.0;
     const fTemp = inputs.ambientTempFactor || 1.0;
     
-    // 3. Corrente de Projeto (Ib)
-    // NBR 5410: Ib corrigida para busca em tabela
-    // Aplicamos 1.25 como margem de segurança normativa para motores
-    const Ib = (In * 1.25 * fs) / (fGroup * fTemp);
+    // 3. Corrente de Projeto (Ib) e Corrente Corrigida para Tabela
+    // NBR 5410: Ib = In * FS (conforme solicitado pelo usuário)
+    const Ib = In * fs;
+    const correctedCurrentForTable = Ib / (fGroup * fTemp);
     
     // 4. Dimensionamento Independente
     const method = inputs.installationMethod;
@@ -139,8 +139,8 @@ export class CalculationEngine {
     }
     const numConductors = inputs.phase === 'trifasico' ? 3 : 2;
     
-    const secAmp = this.getSectionByAmpacity(Ib, method, numConductors);
-    const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
+    const secAmp = this.getSectionByAmpacity(correctedCurrentForTable, method, numConductors);
+    const dropResult = this.getSectionByVoltageDrop(Ib, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     
     // 5. Seleção Final (Maior entre os critérios)
     const finalSection = Math.max(secAmp, dropResult.selectedSection, this.SECAO_MINIMA_FORCA);

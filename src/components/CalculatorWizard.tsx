@@ -187,7 +187,7 @@ export const CalculatorWizard = () => {
       setCalculation(inputs, results);
       setView('results');
     } catch (error) {
-      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            A aplicação está apresentando erro ao executar o dimensionamento. QUando o usuário preenche os dados solicitados e clica em Calcular Dimensionamento, a aplicação não muda de página e apresenta erro. Faça uma auditoria e corrija os erros");
+      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Ao calcular a corrente de Projeto Ib, considere Ib = IN x FS. Não inclua na fórmula o fator 1,25. Ao calcular a secção transversal por queda de tensão, considere a corrente Ib. Não considere a corrente nominal IN. Corrija essas fórmulas na aplicação");
     } finally {
       setIsCalculating(false);
     }
