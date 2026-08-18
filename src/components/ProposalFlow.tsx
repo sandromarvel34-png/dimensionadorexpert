@@ -1,4 +1,5 @@
 import { useAppStore } from '@/lib/store';
+import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
