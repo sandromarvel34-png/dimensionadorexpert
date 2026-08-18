@@ -310,8 +310,8 @@ export const ProposalFlow = () => {
                     <p className="text-sm font-bold">{currentInputs?.voltage} V</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n', { throwOnError: false }) }} />
-                    <p className="text-sm font-bold text-primary">{currentResults?.nominalCurrent.toFixed(2)} A</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_{b}', { throwOnError: false }) }} />
+                    <p className="text-sm font-bold text-primary">{((currentResults?.nominalCurrent || 0) * 1.25 * (currentInputs?.serviceFactor || 1) / ((currentInputs?.groupingFactor || 1) * (currentInputs?.ambientTempFactor || 1))).toFixed(1)} A</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Distância</p>
