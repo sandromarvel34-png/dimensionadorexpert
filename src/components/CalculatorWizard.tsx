@@ -304,7 +304,7 @@ export const CalculatorWizard = () => {
                   <div className="space-y-3">
                     <Label className="text-foreground font-semibold">Fator de Serviço (FS)</Label>
                     <div className="relative">
-                      <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor?.toString() || "1.0"} className="h-12 text-base" required />
+                      <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor ? Number(currentInputs.serviceFactor).toFixed(2) : "1.00"} className="h-12 text-base" required />
                       <p className="mt-1 text-[10px] text-slate-500 font-medium">Multiplicador de carga máxima contínua (ex: 1.15)</p>
                     </div>
                   </div>
@@ -328,11 +328,11 @@ export const CalculatorWizard = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">cos φ</Label>
-                        <Input name="powerFactor" type="number" step="0.01" defaultValue={currentInputs?.powerFactor?.toString() || "0.85"} placeholder="Ex: 0.85" className="h-11" required={dataSource === 'manual'} />
+                        <Input name="powerFactor" type="number" step="0.01" defaultValue={currentInputs?.powerFactor ? Number(currentInputs.powerFactor).toFixed(2) : "0.85"} placeholder="Ex: 0.85" className="h-11" required={dataSource === 'manual'} />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-foreground font-medium text-xs">Rendimento (η)</Label>
-                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency?.toString() || "0.90"} placeholder="Ex: 0.90" className="h-11" required={dataSource === 'manual'} />
+                        <Input name="efficiency" type="number" step="0.01" defaultValue={currentInputs?.efficiency ? Number(currentInputs.efficiency).toFixed(2) : "0.90"} placeholder="Ex: 0.90" className="h-11" required={dataSource === 'manual'} />
                       </div>
                     </div>
                   </div>
