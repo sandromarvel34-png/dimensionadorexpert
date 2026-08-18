@@ -35,8 +35,8 @@ export const ProposalFlow = () => {
 
 
     const initialItems: any[] = [
-      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V (Fases)`, qtd: cableQty, unit: 'm', price: '' },
-      { id: 'cable-ground', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V (Terra)`, qtd: groundQty, unit: 'm', price: '' }
+      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V PVC 70°C (Fases)`, qtd: cableQty, unit: 'm', price: '' },
+      { id: 'cable-ground', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V PVC 70°C (Terra)`, qtd: groundQty, unit: 'm', price: '' }
 
     ];
 

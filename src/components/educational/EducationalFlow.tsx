@@ -143,14 +143,14 @@ export const EducationalFlow = () => {
               title="Cálculo da Seção Transversal por Queda de Tensão"
               legend={[
                 { symbol: 'S', label: 'Seção do condutor (mm²)' },
-                { symbol: '\\rho', label: 'Resistividade do Cobre' },
+                { symbol: '\\rho', label: 'Resistividade a 70°C (0,0213 \\Omega\\cdot mm^2/m)' },
                 { symbol: 'L', label: 'Comprimento (m)' },
                 { symbol: 'I_b', label: 'Corrente de projeto (A)' },
                 { symbol: '\\Delta V_{\\%}', label: 'Limite admissível informado (%)' },
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`S = \\frac{100 \\cdot ${phaseFactor} \\cdot 0{,}0178 \\cdot ${currentInputs.distance} \\cdot ${(currentResults.nominalCurrent * fs).toFixed(2)} \\cdot ${pf}}{\\Delta V_{\\%} \\cdot ${currentInputs.voltage}}`}
+              {`S = \\frac{100 \\cdot ${phaseFactor} \\cdot 0{,}0213 \\cdot ${currentInputs.distance} \\cdot ${(currentResults.nominalCurrent * fs).toFixed(2)} \\cdot ${pf}}{\\Delta V_{\\%} \\cdot ${currentInputs.voltage}}`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <div className="flex justify-between items-start mb-4">

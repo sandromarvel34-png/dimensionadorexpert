@@ -10,7 +10,12 @@ import { AMPACITY_TABLES_NBR5410 } from './ampacity-tables';
 
 export class CalculationEngine {
   // Constantes físicas (Referência: NBR 5410)
-  private static readonly RHO_COPPER = 0.0178; // Ω·mm²/m a 20°C
+  // Resistividade do cobre a 20°C: 1/56 = 0,0178
+  // Coeficiente de temperatura (alfa): 0,00393 para o cobre
+  // Rho(T) = Rho(20) * (1 + alpha * (T - 20))
+  // Para 70°C (regime permanente PVC): 0,0178 * (1 + 0,00393 * (70 - 20)) = 0,0178 * 1,1965 = 0,0213
+  private static readonly RHO_COPPER_20 = 0.0178; // Ω·mm²/m a 20°C
+  private static readonly RHO_COPPER_70 = 0.0213; // Ω·mm²/m a 70°C (conforme NBR 5410 Anexo B)
   private static readonly COS_PHI_DEFAULT = 0.85;
   private static readonly EFFICIENCY_DEFAULT = 0.90;
   private static readonly SECAO_MINIMA_FORCA = 2.5;
@@ -90,7 +95,8 @@ export class CalculationEngine {
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
     
     // S = (100 * k * rho * L * In * cosphi) / (deltaV% * V)
-    const requiredSection = (100 * k * CalculationEngine.RHO_COPPER * distance * current * pf) / (maxDropPercent * voltage);
+    // Conforme NBR 5410, para cabos em regime permanente (PVC 70°C), utiliza-se rho = 0,0213
+    const requiredSection = (100 * k * CalculationEngine.RHO_COPPER_70 * distance * current * pf) / (maxDropPercent * voltage);
     
     let selectedSection: number = standardSections[standardSections.length - 1]!;
     let found = false;
@@ -106,7 +112,7 @@ export class CalculationEngine {
       throw new Error(`Seção teórica necessária (${requiredSection.toFixed(2)} mm²) excede o limite do catálogo.`);
     }
 
-    const actualDropPercent = (k * CalculationEngine.RHO_COPPER * distance * current * pf * 100) / (selectedSection * voltage);
+    const actualDropPercent = (k * CalculationEngine.RHO_COPPER_70 * distance * current * pf * 100) / (selectedSection * voltage);
 
     return { requiredSection, selectedSection, actualDrop: actualDropPercent };
   }

@@ -131,7 +131,7 @@ export const ResultsView = () => {
                 <Info className="w-3 h-3" /> Referência Técnica
               </p>
               <p className="text-xs text-slate-300 leading-relaxed italic">
-                Cálculos baseados na NBR 5410:2004 para o método de instalação {currentInputs.groupingType || 'B1'} e fatores de correção aplicados.
+                Cálculos baseados na NBR 5410:2004. Queda de tensão calculada com resistividade do cobre a 70°C (0,0213 Ω·mm²/m) conforme Anexo B para isolação em PVC.
               </p>
             </div>
           </div>
