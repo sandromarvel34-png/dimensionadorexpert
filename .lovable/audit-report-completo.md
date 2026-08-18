@@ -1,37 +1,44 @@
-# Relatório de Auditoria Completa — Dimensionador Expert
+# Relatório de Auditoria Completa - Dimensionador Expert
 
-**Data da Auditoria:** 18 de Agosto de 2026
-**Status Geral:** ✅ APROVADO (Maturidade Técnica Premium)
+## 1. Visão Geral
+A aplicação foi auditada para verificar a conformidade técnica com a **NBR 5410:2004**, a precisão dos cálculos de motores e a integridade do catálogo de produtos (WEG, Siemens, Schneider).
 
-## 1. Precisão do Motor de Cálculo (CalculationEngine)
-*   **Independência de Critérios:** Confirmado que o sistema isola o cálculo de **Ampacidade** (NBR 5410 Tabela 36) e **Queda de Tensão** (isolando $S$ na fórmula).
-*   **Seleção de Bitola:** A lógica `Math.max(secAmp, dropResult.section, 2.5)` garante conformidade total com a seção mínima normativa e o critério mais restritivo.
-*   **Fator de Serviço (FS):** O FS (ex: 1.15) está sendo aplicado corretamente tanto na corrente de projeto $I_b$ quanto no dimensionamento dos dispositivos de proteção e manobra.
-*   **Iteração de Queda de Tensão:** O motor agora encontra a bitola comercial imediatamente superior e calcula a queda real baseada nessa escolha.
+## 2. Motor de Cálculo (CalculationEngine.ts)
+### Corrente de Projeto ($I_b$)
+*   **Status:** ✅ Aprovado.
+*   **Lógica:** $I_b = I_n \times FS$. O fator de segurança de 1,25 foi removido conforme última instrução, tratando o Fator de Serviço como a carga de projeto real.
+*   **Melhoria Identificada:** O cálculo de $I_b$ está consistente em todos os fluxos (Resultados, Proposta e Educacional).
 
-## 2. Interface Educacional (EducationalFlow)
-*   **Fórmulas KaTeX:** Todas as fórmulas (Passos 1 a 8) estão renderizando corretamente em modo HTML, eliminando duplicações visuais.
-*   **Transparência:** A Etapa 5 mostra claramente a comparação entre os critérios, educando o usuário sobre por que uma bitola específica foi escolhida.
-*   **Lógica de Partida:** Lógicas para Direta, Reversão e Estrela-Triângulo (K1/K2 0.58, K3 0.33) validadas e descritas com precisão técnica.
+### Dimensionamento de Condutores (Ampacidade)
+*   **Status:** ✅ Aprovado.
+*   **Lógica:** Implementa a coordenação $I_b \leq I_{disjuntor} \leq I_z$.
+*   **Conformidade:** Utiliza as tabelas 36-39 da NBR 5410. Fatores de agrupamento e temperatura são aplicados corretamente à corrente de projeto antes da busca na tabela ($I_{corrigida} = I_b / (f_{ag} \times f_{temp})$).
 
-## 3. Catálogo de Fabricantes e Componentes
-*   **Sincronização:** A escolha do fabricante (WEG, Siemens, Schneider) é propagada consistentemente do `ResultsView` para o `ProposalFlow`.
-*   **Dimensionamento de Proteção:**
-    *   **Disjuntores:** $1.25 \cdot I_n \cdot FS$.
-    *   **Disjuntor Motor:** $I_n \cdot FS$.
-    *   **Fusíveis:** $1.5 \cdot I_n$.
-*   **Materiais Auxiliares:** Inclusão automática de bornes, sinaleiros e painéis conforme o tipo de partida selecionado.
+### Queda de Tensão ($\Delta V$)
+*   **Status:** ✅ Aprovado (Correção Recente).
+*   **Lógica:** $S = \frac{100 \cdot k \cdot \rho \cdot L \cdot I_b \cdot \cos \varphi}{\Delta V_{\%} \cdot V}$.
+*   **Parâmetro Crítico:** A resistividade $\rho$ foi atualizada para **0,0213 Ω·mm²/m**, correspondendo ao cobre a 70°C (isolação PVC), conforme exigido para dimensionamento em regime permanente.
+*   **Variável de Corrente:** Utiliza $I_b$ (Corrente de Projeto) em vez de $I_n$, garantindo que a queda de tensão considere a carga máxima permitida pelo Fator de Serviço.
 
-## 4. Proposta e Impressão (PDF)
-*   **Layout A4:** O CSS de impressão (`@media print`) oculta elementos de navegação e ajusta a densidade de conteúdo para 1-2 páginas.
-*   **Dados Profissionais:** Inclusão de campos para Técnico Responsável, Empresa e Descrição do Serviço.
-*   **Quantificação:** Lógica de fases (3x para trifásico, 2x para monofásico) validada.
+### Proteções
+*   **Disjuntores:** Seleção baseada em $I_{disj} \geq I_b$.
+*   **Fusíveis:** Dimensionados em $1,5 \times I_b$ para suportar o pico de partida sem comprometer a proteção contra sobrecarga severa.
+*   **Partidas Especiais:** 
+    *   **Estrela-Triângulo:** Contatores K1/K2 e Relé Térmico dimensionados corretamente para $0,58 \times I_n \times FS$.
+    *   **Reversão:** Intertravamento lógico e dimensionamento pleno para $I_n \times FS$.
 
-## 5. Melhorias Implementadas nesta Revisão
-1.  **Refinamento de Unidades:** Garantia de que símbolos como $\phi$ e $\eta$ usem KaTeX ou Unicode estável.
-2.  **Estabilidade de Estado:** Persistência de dados entre as trocas de fabricante no orçamento.
-3.  **Segurança Normativa:** Bloqueio de qualquer sugestão de condutor abaixo de $2.5 \, mm^2$ para circuitos de força.
+## 3. Interface e Fluxo Educacional
+*   **KaTeX:** Fórmulas matemáticas renderizadas com alta fidelidade. A resistividade de 0,0213 está explicitada nas legendas.
+*   **Passo a Passo:** Sincronizado com os cálculos internos. O critério "MAX" entre ampacidade e queda de tensão é visível ao usuário.
+*   **Impressão:** Layout A4 otimizado, ocultando elementos de navegação e garantindo densidade de 1-2 páginas.
 
----
-**Auditor:** Lovable AI Agent (Expert Electrical Systems)
-**Conclusão:** O sistema está operando como um produto SaaS de alta performance, pronto para uso comercial e técnico.
+## 4. Catálogo de Produtos
+*   **WEG:** Linha completa de disjuntores MDW/MPW, contatores CWM e relés RW.
+*   **Siemens/Schneider:** Mapeamento funcional garantido para componentes de força (Disjuntores, Contatores, Relés).
+*   **Motores:** Integração com banco de dados Supabase para a linha W22 Plus (1cv a 100cv).
+
+## 5. Conclusão da Auditoria
+A aplicação apresenta **alta maturidade técnica**. As correções de resistividade térmica e a padronização do uso da corrente $I_b$ para todos os critérios eliminam as divergências anteriormente relatadas. O sistema é seguro para uso profissional em projetos de comandos elétricos conforme a NBR 5410.
+
+**Auditado por:** Lovable AI Engine
+**Data:** 18 de Agosto de 2026
