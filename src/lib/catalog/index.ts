@@ -161,14 +161,20 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
 
   // Disjuntores de Caixa Moldada (Acima de 125A)
   { id: 'weg-dwb160', manufacturer: 'WEG', category: 'disjuntor', model: 'DWB160', commercialCode: '10045678', description: 'Disjuntor Caixa Moldada DWB160, 160A', nominalCurrent: 160, voltage: 440, price: 450.00 },
+  { id: 'weg-dwb250-200', manufacturer: 'WEG', category: 'disjuntor', model: 'DWB250', commercialCode: '10045681', description: 'Disjuntor Caixa Moldada DWB250, 200A', nominalCurrent: 200, voltage: 440, price: 580.00 },
+  { id: 'weg-dwb250-225', manufacturer: 'WEG', category: 'disjuntor', model: 'DWB250', commercialCode: '10045682', description: 'Disjuntor Caixa Moldada DWB250, 225A', nominalCurrent: 225, voltage: 440, price: 620.00 },
   { id: 'weg-dwb250', manufacturer: 'WEG', category: 'disjuntor', model: 'DWB250', commercialCode: '10045679', description: 'Disjuntor Caixa Moldada DWB250, 250A', nominalCurrent: 250, voltage: 440, price: 650.00 },
   { id: 'weg-dwb400', manufacturer: 'WEG', category: 'disjuntor', model: 'DWB400', commercialCode: '10045680', description: 'Disjuntor Caixa Moldada DWB400, 400A', nominalCurrent: 400, voltage: 440, price: 950.00 },
 
   { id: 'schneider-nsx160', manufacturer: 'Schneider', category: 'disjuntor', model: 'NSX160', commercialCode: 'NSX160N', description: 'Disjuntor Compact NSX160, 160A', nominalCurrent: 160, voltage: 440, price: 680.00 },
+  { id: 'schneider-nsx250-200', manufacturer: 'Schneider', category: 'disjuntor', model: 'NSX250', commercialCode: 'NSX250N-200', description: 'Disjuntor Compact NSX250, 200A', nominalCurrent: 200, voltage: 440, price: 780.00 },
+  { id: 'schneider-nsx250-225', manufacturer: 'Schneider', category: 'disjuntor', model: 'NSX250', commercialCode: 'NSX250N-225', description: 'Disjuntor Compact NSX250, 225A', nominalCurrent: 225, voltage: 440, price: 820.00 },
   { id: 'schneider-nsx250', manufacturer: 'Schneider', category: 'disjuntor', model: 'NSX250', commercialCode: 'NSX250N', description: 'Disjuntor Compact NSX250, 250A', nominalCurrent: 250, voltage: 440, price: 880.00 },
   { id: 'schneider-nsx400', manufacturer: 'Schneider', category: 'disjuntor', model: 'NSX400', commercialCode: 'NSX400N', description: 'Disjuntor Compact NSX400, 400A', nominalCurrent: 400, voltage: 440, price: 1280.00 },
 
   { id: 'siemens-3va160', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA160', commercialCode: '3VA160', description: 'Disjuntor 3VA1, 160A', nominalCurrent: 160, voltage: 440, price: 580.00 },
+  { id: 'siemens-3va250-200', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA250', commercialCode: '3VA250-200', description: 'Disjuntor 3VA1, 200A', nominalCurrent: 200, voltage: 440, price: 680.00 },
+  { id: 'siemens-3va250-225', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA250', commercialCode: '3VA250-225', description: 'Disjuntor 3VA1, 225A', nominalCurrent: 225, voltage: 440, price: 720.00 },
   { id: 'siemens-3va250', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA250', commercialCode: '3VA250', description: 'Disjuntor 3VA1, 250A', nominalCurrent: 250, voltage: 440, price: 780.00 },
   { id: 'siemens-3va400', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA400', commercialCode: '3VA400', description: 'Disjuntor 3VA1, 400A', nominalCurrent: 400, voltage: 440, price: 1180.00 },
 
