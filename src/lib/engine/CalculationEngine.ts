@@ -123,7 +123,7 @@ export class CalculationEngine {
     
     // S = (k * rho * L * In * cosphi) / (deltaV_max * V) * 100
     // deltaV_max é o percentual (ex: 2)
-    const requiredSection = (k * this.RHO_COPPER * distance * current * pf) / ((maxDropPercent / 100) * voltage);
+    const requiredSection = (k * CalculationEngine.RHO_COPPER * distance * current * pf) / ((maxDropPercent / 100) * voltage);
     
     // Encontrar a bitola comercial imediatamente superior
     let section = standardSections[standardSections.length - 1];
@@ -135,7 +135,7 @@ export class CalculationEngine {
     }
 
     // Calcular a queda real para esta bitola comercial
-    const actualDropVolts = (k * this.RHO_COPPER * distance * current * pf) / section;
+    const actualDropVolts = (k * CalculationEngine.RHO_COPPER * distance * current * pf) / section;
     const actualDropPercent = (actualDropVolts / voltage) * 100;
 
     return { section, actualDrop: actualDropPercent };
