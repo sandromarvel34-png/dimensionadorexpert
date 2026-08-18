@@ -122,7 +122,7 @@ export const EducationalFlow = () => {
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`S = \\frac{100 \\cdot k \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{\\Delta V_{\\%} \\cdot V}`}
+              {`S = \\frac{100 \\cdot ${phaseFactor} \\cdot 0{,}0178 \\cdot ${currentInputs.distance} \\cdot ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${pf}}{\\Delta V_{\\%} \\cdot ${currentInputs.voltage}}`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <div className="flex justify-between items-start mb-4">
