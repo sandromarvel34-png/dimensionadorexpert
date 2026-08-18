@@ -122,16 +122,16 @@ export const EducationalFlow = () => {
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`S = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{\\Delta V_{máx} \\cdot V} \\cdot 100`}
+              {`S = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{(\\Delta V_{máx}/100) \\cdot V}`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Seção Mínima Exigida</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Seção Mínima Comercial (Queda)</p>
                   <p className="text-3xl font-black text-primary">{currentResults.cableByVoltageDrop} mm²</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Resultante</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Real Final</p>
                   <p className="text-xl font-bold text-slate-700">{currentResults.voltageDropCalculated.toFixed(2)}%</p>
                 </div>
               </div>

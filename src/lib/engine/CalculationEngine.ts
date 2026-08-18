@@ -87,23 +87,25 @@ export class CalculationEngine {
    */
   static getSectionByAmpacity(current: number): number {
     const cabos = [
-      { mm: 1.5, amp: 17.5 },
-      { mm: 2.5, amp: 24 },
-      { mm: 4, amp: 32 },
-      { mm: 6, amp: 41 },
-      { mm: 10, amp: 57 },
-      { mm: 16, amp: 76 },
-      { mm: 25, amp: 101 },
-      { mm: 35, amp: 125 },
-      { mm: 50, amp: 151 },
-      { mm: 70, amp: 192 },
-      { mm: 95, amp: 232 },
-      { mm: 120, amp: 269 },
-      { mm: 150, amp: 309 }
+      { mm: 1.5, amp: 15.5 },
+      { mm: 2.5, amp: 21 },
+      { mm: 4, amp: 28 },
+      { mm: 6, amp: 36 },
+      { mm: 10, amp: 50 },
+      { mm: 16, amp: 68 },
+      { mm: 25, amp: 89 },
+      { mm: 35, amp: 110 },
+      { mm: 50, amp: 134 },
+      { mm: 70, amp: 171 },
+      { mm: 95, amp: 207 },
+      { mm: 120, amp: 239 },
+      { mm: 150, amp: 275 },
+      { mm: 185, amp: 314 },
+      { mm: 240, amp: 371 }
     ];
 
     const result = cabos.find(c => c.amp >= current);
-    return result ? result.mm : 95;
+    return result ? result.mm : 240;
   }
 
   /**
@@ -119,15 +121,20 @@ export class CalculationEngine {
     phase: string = 'trifasico'
   ): { section: number; actualDrop: number } {
     const k = phase === 'trifasico' ? Math.sqrt(3) : 2;
-    const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150];
+    const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300];
     
-    // S = (k * rho * L * In * cosphi) / (deltaV_max * V) * 100
-    // deltaV_max é o percentual (ex: 2)
-    const requiredSection = (k * CalculationEngine.RHO_COPPER * distance * current * pf) / ((maxDropPercent / 100) * voltage);
+    // NBR 5410 - Cálculo de queda de tensão em circuitos trifásicos:
+    // deltaV(V) = sqrt(3) * rho * (L/S) * In * cosphi
+    // Para isolar S dado um deltaV_max(V):
+    // S = (sqrt(3) * rho * L * In * cosphi) / deltaV_max(V)
+    
+    // deltaV_max(V) = (maxDropPercent / 100) * V
+    const maxDropVolts = (maxDropPercent / 100) * voltage;
+    
+    const requiredSection = (k * CalculationEngine.RHO_COPPER * distance * current * pf) / maxDropVolts;
     
     // Encontrar a bitola comercial imediatamente superior
-    const lastSection = standardSections[standardSections.length - 1];
-    let section: number = lastSection !== undefined ? lastSection : 150;
+    let section: number = standardSections[standardSections.length - 1]!;
     
     for (const s of standardSections) {
       if (s >= requiredSection) {
@@ -136,9 +143,9 @@ export class CalculationEngine {
       }
     }
 
-    // Calcular a queda real para esta bitola comercial
-    const actualDropVolts = (k * CalculationEngine.RHO_COPPER * distance * current * pf) / section;
-    const actualDropPercent = (actualDropVolts / voltage) * 100;
+    // Calcular a queda REAL resultante do condutor comercial selecionado
+    // deltaV (%) = (k * rho * L * In * cosphi * 100) / (S * V)
+    const actualDropPercent = (k * CalculationEngine.RHO_COPPER * distance * current * pf * 100) / (section * voltage);
 
     return { section, actualDrop: actualDropPercent };
   }
