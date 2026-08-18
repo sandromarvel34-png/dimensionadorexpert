@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import katex from 'katex';
 import { useAppStore } from '@/lib/store';
+import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronLeft, ChevronRight, CheckCircle2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
