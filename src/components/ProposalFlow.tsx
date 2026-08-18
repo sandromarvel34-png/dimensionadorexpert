@@ -323,11 +323,11 @@ export const ProposalFlow = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('\\cos \\varphi / \\eta / FS', { throwOnError: false }) }} />
-                    <p className="text-sm font-bold">{currentInputs?.powerFactor} / {currentInputs?.efficiency} / {currentInputs?.serviceFactor}</p>
+                    <p className="text-sm font-bold">{(currentInputs?.powerFactor || 0.85).toFixed(2)} / {(currentInputs?.efficiency || 0.90).toFixed(2)} / {(currentInputs?.serviceFactor || 1.0).toFixed(2)}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Critério</p>
-                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : <span dangerouslySetInnerHTML={{ __html: '$\\Delta V$' }} />}</p>
+                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : 'Queda ΔV'}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Seção Final</p>
