@@ -51,7 +51,7 @@ export class CalculationEngine {
    * Critério 1: Capacidade de Corrente (Ampacidade)
    * Retorna a seção comercial que suporta a corrente Ib após correções.
    */
-  static getSectionByAmpacity(current: number, method: string = 'B1', conductors: number = 3): number {
+  static getSectionByAmpacity(current: number, breakerCurrent: number, method: string = 'B1', conductors: number = 3): number {
     const tableData = AMPACITY_TABLES_NBR5410.find(t => t.method === method && t.conductors === conductors);
     
     if (!tableData) {
@@ -64,14 +64,15 @@ export class CalculationEngine {
 
     for (const section of sortedSections) {
       const ampacity = tableData.table[section];
-      if (ampacity !== undefined && ampacity >= current) {
+      // Regra NBR 5410: Ib <= In_disjuntor <= Iz
+      if (ampacity !== undefined && ampacity >= current && ampacity >= breakerCurrent) {
         return section;
       }
     }
 
     const maxSection = sortedSections[sortedSections.length - 1];
     const maxAmpacity = tableData.table[maxSection!];
-    throw new Error(`Corrente de projeto (${current.toFixed(2)} A) excede a capacidade máxima da tabela para o método ${method} (${maxAmpacity} A).`);
+    throw new Error(`Corrente de projeto (${current.toFixed(2)} A) ou do disjuntor (${breakerCurrent.toFixed(2)} A) excede a capacidade máxima da tabela para o método ${method} (${maxAmpacity} A).`);
   }
 
   /**
@@ -132,24 +133,30 @@ export class CalculationEngine {
     const Ib = In * fs;
     const correctedCurrentForTable = Ib / (fGroup * fTemp);
     
-    // 4. Dimensionamento Independente
+    // 4. Dimensionamento do Disjuntor (Primeiro passo para o critério Ib <= Idisj <= Iz)
+    // O disjuntor deve ser >= Ib. Usamos In * fs como referência para encontrar o disjuntor comercial.
+    const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
+    const compatibleBreaker = findCompatibleProduct('disjuntor', Ib, mfr);
+    const breakerNominalCurrent = compatibleBreaker ? parseFloat(compatibleBreaker.model.match(/\d+/)?.[0] || Ib.toString()) : Ib;
+
+    // 5. Dimensionamento Independente do Condutor
     const method = inputs.installationMethod;
     if (!method) {
       throw new Error("Método de instalação não especificado.");
     }
     const numConductors = inputs.phase === 'trifasico' ? 3 : 2;
     
-    const secAmp = this.getSectionByAmpacity(correctedCurrentForTable, method, numConductors);
+    // NBR 5410: Iz deve ser >= Idisjuntor (que por sua vez é >= Ib)
+    const secAmp = this.getSectionByAmpacity(correctedCurrentForTable, breakerNominalCurrent / (fGroup * fTemp), method, numConductors);
     const dropResult = this.getSectionByVoltageDrop(Ib, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     
-    // 5. Seleção Final (Maior entre os critérios)
+    // 6. Seleção Final (Maior entre os critérios)
     const finalSection = Math.max(secAmp, dropResult.selectedSection, this.SECAO_MINIMA_FORCA);
     const limitingCriterion = finalSection === secAmp ? 'ampacity' : 'voltageDrop';
 
     // Proteções
-    const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
     const requirements: TechnicalRequirement[] = [
-      { category: 'disjuntor', current: In * fs, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' },
+      { category: 'disjuntor', current: Ib, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' },
       { category: 'disjuntor', current: 6, quantity: 1, label: 'Disjuntor do Circuito Auxiliar (Comando)' },
       { category: 'fusivel', current: In * 1.5, quantity: 3, label: 'Fusíveis do Circuito Principal (Força)' },
       { category: 'disjuntorMotor', current: In * fs, quantity: 1, label: 'Disjuntor Motor' }

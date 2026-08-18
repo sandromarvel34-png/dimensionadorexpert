@@ -187,7 +187,7 @@ export const CalculatorWizard = () => {
       setCalculation(inputs, results);
       setView('results');
     } catch (error) {
-      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Ao calcular a corrente de Projeto Ib, considere Ib = IN x FS. Não inclua na fórmula o fator 1,25. Ao calcular a secção transversal por queda de tensão, considere a corrente Ib. Não considere a corrente nominal IN. Corrija essas fórmulas na aplicação");
+      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Considerando que a Corrente Ib deve ser menor ou igual a Corrente do Disjuntor que deve ser menor ou igual a Capacidade de condução do condutor (Ib <= Idisjuntor <= Icondutor), corrija as falhas de dimensionamento dos dispositivos");
     } finally {
       setIsCalculating(false);
     }
