@@ -190,7 +190,7 @@ export class CalculationEngine {
 
     // Compatibilidade Legada (Mapeamento direto de proteções)
     const protections: CalculationResults['protections'] = {
-      breaker: findCompatibleProduct('disjuntor', In * fs, mfr) || null,
+      breaker: findCompatibleProduct('disjuntor', Ib, mfr) || null,
       motorBreaker: findCompatibleProduct('disjuntorMotor', In * fs, mfr) || null,
       diazedFuse: findCompatibleProduct('fusivel', In * 1.5, mfr) || null,
       nhFuse: findCompatibleProduct('fusivel', In * 1.5, mfr) || null,
