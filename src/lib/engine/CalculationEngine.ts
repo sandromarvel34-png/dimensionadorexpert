@@ -164,8 +164,10 @@ export class CalculationEngine {
     const limitingCriterion = finalSection === secAmp ? 'ampacity' : 'voltageDrop';
 
     // Proteções
+    // Conforme NBR 5410, para coordenação com cabos, o disjuntor de força deve ser Ib <= In_disj <= Iz.
+    // Usamos o disjuntor já encontrado no passo 4.
     const requirements: TechnicalRequirement[] = [
-      { category: 'disjuntor', current: Ib, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' },
+      { category: 'disjuntor', current: breakerNominalCurrent, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' },
       { category: 'disjuntor', current: 6, quantity: 1, label: 'Disjuntor do Circuito Auxiliar (Comando)' },
       { category: 'fusivel', current: Ib * 1.5, quantity: 3, label: 'Fusíveis do Circuito Principal (Força)' },
       { category: 'disjuntorMotor', current: In * fs, quantity: 1, label: 'Disjuntor Motor' }
