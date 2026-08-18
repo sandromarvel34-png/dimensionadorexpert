@@ -239,7 +239,7 @@ export const EducationalFlow = () => {
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator (K3):</span> Selecionado para <span dangerouslySetInnerHTML={{ __html: katex.renderToString('0{,}33 \\cdot I_n \\cdot FS', { output: 'html' }) }} />.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator (K3):</span> Selecionado para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`0{,}33 \\cdot I_n \\cdot FS = ${(currentResults.nominalCurrent * 0.33 * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
