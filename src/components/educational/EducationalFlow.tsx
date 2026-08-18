@@ -257,7 +257,7 @@ export const EducationalFlow = () => {
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Dimensionados para <span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} /> com intertravamento.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Dimensionados para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} /> com intertravamento.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
