@@ -157,6 +157,10 @@ export class CalculationEngine {
     // Para ampacidade, o condutor deve suportar a corrente do disjuntor selecionado.
     // Usamos breakerNominalCurrent / (fGroup * fTemp) para garantir que Iz (ampacidade nominal) >= In_disjuntor
     const secAmp = this.getSectionByAmpacity(correctedCurrentForTable, breakerNominalCurrent / (fGroup * fTemp), method, numConductors);
+    
+    // Garantia adicional de proteção: Iz do cabo selecionado * fGroup * fTemp deve ser >= In_disjuntor
+    // No entanto, getSectionByAmpacity já faz Iz >= correctedBreakerCurrent, o que é equivalente.
+
     const dropResult = this.getSectionByVoltageDrop(Ib, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     
     // 6. Seleção Final (Maior entre os critérios)
