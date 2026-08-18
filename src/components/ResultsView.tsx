@@ -122,8 +122,8 @@ export const ResultsView = () => {
               <span className="text-xl font-bold">60Hz / 3{"\u03C6"}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_b \\text{ (Carga Máxima)}', { throwOnError: false }) }} />
-              <span className="text-xl font-bold">{(currentResults.nominalCurrent * 1.25 * (currentInputs.serviceFactor || 1)).toFixed(1)} A</span>
+              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_b \\text{ (Corrente de Projeto)}', { throwOnError: false }) }} />
+              <span className="text-xl font-bold">{((currentResults.nominalCurrent * 1.25 * (currentInputs.serviceFactor || 1)) / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(1)} A</span>
             </div>
             <div className="pt-4 border-t border-white/10">
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">

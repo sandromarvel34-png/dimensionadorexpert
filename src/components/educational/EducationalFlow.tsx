@@ -76,10 +76,10 @@ export const EducationalFlow = () => {
             </div>
             
             <div className="space-y-4">
-              <p className="font-bold text-sm text-primary uppercase">2. Corrente de Projeto Corrigida (I_b):</p>
-              <p className="text-sm text-slate-600">Aplicamos o fator de segurança de 1.25 (NBR 5410) e o Fator de Serviço (FS).</p>
+              <p className="font-bold text-sm text-primary uppercase">2. Corrente de Projeto (I_b):</p>
+              <p className="text-sm text-slate-600">Considera Fator de Segurança (1.25), Fator de Serviço (FS) e Fatores de Correção Normativos.</p>
               <MathFormula
-                title="Cálculo da Corrente de Projeto"
+                title="Cálculo da Corrente de Projeto Corrigida"
                 legend={[
                   { symbol: 'I_b', label: 'Corrente de projeto corrigida (A)' },
                   { symbol: 'I_n', label: 'Corrente nominal (A)' },
