@@ -82,12 +82,12 @@ export const ResultsView = () => {
               <p className="text-xl font-bold">{currentResults.cableByAmpacity} mm²</p>
             </div>
             <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Seção Mín. (Queda)</p>
-              <p className="text-xl font-bold">{currentResults.cableByVoltageDrop} mm²</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Limite Queda ΔV</p>
+              <p className="text-xl font-bold">{currentInputs.maxVoltageDrop}%</p>
             </div>
             <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Queda Final</p>
-              <p className="text-xl font-bold text-primary">{isNaN(currentResults.voltageDropCalculated) ? '0.00' : currentResults.voltageDropCalculated.toFixed(2)}%</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Seção para ΔV</p>
+              <p className="text-xl font-bold text-primary">{currentResults.cableByVoltageDrop} mm²</p>
             </div>
           </div>
         </div>

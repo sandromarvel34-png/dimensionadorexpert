@@ -110,15 +110,15 @@ export const EducationalFlow = () => {
       case 4:
         return (
           <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Calculamos a seção mínima do condutor necessária para que a queda de tensão não ultrapasse **{currentInputs.maxVoltageDrop}%** na distância de **{currentInputs.distance}m**.</p>
+            <p className="text-slate-600">Calculamos a seção transversal mínima necessária para atender ao limite de queda de tensão de **{currentInputs.maxVoltageDrop}%**.</p>
             <MathFormula
-              title="Cálculo da Seção por Queda de Tensão"
+              title="Cálculo da Seção Transversal por Queda de Tensão"
               legend={[
                 { symbol: 'S', label: 'Seção do condutor (mm²)' },
                 { symbol: '\\rho', label: 'Resistividade do Cobre' },
                 { symbol: 'L', label: 'Comprimento (m)' },
                 { symbol: 'I_n', label: 'Corrente nominal (A)' },
-                { symbol: '\\Delta V_{máx}', label: 'Limite de queda percentual' },
+                { symbol: '\\Delta V_{\\%}', label: 'Limite admissível informado (%)' },
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
@@ -127,16 +127,16 @@ export const EducationalFlow = () => {
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Seção Mínima Comercial (Queda)</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Seção Mínima Necessária</p>
                   <p className="text-3xl font-black text-primary">{currentResults.cableByVoltageDrop} mm²</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Real Final</p>
-                  <p className="text-xl font-bold text-slate-700">{currentResults.voltageDropCalculated.toFixed(2)}%</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Limite do Usuário</p>
+                  <p className="text-xl font-bold text-slate-700">{currentInputs.maxVoltageDrop}%</p>
                 </div>
               </div>
               <p className="text-xs font-bold text-green-600 mt-2 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> Bitola comercial de {currentResults.cableByVoltageDrop}mm² atende ao limite de {currentInputs.maxVoltageDrop}%
+                <CheckCircle2 className="w-3 h-3" /> ATENDE AO LIMITE INFORMADO: A seção de {currentResults.cableByVoltageDrop}mm² garante uma queda de {currentResults.voltageDropCalculated.toFixed(2)}%, respeitando o teto de {currentInputs.maxVoltageDrop}%.
               </p>
             </div>
           </div>
