@@ -95,7 +95,8 @@ export class CalculationEngine {
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
     
     // S = (100 * k * rho * L * In * cosphi) / (deltaV% * V)
-    const requiredSection = (100 * k * CalculationEngine.RHO_COPPER * distance * current * pf) / (maxDropPercent * voltage);
+    // Conforme NBR 5410, para cabos em regime permanente (PVC 70°C), utiliza-se rho = 0,0213
+    const requiredSection = (100 * k * CalculationEngine.RHO_COPPER_70 * distance * current * pf) / (maxDropPercent * voltage);
     
     let selectedSection: number = standardSections[standardSections.length - 1]!;
     let found = false;
@@ -111,7 +112,7 @@ export class CalculationEngine {
       throw new Error(`Seção teórica necessária (${requiredSection.toFixed(2)} mm²) excede o limite do catálogo.`);
     }
 
-    const actualDropPercent = (k * CalculationEngine.RHO_COPPER * distance * current * pf * 100) / (selectedSection * voltage);
+    const actualDropPercent = (k * CalculationEngine.RHO_COPPER_70 * distance * current * pf * 100) / (selectedSection * voltage);
 
     return { requiredSection, selectedSection, actualDrop: actualDropPercent };
   }
