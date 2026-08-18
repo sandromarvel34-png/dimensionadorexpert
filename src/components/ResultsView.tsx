@@ -124,7 +124,7 @@ export const ResultsView = () => {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_b \\text{ (Corrente de Projeto)}', { throwOnError: false }) }} />
-              <span className="text-xl font-bold">{((currentResults.nominalCurrent * 1.25 * (currentInputs.serviceFactor || 1)) / ((CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs.groupingCount?.toString() || '1'] || 1.0) * (currentInputs.ambientTempFactor || 1))).toFixed(1)} A</span>
+              <span className="text-xl font-bold">{(currentResults.nominalCurrent * (currentInputs.serviceFactor || 1)).toFixed(1)} A</span>
             </div>
             <div className="pt-4 border-t border-white/10">
               <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">

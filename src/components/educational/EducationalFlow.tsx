@@ -93,26 +93,38 @@ export const EducationalFlow = () => {
             
             <div className="space-y-4">
               <p className="font-bold text-sm text-primary uppercase">2. Corrente de Projeto (I_b):</p>
-              <p className="text-sm text-slate-600">Considera Fator de Segurança (1.25), Fator de Serviço (FS) e Fatores de Correção Normativos.</p>
-              <MathFormula
-                title="Cálculo da Corrente de Projeto Corrigida"
-                legend={[
-                  { symbol: 'I_b', label: 'Corrente de projeto corrigida (A)' },
-                  { symbol: 'I_n', label: 'Corrente nominal (A)' },
-                  { symbol: 'FS', label: 'Fator de serviço' },
-                  { symbol: 'f_{agrup}', label: 'Fator de agrupamento' },
-                  { symbol: 'f_{temp}', label: 'Fator de temperatura' }
-                ]}
-              >
-                {`I_b = \\frac{I_n \\cdot 1{,}25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1{,}25 \\cdot ${fs.toFixed(2)}}{${(CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs.groupingCount?.toString() || '1'] || 1.0).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${((currentResults.nominalCurrent * 1.25 * fs) / ((CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs.groupingCount?.toString() || '1'] || 1.0) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
-              </MathFormula>
+              <p className="text-sm text-slate-600">Considera o Fator de Serviço (FS). A corrente corrigida para busca em tabela utiliza fatores de agrupamento e temperatura.</p>
+              <div className="space-y-6">
+                <MathFormula
+                  title="Cálculo da Corrente de Projeto"
+                  legend={[
+                    { symbol: 'I_b', label: 'Corrente de projeto (A)' },
+                    { symbol: 'I_n', label: 'Corrente nominal (A)' },
+                    { symbol: 'FS', label: 'Fator de serviço' }
+                  ]}
+                >
+                  {`I_b = I_n \\cdot FS = ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${fs.toFixed(2)} = ${(currentResults.nominalCurrent * fs).toFixed(2)} \\text{ A}`}
+                </MathFormula>
+
+                <MathFormula
+                  title="Cálculo da Corrente Corrigida para Tabela (Ampacidade)"
+                  legend={[
+                    { symbol: 'I_{corrigida}', label: 'Corrente para busca em tabela (A)' },
+                    { symbol: 'I_b', label: 'Corrente de projeto (A)' },
+                    { symbol: 'f_{agrup}', label: 'Fator de agrupamento' },
+                    { symbol: 'f_{temp}', label: 'Fator de temperatura' }
+                  ]}
+                >
+                  {`I_{corrigida} = \\frac{I_b}{f_{agrup} \\cdot f_{temp}} = \\frac{( ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${fs.toFixed(2)} )}{${(CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs.groupingCount?.toString() || '1'] || 1.0).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${((currentResults.nominalCurrent * fs) / ((CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs.groupingCount?.toString() || '1'] || 1.0) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
+                </MathFormula>
+              </div>
             </div>
           </div>
         );
       case 3:
         return (
           <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Consultamos a **Tabela 36 da NBR 5410** (Método {currentInputs.groupingType || 'B1'}) para encontrar um cabo que suporte a corrente **Ib**.</p>
+            <p className="text-slate-600">Consultamos a **Tabela 36 da NBR 5410** (Método {currentInputs.groupingType || 'B1'}) para encontrar um cabo que suporte a corrente **corrigida para tabela (I_corrigida)**.</p>
             <div className="bg-white p-6 rounded-xl border border-primary/20 shadow-sm">
               <p className="text-sm font-bold text-slate-500 uppercase mb-4">Resultado da Ampacidade:</p>
               <div className="flex items-end gap-2">
@@ -133,12 +145,12 @@ export const EducationalFlow = () => {
                 { symbol: 'S', label: 'Seção do condutor (mm²)' },
                 { symbol: '\\rho', label: 'Resistividade do Cobre' },
                 { symbol: 'L', label: 'Comprimento (m)' },
-                { symbol: 'I_n', label: 'Corrente nominal (A)' },
+                { symbol: 'I_b', label: 'Corrente de projeto (A)' },
                 { symbol: '\\Delta V_{\\%}', label: 'Limite admissível informado (%)' },
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`S = \\frac{100 \\cdot ${phaseFactor} \\cdot 0{,}0178 \\cdot ${currentInputs.distance} \\cdot ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${pf}}{\\Delta V_{\\%} \\cdot ${currentInputs.voltage}}`}
+              {`S = \\frac{100 \\cdot ${phaseFactor} \\cdot 0{,}0178 \\cdot ${currentInputs.distance} \\cdot ${(currentResults.nominalCurrent * fs).toFixed(2)} \\cdot ${pf}}{\\Delta V_{\\%} \\cdot ${currentInputs.voltage}}`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <div className="flex justify-between items-start mb-4">
@@ -189,9 +201,9 @@ export const EducationalFlow = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500 flex items-center gap-1">
-                      Disjuntor (<span dangerouslySetInnerHTML={{ __html: katex.renderToString('1{,}25 \\cdot I_n \\cdot FS', { output: 'html' }) }} />)
+                      Disjuntor (<span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} />)
                     </span>
-                    <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)} A</span>
+                    <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500 flex items-center gap-1">

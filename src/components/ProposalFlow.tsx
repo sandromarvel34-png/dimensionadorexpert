@@ -312,7 +312,7 @@ export const ProposalFlow = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_{b}', { throwOnError: false }) }} />
-                    <p className="text-sm font-bold text-primary">{((currentResults?.nominalCurrent || 0) * 1.25 * (currentInputs?.serviceFactor || 1) / ((CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs?.groupingCount?.toString() || '1'] || 1.0) * (currentInputs?.ambientTempFactor || 1))).toFixed(1)} A</p>
+                    <p className="text-sm font-bold text-primary">{((currentResults?.nominalCurrent || 0) * (currentInputs?.serviceFactor || 1)).toFixed(1)} A</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Distância</p>
