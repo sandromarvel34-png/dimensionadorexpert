@@ -63,12 +63,15 @@ export class CalculationEngine {
       .sort((a, b) => a - b);
 
     for (const section of sortedSections) {
-      if (tableData.table[section] >= current) {
+      const ampacity = tableData.table[section];
+      if (ampacity !== undefined && ampacity >= current) {
         return section;
       }
     }
 
-    throw new Error(`Corrente de projeto (${current.toFixed(2)} A) excede a capacidade máxima da tabela para o método ${method} (${tableData.table[sortedSections[sortedSections.length - 1]]} A).`);
+    const maxSection = sortedSections[sortedSections.length - 1];
+    const maxAmpacity = tableData.table[maxSection!];
+    throw new Error(`Corrente de projeto (${current.toFixed(2)} A) excede a capacidade máxima da tabela para o método ${method} (${maxAmpacity} A).`);
   }
 
   /**
@@ -88,7 +91,7 @@ export class CalculationEngine {
     // S = (100 * k * rho * L * In * cosphi) / (deltaV% * V)
     const requiredSection = (100 * k * CalculationEngine.RHO_COPPER * distance * current * pf) / (maxDropPercent * voltage);
     
-    let selectedSection: number = standardSections[standardSections.length - 1];
+    let selectedSection: number = standardSections[standardSections.length - 1]!;
     let found = false;
     for (const s of standardSections) {
       if (s >= requiredSection) {
