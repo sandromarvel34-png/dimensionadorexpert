@@ -171,6 +171,7 @@ export class CalculationEngine {
     
     // Corrente de projeto corrigida (Ib) para dimensionamento de cabos
     // Ib = (In * 1.25 * FS) / (f1 * f2)
+    // Nota: O fator 1.25 é uma recomendação conservadora da NBR 5410 para motores
     const correctedCurrent = (In * 1.25 * fs) / (fGroup * fTemp);
     
     // NBR 5410: Para dimensionamento de condutores em circuitos de motores, 
