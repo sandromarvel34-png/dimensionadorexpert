@@ -133,7 +133,10 @@ export class CalculationEngine {
     const Ib = (In * 1.25 * fs) / (fGroup * fTemp);
     
     // 4. Dimensionamento Independente
-    const method = inputs.installationMethod || 'B1';
+    const method = inputs.installationMethod;
+    if (!method) {
+      throw new Error("Método de instalação não especificado.");
+    }
     const numConductors = inputs.phase === 'trifasico' ? 3 : 2;
     
     const secAmp = this.getSectionByAmpacity(Ib, method, numConductors);
