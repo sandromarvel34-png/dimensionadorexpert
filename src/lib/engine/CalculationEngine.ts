@@ -131,6 +131,7 @@ export class CalculationEngine {
     // 3. Corrente de Projeto (Ib) e Corrente Corrigida para Tabela
     // NBR 5410: Ib = In * FS (conforme solicitado pelo usuário)
     const Ib = In * fs;
+    // Corrente Corrigida para busca na tabela de ampacidade (Iz >= Ib / (fGroup * fTemp))
     const correctedCurrentForTable = Ib / (fGroup * fTemp);
     
     // 4. Dimensionamento do Disjuntor (Primeiro passo para o critério Ib <= Idisj <= Iz)
@@ -147,6 +148,8 @@ export class CalculationEngine {
     const numConductors = inputs.phase === 'trifasico' ? 3 : 2;
     
     // NBR 5410: Iz deve ser >= Idisjuntor (que por sua vez é >= Ib)
+    // Para ampacidade, o condutor deve suportar a corrente do disjuntor selecionado.
+    // Usamos breakerNominalCurrent / (fGroup * fTemp) para garantir que Iz (ampacidade nominal) >= In_disjuntor
     const secAmp = this.getSectionByAmpacity(correctedCurrentForTable, breakerNominalCurrent / (fGroup * fTemp), method, numConductors);
     const dropResult = this.getSectionByVoltageDrop(Ib, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     

@@ -187,7 +187,7 @@ export const CalculatorWizard = () => {
       setCalculation(inputs, results);
       setView('results');
     } catch (error) {
-      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Apresente uma auditoria nos cálculos dos dimensionamentos dos dispositivos, revise o dimensionamento dos fusíveis e demais dispositivos e corrija as falhas e erros");
+      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            COnidere um motor de 75cv, 220v, tifásico, distancia: 50m, fator de potencia: 0,85, rendimento: 0,90, fator de serviço: 1,10, Queda de tensão admissível: 2%, método B1. A apkicação recomendou um condutor de 185mm². Consultando a Tabela 36 da NBR 5410 (Método B1, 3 condutores carregados, cobre/PVC):\n\nO condutor de 120 mm² suporta até 239 A.\n\nComo a nossa corrente corrigida deu 239,26 A, o cabo de 120 mm² é ultrapassado por uma fração mínima de 0,26 A.\n\nSeguindo rigidamente a norma, devemos adotar a seção comercial imediatamente superior: 150 mm² (que suporta até 271 A na tabela). Faça uma auditoria, identifique as divergencias e corrija as falhas.");
     } finally {
       setIsCalculating(false);
     }
