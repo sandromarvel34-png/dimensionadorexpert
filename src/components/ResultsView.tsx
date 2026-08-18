@@ -1,4 +1,5 @@
 import { useAppStore } from '@/lib/store';
+import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText, CheckCircle2, Factory, Shield, Info, ShoppingCart, GraduationCap } from 'lucide-react';
 import { useState } from 'react';
