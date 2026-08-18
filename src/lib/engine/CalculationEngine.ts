@@ -137,7 +137,7 @@ export class CalculationEngine {
     // O disjuntor deve ser >= Ib. Usamos In * fs como referência para encontrar o disjuntor comercial.
     const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
     const compatibleBreaker = findCompatibleProduct('disjuntor', Ib, mfr);
-    const breakerNominalCurrent = compatibleBreaker ? parseFloat(compatibleBreaker.model.match(/\d+/)?.[0] || Ib.toString()) : Ib;
+    const breakerNominalCurrent = compatibleBreaker ? (compatibleBreaker.nominalCurrent || parseFloat(compatibleBreaker.model.match(/\d+/)?.[0] || Ib.toString())) : Ib;
 
     // 5. Dimensionamento Independente do Condutor
     const method = inputs.installationMethod;
@@ -158,7 +158,7 @@ export class CalculationEngine {
     const requirements: TechnicalRequirement[] = [
       { category: 'disjuntor', current: Ib, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' },
       { category: 'disjuntor', current: 6, quantity: 1, label: 'Disjuntor do Circuito Auxiliar (Comando)' },
-      { category: 'fusivel', current: In * 1.5, quantity: 3, label: 'Fusíveis do Circuito Principal (Força)' },
+      { category: 'fusivel', current: Ib * 1.5, quantity: 3, label: 'Fusíveis do Circuito Principal (Força)' },
       { category: 'disjuntorMotor', current: In * fs, quantity: 1, label: 'Disjuntor Motor' }
     ];
 
@@ -190,10 +190,10 @@ export class CalculationEngine {
 
     // Compatibilidade Legada (Mapeamento direto de proteções)
     const protections: CalculationResults['protections'] = {
-      breaker: findCompatibleProduct('disjuntor', In * fs, mfr) || null,
+      breaker: findCompatibleProduct('disjuntor', Ib, mfr) || null,
       motorBreaker: findCompatibleProduct('disjuntorMotor', In * fs, mfr) || null,
-      diazedFuse: findCompatibleProduct('fusivel', In * 1.5, mfr) || null,
-      nhFuse: findCompatibleProduct('fusivel', In * 1.5, mfr) || null,
+      diazedFuse: findCompatibleProduct('fusivel', Ib * 1.5, mfr) || null,
+      nhFuse: findCompatibleProduct('fusivel', Ib * 1.5, mfr) || null,
       thermalRelay: findCompatibleProduct('releTermico', In * (inputs.starterType === 'estrelaTriangulo' ? 0.58 : 1.0) * fs, mfr) || null,
       contactor: findCompatibleProducts('contator', In * (inputs.starterType === 'estrelaTriangulo' ? 0.58 : 1.0) * fs, mfr),
       timerRelay: inputs.starterType === 'estrelaTriangulo' ? (findCompatibleProduct('releTempo', 0, mfr) || null) : null,

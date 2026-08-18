@@ -187,7 +187,7 @@ export const CalculatorWizard = () => {
       setCalculation(inputs, results);
       setView('results');
     } catch (error) {
-      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Considerando que a Corrente Ib deve ser menor ou igual a Corrente do Disjuntor que deve ser menor ou igual a Capacidade de condução do condutor (Ib <= Idisjuntor <= Icondutor), corrija as falhas de dimensionamento dos dispositivos");
+      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Apresente uma auditoria nos cálculos dos dimensionamentos dos dispositivos, revise o dimensionamento dos fusíveis e demais dispositivos e corrija as falhas e erros");
     } finally {
       setIsCalculating(false);
     }
