@@ -15,7 +15,7 @@ export class CalculationEngine {
   private static readonly EFFICIENCY_DEFAULT = 0.90;
   private static readonly SECAO_MINIMA_FORCA = 2.5;
 
-  static readonly TEMPERATURE_FACTORS_PVC: Record<string, number> = {
+  static readonly TEMPERATURE_FACTORS: Record<string, number> = {
     '10': 1.22, '15': 1.17, '20': 1.12, '25': 1.06, '30': 1.00,
     '35': 0.94, '40': 0.87, '45': 0.79, '50': 0.71, '55': 0.61, '60': 0.50
   };
