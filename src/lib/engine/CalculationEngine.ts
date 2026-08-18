@@ -110,7 +110,7 @@ export class CalculationEngine {
 
   /**
    * Critério 2: Queda de Tensão
-   * Baseado na fórmula do arquivo de referência
+   * Calcula a seção transversal mínima necessária baseada no limite de queda de tensão admissível.
    */
   static getSectionByVoltageDrop(
     current: number, 
@@ -119,33 +119,27 @@ export class CalculationEngine {
     maxDropPercent: number,
     pf: number = 0.85,
     phase: string = 'trifasico'
-  ): { section: number; actualDrop: number } {
+  ): { requiredSection: number; selectedSection: number; actualDrop: number } {
     const k = phase === 'trifasico' ? Math.sqrt(3) : 2;
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300];
     
     // NBR 5410 - Cálculo de dimensionamento por queda de tensão:
     // S = (100 * k * rho * L * In * cosphi) / (deltaV% * V)
-    // Onde deltaV% é o valor escalar (ex: 2 para 2%)
-
     const requiredSection = (100 * k * CalculationEngine.RHO_COPPER * distance * current * pf) / (maxDropPercent * voltage);
     
-    // Encontrar a bitola comercial imediatamente superior (Cálculo Independente B)
-    let section: number = standardSections[standardSections.length - 1]!;
-    
+    // Encontrar a bitola comercial imediatamente superior
+    let selectedSection: number = standardSections[standardSections.length - 1]!;
     for (const s of standardSections) {
       if (s >= requiredSection) {
-        section = s;
+        selectedSection = s;
         break;
       }
     }
 
-    // Calcular a queda REAL resultante do condutor comercial selecionado (Cálculo Real C)
+    // Calcular a queda REAL resultante para validação (deltaV_real <= deltaV_admissível)
+    const actualDropPercent = (k * CalculationEngine.RHO_COPPER * distance * current * pf * 100) / (selectedSection * voltage);
 
-    // Calcular a queda REAL resultante do condutor comercial selecionado
-    // deltaV (%) = (k * rho * L * In * cosphi * 100) / (S * V)
-    const actualDropPercent = (k * CalculationEngine.RHO_COPPER * distance * current * pf * 100) / (section * voltage);
-
-    return { section, actualDrop: actualDropPercent };
+    return { requiredSection, selectedSection, actualDrop: actualDropPercent };
   }
 
   static performFullCalculation(inputs: CalculationInputs): CalculationResults {
@@ -184,13 +178,13 @@ export class CalculationEngine {
     const secAmp = this.getSectionByAmpacity(correctedCurrent);
     const dropResult = this.getSectionByVoltageDrop(In, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     
-    // Garantir que a queda calculada seja um número válido para evitar NaN%
+    // Garantir que a queda calculada seja um número válido
     const voltageDropCalculated = isNaN(dropResult.actualDrop) ? 0 : dropResult.actualDrop;
     
-    // O dimensionamento final DEVE ser a maior bitola entre ampacidade e queda de tensão
-    const finalSection = Math.max(secAmp, dropResult.section, this.SECAO_MINIMA_FORCA);
+    // O dimensionamento final DEVE ser a maior bitola entre ampacidade, queda de tensão e mínima normativa
+    const finalSection = Math.max(secAmp, dropResult.selectedSection, this.SECAO_MINIMA_FORCA);
     
-    const limitingCriterion = dropResult.section > secAmp ? 'voltageDrop' : 'ampacity';
+    const limitingCriterion = dropResult.selectedSection > secAmp ? 'voltageDrop' : 'ampacity';
 
     const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
     
@@ -314,7 +308,7 @@ export class CalculationEngine {
     return {
       nominalCurrent: In,
       cableByAmpacity: secAmp,
-      cableByVoltageDrop: dropResult.section,
+      cableByVoltageDrop: dropResult.selectedSection,
       finalCableSection: finalSection,
       voltageDropCalculated: voltageDropCalculated,
       limitingCriterion,
