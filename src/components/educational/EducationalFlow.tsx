@@ -172,20 +172,28 @@ export const EducationalFlow = () => {
       case 5:
         return (
           <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">O sistema seleciona a **MAIOR** bitola entre os dois critérios para garantir segurança e performance.</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div className={cn("p-4 rounded-lg border-2", currentResults.limitingCriterion === 'ampacity' ? "border-primary bg-primary/5" : "border-slate-100")}>
-                <p className="text-[10px] font-black uppercase">Ampacidade</p>
-                <p className="text-2xl font-black">{currentResults.cableByAmpacity} mm²</p>
+            <p className="text-slate-600">O sistema aplica o critério da **NBR 5410** onde a capacidade do cabo (Iz) deve ser maior ou igual à corrente do disjuntor, que por sua vez deve ser maior ou igual à corrente de projeto (**Ib ≤ Idisj ≤ Iz**).</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-lg border border-slate-100 bg-slate-50/50">
+                <p className="text-[10px] font-black uppercase text-slate-500">Ampacidade (Ib)</p>
+                <p className="text-2xl font-black text-slate-700">{currentResults.cableByAmpacity} mm²</p>
+                <p className="text-[10px] text-slate-400 mt-1">Garante suporte térmico à carga</p>
               </div>
-              <div className={cn("p-4 rounded-lg border-2", currentResults.limitingCriterion === 'voltageDrop' ? "border-primary bg-primary/5" : "border-slate-100")}>
-                <p className="text-[10px] font-black uppercase">Queda de Tensão</p>
+              <div className={cn("p-4 rounded-lg border-2", currentResults.limitingCriterion === 'ampacity' ? "border-primary bg-primary/5" : "border-slate-100 bg-slate-50/50")}>
+                <p className="text-[10px] font-black uppercase">Proteção (Idisj)</p>
+                <p className="text-2xl font-black">{currentResults.cableByAmpacity} mm²</p>
+                <p className="text-[10px] text-slate-400 mt-1">Coordenado com o disjuntor</p>
+              </div>
+              <div className={cn("p-4 rounded-lg border-2", currentResults.limitingCriterion === 'voltageDrop' ? "border-primary bg-primary/5" : "border-slate-100 bg-slate-50/50")}>
+                <p className="text-[10px] font-black uppercase">Queda de Tensão (ΔV)</p>
                 <p className="text-2xl font-black">{currentResults.cableByVoltageDrop} mm²</p>
+                <p className="text-[10px] text-slate-400 mt-1">Limite de {currentInputs.maxVoltageDrop}%</p>
               </div>
             </div>
-            <div className="bg-slate-900 text-white p-6 rounded-xl text-center">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bitola Escolhida</p>
+            <div className="bg-slate-900 text-white p-6 rounded-xl text-center shadow-xl border-t-4 border-primary">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bitola Final Selecionada (MAX)</p>
               <p className="text-5xl font-black text-primary">{currentResults.finalCableSection} mm²</p>
+              <p className="text-[10px] text-slate-500 mt-2 font-medium tracking-tight">Atende NBR 5410: Ampacidade, Queda de Tensão e Coordenação com Proteção</p>
             </div>
           </div>
         );
