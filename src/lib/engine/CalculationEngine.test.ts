@@ -24,10 +24,10 @@ describe('CalculationEngine', () => {
   });
 
   test('deve selecionar a seção correta por ampacidade', () => {
-    const section = CalculationEngine.getSectionByAmpacity(15); // Tabela diz 1.5mm2 até 17.5A
+    const section = CalculationEngine.getSectionByAmpacity(15, 15, 'B1', 2); // Tabela diz 1.5mm2 até 17.5A
     expect(section).toBe(1.5);
     
-    const sectionHigh = CalculationEngine.getSectionByAmpacity(50); // Deve ser 10mm2 (57A)
+    const sectionHigh = CalculationEngine.getSectionByAmpacity(50, 50, 'B1', 2); // Deve ser 10mm2 (57A)
     expect(sectionHigh).toBe(10);
   });
 
