@@ -23,14 +23,14 @@ async function runAudit() {
 
   const methods = ['B1', 'B2', 'C', 'D', 'E', 'F'];
   methods.forEach(m => {
-    console.log(\`Teste Método: \${m}\`);
+    console.log("Teste Método: " + m);
     try {
       const inputs = { ...baseInputs, installationMethod: m };
       const results = CalculationEngine.performFullCalculation(inputs);
-      console.log(\`  Método recebido: \${inputs.installationMethod}\`);
-      console.log(\`  Seção comercial (Ampacidade): \${results.cableByAmpacity} mm²\`);
+      console.log("  Método recebido: " + (inputs.installationMethod || "N/A"));
+      console.log("  Seção comercial (Ampacidade): " + results.cableByAmpacity + " mm²");
     } catch (e: any) {
-      console.log(\`  ERRO/AVISO: \${e.message}\`);
+      console.log("  ERRO/AVISO: " + e.message);
     }
   });
 
@@ -39,19 +39,18 @@ async function runAudit() {
   dvTests.forEach(dv => {
     const inputs = { ...baseInputs, maxVoltageDrop: dv };
     const results = CalculationEngine.performFullCalculation(inputs);
-    // Invocando diretamente a função interna para evidência de valores
     const dropDetails = CalculationEngine.getSectionByVoltageDrop(
         results.nominalCurrent, 
         inputs.distance, 
         inputs.voltage, 
         inputs.maxVoltageDrop, 
-        inputs.powerFactor, 
+        inputs.powerFactor || 0.85, 
         inputs.phase
     );
-    console.log(\`ΔV selecionado: \${dv}%\`);
-    console.log(\`  Valor recebido pela função: \${dv}\`);
-    console.log(\`  Seção teórica calculada: \${dropDetails.requiredSection.toFixed(4)} mm²\`);
-    console.log(\`  Seção comercial selecionada: \${dropDetails.selectedSection} mm²\`);
+    console.log("ΔV selecionado: " + dv + "%");
+    console.log("  Valor recebido pela função: " + dv);
+    console.log("  Seção teórica calculada: " + dropDetails.requiredSection.toFixed(4) + " mm²");
+    console.log("  Seção comercial selecionada: " + dropDetails.selectedSection + " mm²");
   });
 
   console.log("\n--- 4. TESTE DA CONVERSÃO PARA SEÇÃO COMERCIAL ---");
@@ -66,21 +65,17 @@ async function runAudit() {
         break;
       }
     }
-    console.log(\`Teórica: \${t} mm² -> Comercial: \${selected} mm²\`);
+    console.log("Teórica: " + t + " mm² -> Comercial: " + selected + " mm²");
   });
 
   console.log("\n--- 5. TESTE DE INDEPENDÊNCIA ---");
-  // Cenário 1: S_amp = 16, S_qt = 25
-  // Ajustamos a distância para forçar S_qt = 25
   console.log("Cenário 1: Forçando S_qt > S_amp");
   const results1 = CalculationEngine.performFullCalculation({ ...baseInputs, distance: 100, maxVoltageDrop: 1 });
-  console.log(\`  S_amp: \${results1.cableByAmpacity} | S_qt: \${results1.cableByVoltageDrop} | Final: \${results1.finalCableSection}\`);
+  console.log("  S_amp: " + results1.cableByAmpacity + " | S_qt: " + results1.cableByVoltageDrop + " | Final: " + results1.finalCableSection);
 
-  // Cenário 2: S_amp = 35, S_qt = 16
-  // Ajustamos Ib (via Ib = In*1.25/fAgrup) forçando agrupamento baixo
   console.log("Cenário 2: Forçando S_amp > S_qt");
   const results2 = CalculationEngine.performFullCalculation({ ...baseInputs, groupingCount: 6, distance: 5 });
-  console.log(\`  S_amp: \${results2.cableByAmpacity} | S_qt: \${results2.cableByVoltageDrop} | Final: \${results2.finalCableSection}\`);
+  console.log("  S_amp: " + results2.cableByAmpacity + " | S_qt: " + results2.cableByVoltageDrop + " | Final: " + results2.finalCableSection);
 }
 
 runAudit();
