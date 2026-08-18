@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import katex from 'katex';
 import { useAppStore } from '@/lib/store';
+import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronLeft, ChevronRight, CheckCircle2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { MathFormula } from '@/components/MathFormula';
 
 export const EducationalFlow = () => {
@@ -36,22 +36,38 @@ export const EducationalFlow = () => {
         return (
           <div className="space-y-6 text-left w-full">
             <p className="text-slate-600">O dimensionamento começa com os dados técnicos fornecidos pelo usuário ou catálogo.</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded-lg border">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
                 <p className="text-[10px] font-black text-muted-foreground uppercase">Potência</p>
                 <p className="font-bold">{currentInputs.power} {currentInputs.powerUnit}</p>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
                 <p className="text-[10px] font-black text-muted-foreground uppercase">Tensão</p>
-                <p className="font-bold">{currentInputs.voltage}V ({currentInputs.phase})</p>
+                <p className="font-bold">{currentInputs.voltage}V ({currentInputs.phase === 'trifasico' ? '3φ' : '1φ'})</p>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Fator de Potência</p>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">Distância</p>
+                <p className="font-bold">{currentInputs.distance} m</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">Partida</p>
+                <p className="font-bold capitalize">{currentInputs.starterType}</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">cos φ</p>
                 <p className="font-bold">{pf}</p>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Rendimento</p>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">Rendimento (η)</p>
                 <p className="font-bold">{eff}</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">Fator de Serviço</p>
+                <p className="font-bold">{fs}</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">ΔV Admissível</p>
+                <p className="font-bold">{currentInputs.maxVoltageDrop}%</p>
               </div>
             </div>
           </div>
@@ -88,7 +104,7 @@ export const EducationalFlow = () => {
                   { symbol: 'f_{temp}', label: 'Fator de temperatura' }
                 ]}
               >
-                {`I_b = \\frac{I_n \\cdot 1{,}25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1{,}25 \\cdot ${fs.toFixed(2)}}{${(currentInputs.groupingFactor || 1).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${((currentResults.nominalCurrent * 1.25 * fs) / ((currentInputs.groupingFactor || 1) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
+                {`I_b = \\frac{I_n \\cdot 1{,}25 \\cdot FS}{f_{agrup} \\cdot f_{temp}} = \\frac{${currentResults.nominalCurrent.toFixed(2)} \\cdot 1{,}25 \\cdot ${fs.toFixed(2)}}{${(CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs.groupingCount?.toString() || '1'] || 1.0).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${((currentResults.nominalCurrent * 1.25 * fs) / ((CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs.groupingCount?.toString() || '1'] || 1.0) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
               </MathFormula>
             </div>
           </div>
@@ -122,7 +138,7 @@ export const EducationalFlow = () => {
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`S = \\frac{100 \\cdot k \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{\\Delta V_{\\%} \\cdot V}`}
+              {`S = \\frac{100 \\cdot ${phaseFactor} \\cdot 0{,}0178 \\cdot ${currentInputs.distance} \\cdot ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${pf}}{\\Delta V_{\\%} \\cdot ${currentInputs.voltage}}`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
               <div className="flex justify-between items-start mb-4">
@@ -220,11 +236,11 @@ export const EducationalFlow = () => {
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar <span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} /> em regime AC-3.</p>
+              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${fs.toFixed(2)} = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} /> em regime AC-3.</p>
             </div>
             <div className="flex items-start gap-3">
               <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de <span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} />.</p>
+              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
             </div>
           </div>
         );
@@ -235,15 +251,15 @@ export const EducationalFlow = () => {
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Selecionados para <span dangerouslySetInnerHTML={{ __html: katex.renderToString('0{,}58 \\cdot I_n \\cdot FS', { output: 'html' }) }} />.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Selecionados para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`0{,}58 \\cdot I_n \\cdot FS = ${(currentResults.nominalCurrent * 0.58 * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator (K3):</span> Selecionado para <span dangerouslySetInnerHTML={{ __html: katex.renderToString('0{,}33 \\cdot I_n \\cdot FS', { output: 'html' }) }} />.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator (K3):</span> Selecionado para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`0{,}33 \\cdot I_n \\cdot FS = ${(currentResults.nominalCurrent * 0.33 * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir <span dangerouslySetInnerHTML={{ __html: katex.renderToString('0{,}58 \\cdot I_n \\cdot FS', { output: 'html' }) }} />.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`0{,}58 \\cdot I_n \\cdot FS = ${(currentResults.nominalCurrent * 0.58 * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
@@ -257,11 +273,11 @@ export const EducationalFlow = () => {
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Dimensionados para <span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} /> com intertravamento.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Dimensionados para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} /> com intertravamento.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Proteção única configurada para <span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} />.</p>
+                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Proteção única configurada para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
               </div>
             </div>
           );
