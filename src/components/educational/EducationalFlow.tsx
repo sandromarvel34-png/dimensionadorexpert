@@ -224,7 +224,7 @@ export const EducationalFlow = () => {
             </div>
             <div className="flex items-start gap-3">
               <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de <span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} />.</p>
+              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
             </div>
           </div>
         );
