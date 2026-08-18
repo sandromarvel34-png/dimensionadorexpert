@@ -36,22 +36,38 @@ export const EducationalFlow = () => {
         return (
           <div className="space-y-6 text-left w-full">
             <p className="text-slate-600">O dimensionamento começa com os dados técnicos fornecidos pelo usuário ou catálogo.</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded-lg border">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
                 <p className="text-[10px] font-black text-muted-foreground uppercase">Potência</p>
                 <p className="font-bold">{currentInputs.power} {currentInputs.powerUnit}</p>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
                 <p className="text-[10px] font-black text-muted-foreground uppercase">Tensão</p>
-                <p className="font-bold">{currentInputs.voltage}V ({currentInputs.phase})</p>
+                <p className="font-bold">{currentInputs.voltage}V ({currentInputs.phase === 'trifasico' ? '3φ' : '1φ'})</p>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Fator de Potência</p>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">Distância</p>
+                <p className="font-bold">{currentInputs.distance} m</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">Partida</p>
+                <p className="font-bold capitalize">{currentInputs.starterType}</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">cos φ</p>
                 <p className="font-bold">{pf}</p>
               </div>
-              <div className="bg-white p-4 rounded-lg border">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Rendimento</p>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">Rendimento (η)</p>
                 <p className="font-bold">{eff}</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">Fator de Serviço</p>
+                <p className="font-bold">{fs}</p>
+              </div>
+              <div className="bg-white p-4 rounded-lg border shadow-sm">
+                <p className="text-[10px] font-black text-muted-foreground uppercase">ΔV Admissível</p>
+                <p className="font-bold">{currentInputs.maxVoltageDrop}%</p>
               </div>
             </div>
           </div>
