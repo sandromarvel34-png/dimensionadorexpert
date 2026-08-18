@@ -41,7 +41,8 @@ async function runAudit() {
     const inputs = { ...baseInputs, maxVoltageDrop: dv };
     const results = CalculationEngine.performFullCalculation(inputs);
     const dropDetails = CalculationEngine.getSectionByVoltageDrop(
-        results.nominalCurrent, 
+        results.nominalCurrent * (inputs.serviceFactor || 1), 
+
         inputs.distance, 
         inputs.voltage, 
         inputs.maxVoltageDrop, 
