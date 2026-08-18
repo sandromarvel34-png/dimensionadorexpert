@@ -201,9 +201,9 @@ export const EducationalFlow = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500 flex items-center gap-1">
-                      Disjuntor (<span dangerouslySetInnerHTML={{ __html: katex.renderToString('1{,}25 \\cdot I_n \\cdot FS', { output: 'html' }) }} />)
+                      Disjuntor (<span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} />)
                     </span>
-                    <span className="font-black text-primary">{(currentResults.nominalCurrent * 1.25 * fs).toFixed(1)} A</span>
+                    <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)} A</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500 flex items-center gap-1">

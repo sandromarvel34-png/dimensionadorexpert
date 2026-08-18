@@ -149,7 +149,7 @@ export class CalculationEngine {
     // Proteções
     const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
     const requirements: TechnicalRequirement[] = [
-      { category: 'disjuntor', current: In * 1.25 * fs, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' },
+      { category: 'disjuntor', current: In * fs, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' },
       { category: 'disjuntor', current: 6, quantity: 1, label: 'Disjuntor do Circuito Auxiliar (Comando)' },
       { category: 'fusivel', current: In * 1.5, quantity: 3, label: 'Fusíveis do Circuito Principal (Força)' },
       { category: 'disjuntorMotor', current: In * fs, quantity: 1, label: 'Disjuntor Motor' }
@@ -183,7 +183,7 @@ export class CalculationEngine {
 
     // Compatibilidade Legada (Mapeamento direto de proteções)
     const protections: CalculationResults['protections'] = {
-      breaker: findCompatibleProduct('disjuntor', In * 1.25 * fs, mfr) || null,
+      breaker: findCompatibleProduct('disjuntor', In * fs, mfr) || null,
       motorBreaker: findCompatibleProduct('disjuntorMotor', In * fs, mfr) || null,
       diazedFuse: findCompatibleProduct('fusivel', In * 1.5, mfr) || null,
       nhFuse: findCompatibleProduct('fusivel', In * 1.5, mfr) || null,
