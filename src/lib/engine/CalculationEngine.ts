@@ -123,17 +123,13 @@ export class CalculationEngine {
     const k = phase === 'trifasico' ? Math.sqrt(3) : 2;
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300];
     
-    // NBR 5410 - Cálculo de queda de tensão em circuitos trifásicos:
-    // deltaV(V) = sqrt(3) * rho * (L/S) * In * cosphi
-    // Para isolar S dado um deltaV_max(V):
-    // S = (sqrt(3) * rho * L * In * cosphi) / deltaV_max(V)
+    // NBR 5410 - Cálculo de dimensionamento por queda de tensão:
+    // S = (100 * k * rho * L * In * cosphi) / (deltaV% * V)
+    // Onde deltaV% é o valor escalar (ex: 2 para 2%)
+
+    const requiredSection = (100 * k * CalculationEngine.RHO_COPPER * distance * current * pf) / (maxDropPercent * voltage);
     
-    // deltaV_max(V) = (maxDropPercent / 100) * V
-    const maxDropVolts = (maxDropPercent / 100) * voltage;
-    
-    const requiredSection = (k * CalculationEngine.RHO_COPPER * distance * current * pf) / maxDropVolts;
-    
-    // Encontrar a bitola comercial imediatamente superior
+    // Encontrar a bitola comercial imediatamente superior (Cálculo Independente B)
     let section: number = standardSections[standardSections.length - 1]!;
     
     for (const s of standardSections) {
@@ -142,6 +138,8 @@ export class CalculationEngine {
         break;
       }
     }
+
+    // Calcular a queda REAL resultante do condutor comercial selecionado (Cálculo Real C)
 
     // Calcular a queda REAL resultante do condutor comercial selecionado
     // deltaV (%) = (k * rho * L * In * cosphi * 100) / (S * V)
