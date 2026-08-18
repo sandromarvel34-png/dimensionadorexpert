@@ -18,7 +18,8 @@ async function runAudit() {
     ambientTempFactor: 1.0,
     starterType: 'direta',
     preferredManufacturer: 'any',
-    dataSource: 'manual'
+    dataSource: 'manual',
+    quantity: 1
   };
 
   const methods = ['B1', 'B2', 'C', 'D', 'E', 'F'];
