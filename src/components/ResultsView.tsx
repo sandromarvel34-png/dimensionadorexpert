@@ -82,7 +82,7 @@ export const ResultsView = () => {
               <p className="text-xl font-bold">{currentResults.cableByAmpacity} mm²</p>
             </div>
             <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Queda de Tensão</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Seção Mín. (Queda)</p>
               <p className="text-xl font-bold">{currentResults.cableByVoltageDrop} mm²</p>
             </div>
             <div>
