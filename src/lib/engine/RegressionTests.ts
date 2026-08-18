@@ -63,8 +63,8 @@ async function runRegressionTests() {
   // TEST D & E: Correction Factors
   console.log('Testing: Correction Factors (Temp & Grouping)...');
   const resBase = CalculationEngine.performFullCalculation(baseInputs);
-  const resHot = CalculationEngine.performFullCalculation({ ...baseInputs, ambientTempFactor: 0.5 }); // Very hot
-  const resGrouped = CalculationEngine.performFullCalculation({ ...baseInputs, groupingCount: 9 });
+  const resHot = CalculationEngine.performFullCalculation({ ...baseInputs, ambientTempFactor: 0.71 }); // 50°C
+  const resGrouped = CalculationEngine.performFullCalculation({ ...baseInputs, groupingCount: 3 });
 
   if (resHot.cableByAmpacity <= resBase.cableByAmpacity) {
     console.error('FAIL: Temperature factor (0.5) did not increase ampacity section.');
