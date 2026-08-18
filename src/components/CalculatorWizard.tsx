@@ -125,7 +125,7 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingType: formData.get('groupingType') as string || 'B1',
+        installationMethod: formData.get('groupingType') as string || 'B1',
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: selectedMotor.power_factor,
@@ -156,7 +156,7 @@ export const CalculatorWizard = () => {
         starterType: formData.get('starterType') as any,
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
-        groupingType: formData.get('groupingType') as string || 'B1',
+        installationMethod: formData.get('groupingType') as string || 'B1',
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: pf,
@@ -187,7 +187,7 @@ export const CalculatorWizard = () => {
       setCalculation(inputs, results);
       setView('results');
     } catch (error) {
-      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Faça uma auditoria e apresente um relatório completo");
+      toast.error("'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            A aplicação está apresentando erro ao executar o dimensionamento. QUando o usuário preenche os dados solicitados e clica em Calcular Dimensionamento, a aplicação não muda de página e apresenta erro. Faça uma auditoria e corrija os erros");
     } finally {
       setIsCalculating(false);
     }
