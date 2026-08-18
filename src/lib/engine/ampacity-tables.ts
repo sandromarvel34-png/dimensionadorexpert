@@ -72,6 +72,7 @@ export const AMPACITY_TABLES_NBR5410: AmpacityTable[] = [
     material: 'Copper',
     table: {
       1.5: 18, 2.5: 24, 4: 31, 6: 39, 10: 52, 16: 67, 25: 86, 35: 103, 50: 122, 70: 151, 95: 179, 120: 203, 150: 230, 185: 258, 240: 297
+    }
   },
   {
     method: 'E',
