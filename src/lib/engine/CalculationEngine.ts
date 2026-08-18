@@ -147,7 +147,10 @@ export class CalculationEngine {
     const numConductors = inputs.phase === 'trifasico' ? 3 : 2;
     
     // NBR 5410: Iz deve ser >= Idisjuntor (que por sua vez é >= Ib)
-    const secAmp = this.getSectionByAmpacity(correctedCurrentForTable, breakerNominalCurrent / (fGroup * fTemp), method, numConductors);
+    // Para ampacidade, usamos a corrente nominal do disjuntor como o limite Iz >= In_disj
+    // Mas para o cálculo da bitola, a norma diz que a bitola deve suportar In_disj e Ib.
+    // Usamos breakerNominalCurrent / (fGroup * fTemp) para garantir que ampacity >= breakerNominalCurrent
+    const secAmp = this.getSectionByAmpacity(Ib / (fGroup * fTemp), breakerNominalCurrent / (fGroup * fTemp), method, numConductors);
     const dropResult = this.getSectionByVoltageDrop(Ib, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
     
     // 6. Seleção Final (Maior entre os critérios)
