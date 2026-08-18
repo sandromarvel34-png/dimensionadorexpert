@@ -121,21 +121,24 @@ export class CalculationEngine {
     const k = phase === 'trifasico' ? Math.sqrt(3) : 2;
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150];
     
-    // Iteramos pelas bitolas padrão para encontrar a primeira que atenda à queda máxima
-    // O critério é encontrar a bitola que resulte em uma queda <= maxDropPercent
-    for (const section of standardSections) {
-      const actualDropVolts = (k * this.RHO_COPPER * distance * current * pf) / section;
-      const actualDropPercent = (actualDropVolts / voltage) * 100;
-      
-      if (actualDropPercent <= maxDropPercent) {
-        return { section, actualDrop: actualDropPercent };
+    // S = (k * rho * L * In * cosphi) / (deltaV_max * V) * 100
+    // deltaV_max é o percentual (ex: 2)
+    const requiredSection = (k * this.RHO_COPPER * distance * current * pf) / ((maxDropPercent / 100) * voltage);
+    
+    // Encontrar a bitola comercial imediatamente superior
+    let section = standardSections[standardSections.length - 1];
+    for (const s of standardSections) {
+      if (s >= requiredSection) {
+        section = s;
+        break;
       }
     }
 
-    // Caso nenhuma atenda (raro com 150mm²), retornamos a maior disponível
-    const maxSection = standardSections[standardSections.length - 1] as number;
-    const maxDropVolts = (k * this.RHO_COPPER * distance * current * pf) / maxSection;
-    return { section: maxSection, actualDrop: (maxDropVolts / voltage) * 100 };
+    // Calcular a queda real para esta bitola comercial
+    const actualDropVolts = (k * this.RHO_COPPER * distance * current * pf) / section;
+    const actualDropPercent = (actualDropVolts / voltage) * 100;
+
+    return { section, actualDrop: actualDropPercent };
   }
 
   static performFullCalculation(inputs: CalculationInputs): CalculationResults {
