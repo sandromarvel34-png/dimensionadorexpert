@@ -179,16 +179,16 @@ export class CalculationEngine {
     });
 
     // Compatibilidade Legada (Mapeamento direto de proteções)
-    const protections = {
-      breaker: findCompatibleProduct('disjuntor', In * 1.25 * fs, mfr),
-      motorBreaker: findCompatibleProduct('disjuntorMotor', In * fs, mfr),
-      diazedFuse: findCompatibleProduct('fusivel', In * 1.5, mfr),
-      nhFuse: findCompatibleProduct('fusivel', In * 1.5, mfr),
-      thermalRelay: findCompatibleProduct('releTermico', In * (inputs.starterType === 'estrelaTriangulo' ? 0.58 : 1.0) * fs, mfr),
+    const protections: CalculationResults['protections'] = {
+      breaker: findCompatibleProduct('disjuntor', In * 1.25 * fs, mfr) || null,
+      motorBreaker: findCompatibleProduct('disjuntorMotor', In * fs, mfr) || null,
+      diazedFuse: findCompatibleProduct('fusivel', In * 1.5, mfr) || null,
+      nhFuse: findCompatibleProduct('fusivel', In * 1.5, mfr) || null,
+      thermalRelay: findCompatibleProduct('releTermico', In * (inputs.starterType === 'estrelaTriangulo' ? 0.58 : 1.0) * fs, mfr) || null,
       contactor: findCompatibleProducts('contator', In * (inputs.starterType === 'estrelaTriangulo' ? 0.58 : 1.0) * fs, mfr),
-      timerRelay: inputs.starterType === 'estrelaTriangulo' ? findCompatibleProduct('releTempo', 0, mfr) : null,
-      softStarter: inputs.starterType === 'softStarter' ? findCompatibleProduct('softStarter', In * fs, mfr) : null,
-      inverter: inputs.starterType === 'inversor' ? findCompatibleProduct('inverter', In * fs, mfr) : null,
+      timerRelay: inputs.starterType === 'estrelaTriangulo' ? (findCompatibleProduct('releTempo', 0, mfr) || null) : null,
+      softStarter: inputs.starterType === 'softStarter' ? (findCompatibleProduct('softStarter', In * fs, mfr) || null) : null,
+      inverter: inputs.starterType === 'inversor' ? (findCompatibleProduct('inverter', In * fs, mfr) || null) : null,
     };
 
     return {
