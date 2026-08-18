@@ -126,7 +126,7 @@ export class CalculationEngine {
     const requiredSection = (k * CalculationEngine.RHO_COPPER * distance * current * pf) / ((maxDropPercent / 100) * voltage);
     
     // Encontrar a bitola comercial imediatamente superior
-    let section = standardSections[standardSections.length - 1];
+    let section: number = standardSections[standardSections.length - 1];
     for (const s of standardSections) {
       if (s >= requiredSection) {
         section = s;
