@@ -16,6 +16,7 @@ async function runRegressionTests() {
     phase: 'trifasico',
     distance: 50,
     maxVoltageDrop: 2,
+    quantity: 1,
     starterType: 'direta',
     preferredManufacturer: 'WEG',
     powerFactor: 0.85,
