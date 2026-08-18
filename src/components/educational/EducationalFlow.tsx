@@ -110,25 +110,33 @@ export const EducationalFlow = () => {
       case 4:
         return (
           <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Verificamos se a queda de tensão na distância de **{currentInputs.distance}m** está dentro do limite de **{currentInputs.maxVoltageDrop}%**.</p>
+            <p className="text-slate-600">Calculamos a seção mínima do condutor necessária para que a queda de tensão não ultrapasse **{currentInputs.maxVoltageDrop}%** na distância de **{currentInputs.distance}m**.</p>
             <MathFormula
-              title="Cálculo da Queda de Tensão"
+              title="Cálculo da Seção por Queda de Tensão"
               legend={[
-                { symbol: '\\Delta V', label: 'Queda de tensão percentual' },
+                { symbol: 'S', label: 'Seção do condutor (mm²)' },
                 { symbol: '\\rho', label: 'Resistividade do Cobre' },
                 { symbol: 'L', label: 'Comprimento (m)' },
                 { symbol: 'I_n', label: 'Corrente nominal (A)' },
-                { symbol: 'S', label: 'Seção do condutor (mm²)' },
+                { symbol: '\\Delta V_{máx}', label: 'Limite de queda percentual' },
                 { symbol: 'V', label: 'Tensão nominal (V)' }
               ]}
             >
-              {`\\Delta V = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{S \\cdot V} \\cdot 100 = ${currentResults.voltageDropCalculated.toFixed(2)}\\%`}
+              {`S = \\frac{${phaseFactor} \\cdot \\rho \\cdot L \\cdot I_n \\cdot \\cos \\varphi}{\\Delta V_{máx} \\cdot V} \\cdot 100`}
             </MathFormula>
             <div className="bg-white p-6 rounded-xl border border-primary/20">
-              <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Calculada</p>
-              <p className="text-3xl font-black text-primary">{currentResults.voltageDropCalculated.toFixed(2)}%</p>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Seção Mínima Exigida</p>
+                  <p className="text-3xl font-black text-primary">{currentResults.cableByVoltageDrop} mm²</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Queda Resultante</p>
+                  <p className="text-xl font-bold text-slate-700">{currentResults.voltageDropCalculated.toFixed(2)}%</p>
+                </div>
+              </div>
               <p className="text-xs font-bold text-green-600 mt-2 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> Abaixo do limite de {currentInputs.maxVoltageDrop}%
+                <CheckCircle2 className="w-3 h-3" /> Bitola comercial de {currentResults.cableByVoltageDrop}mm² atende ao limite de {currentInputs.maxVoltageDrop}%
               </p>
             </div>
           </div>
