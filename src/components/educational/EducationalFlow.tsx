@@ -5,7 +5,6 @@ import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronLeft, ChevronRight, CheckCircle2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { MathFormula } from '@/components/MathFormula';
 
 export const EducationalFlow = () => {
