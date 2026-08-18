@@ -10,7 +10,12 @@ import { AMPACITY_TABLES_NBR5410 } from './ampacity-tables';
 
 export class CalculationEngine {
   // Constantes físicas (Referência: NBR 5410)
-  private static readonly RHO_COPPER = 0.0178; // Ω·mm²/m a 20°C
+  // Resistividade do cobre a 20°C: 1/56 = 0,0178
+  // Coeficiente de temperatura (alfa): 0,00393 para o cobre
+  // Rho(T) = Rho(20) * (1 + alpha * (T - 20))
+  // Para 70°C (regime permanente PVC): 0,0178 * (1 + 0,00393 * (70 - 20)) = 0,0178 * 1,1965 = 0,0213
+  private static readonly RHO_COPPER_20 = 0.0178; // Ω·mm²/m a 20°C
+  private static readonly RHO_COPPER_70 = 0.0213; // Ω·mm²/m a 70°C (conforme NBR 5410 Anexo B)
   private static readonly COS_PHI_DEFAULT = 0.85;
   private static readonly EFFICIENCY_DEFAULT = 0.90;
   private static readonly SECAO_MINIMA_FORCA = 2.5;
