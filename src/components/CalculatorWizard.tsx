@@ -574,7 +574,7 @@ export const CalculatorWizard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Método de Instalação</Label>
-                <Select name="groupingType" defaultValue={currentInputs?.groupingType || "B1"}>
+                <Select name="groupingType" defaultValue={currentInputs?.installationMethod || "B1"}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
