@@ -94,6 +94,15 @@ export const AMPACITY_TABLES_NBR5410: AmpacityTable[] = [
     }
   },
   {
+    method: 'F',
+    conductors: 3,
+    insulation: 'PVC',
+    material: 'Copper',
+    table: {
+      1.5: 17.5, 2.5: 24, 4: 32, 6: 41, 10: 57, 16: 76, 25: 96, 35: 119, 50: 144, 70: 184, 95: 223, 120: 259, 150: 299, 185: 341, 240: 403, 300: 462
+    }
+  },
+  {
     method: 'G',
     conductors: 3,
     insulation: 'PVC',
