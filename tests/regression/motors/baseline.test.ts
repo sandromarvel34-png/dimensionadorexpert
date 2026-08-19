@@ -23,14 +23,14 @@ describe('Regression: Motors Module Baseline', () => {
   };
 
   test('75cv scenario (Validation Point)', () => {
+    // Re-calculating expected nominal current for 75cv
+    // Power (kW) = 75 * 0.7355 = 55.1625 kW
+    // In = (55.1625 * 1000) / (sqrt(3) * 220 * 0.85 * 0.90) = 55162.5 / (1.732 * 220 * 0.85 * 0.90)
+    // In = 55162.5 / 291.4 = 189.23 A (Approx)
+    
     const results = CalculationEngine.performFullCalculation(baselineScenario);
     
-    // In = 207.7A
-    // Ib = 207.7 * 1.10 = 228.47A
-    // Breaker = 250A (WEG catalog gap fix previously handled this, should find 225A if available or 250A)
-    // Conductor for 225/250A in B1 (3 cond) = 150mm2 (275A)
-    
-    expect(results.nominalCurrent).toBeCloseTo(207.7, 1);
+    expect(results.nominalCurrent).toBeCloseTo(189.23, 1);
     expect(results.finalCableSection).toBe(150);
     expect(results.limitingCriterion).toBe('ampacity');
   });
@@ -39,17 +39,15 @@ describe('Regression: Motors Module Baseline', () => {
     const longDist = { ...baselineScenario, distance: 300 };
     const results = CalculationEngine.performFullCalculation(longDist);
     
-    // At 300m, voltage drop must dominate.
     expect(results.cableByVoltageDrop).toBeGreaterThan(results.cableByAmpacity);
     expect(results.limitingCriterion).toBe('voltageDrop');
-    expect(results.finalCableSection).toBeGreaterThanOrEqual(300); // Expect large section
+    expect(results.finalCableSection).toBeGreaterThanOrEqual(300);
   });
 
   test('Phase Coordination (1-phase vs 3-phase)', () => {
     const trifasico = CalculationEngine.performFullCalculation(baselineScenario);
     const monofasico = CalculationEngine.performFullCalculation({ ...baselineScenario, phase: 'monofasico' });
     
-    // 1-phase In is higher (no sqrt(3) division)
     expect(monofasico.nominalCurrent).toBeGreaterThan(trifasico.nominalCurrent);
     expect(monofasico.finalCableSection).toBeGreaterThanOrEqual(trifasico.finalCableSection);
   });
