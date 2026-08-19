@@ -126,6 +126,7 @@ export const CalculatorWizard = () => {
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
         installationMethod: formData.get('groupingType') as string || 'B1',
+        groupingType: formData.get('groupingType') as string || 'B1',
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: selectedMotor.power_factor,
@@ -157,6 +158,7 @@ export const CalculatorWizard = () => {
         maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
         installationMethod: formData.get('groupingType') as string || 'B1',
+        groupingType: formData.get('groupingType') as string || 'B1',
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
         powerFactor: pf,
@@ -574,7 +576,7 @@ export const CalculatorWizard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Método de Instalação</Label>
-                <Select name="groupingType" defaultValue={currentInputs?.groupingType || "B1"}>
+                <Select name="groupingType" defaultValue={currentInputs?.installationMethod || "B1"}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
