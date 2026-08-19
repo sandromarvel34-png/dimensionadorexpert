@@ -156,7 +156,8 @@ export class CalculationEngine {
     // NBR 5410: Iz deve ser >= Idisjuntor (que por sua vez é >= Ib)
     // Para ampacidade, o condutor deve suportar a corrente do disjuntor selecionado.
     // Usamos breakerNominalCurrent / (fGroup * fTemp) para garantir que Iz (ampacidade nominal) >= In_disjuntor
-    const secAmp = this.getSectionByAmpacity(correctedCurrentForTable, breakerNominalCurrent / (fGroup * fTemp), method, numConductors);
+    const effectiveMethod = method === 'F_G' ? (numConductors === 3 ? 'F' : 'G') : method;
+    const secAmp = this.getSectionByAmpacity(correctedCurrentForTable, breakerNominalCurrent / (fGroup * fTemp), effectiveMethod, numConductors);
     
     // Garantia adicional de proteção: Iz do cabo selecionado * fGroup * fTemp deve ser >= In_disjuntor
     // No entanto, getSectionByAmpacity já faz Iz >= correctedBreakerCurrent, o que é equivalente.

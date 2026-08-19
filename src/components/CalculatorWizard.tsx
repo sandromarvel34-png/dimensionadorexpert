@@ -586,7 +586,7 @@ export const CalculatorWizard = () => {
                     <SelectItem value="C">Método C: Cabos unipolares ou multipolares fixados diretamente sobre a parede ou em canaletas fechadas não embutidas.</SelectItem>
                     <SelectItem value="D">Método D: Cabos unipolares ou multipolares enterrados no solo diretamente ou em eletrodutos enterrados.</SelectItem>
                     <SelectItem value="E">Método E: Cabos unipolares ou multipolares ao ar livre, fixados em perfilados, prateleiras ou leitos para cabos.</SelectItem>
-                    <SelectItem value="F_G">Métodos F e G: Cabos unipolares dispostos em formação específica (trevo ou espaçados) ao ar livre.</SelectItem>
+                    <SelectItem value="F_G">Métodos F e G: Cabos unipolares ao ar livre (F em trevo, G espaçados).</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
