@@ -57,7 +57,9 @@ export class CalculationEngine {
    * Retorna a seção comercial que suporta a corrente Ib após correções.
    */
   static getSectionByAmpacity(current: number, breakerCurrent: number, method: string = 'B1', conductors: number = 3): number {
-    const tableData = AMPACITY_TABLES_NBR5410.find(t => t.method === method && t.conductors === conductors);
+    // Normalização de métodos (Ex: F_G -> F)
+    const normalizedMethod = method === 'F_G' ? 'F' : method;
+    const tableData = AMPACITY_TABLES_NBR5410.find(t => t.method === normalizedMethod && t.conductors === conductors);
     
     if (!tableData) {
       throw new Error(`Tabela técnica não encontrada para o método ${method} com ${conductors} condutores carregados.`);
