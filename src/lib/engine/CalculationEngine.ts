@@ -118,6 +118,10 @@ export class CalculationEngine {
   }
 
   static performFullCalculation(inputs: CalculationInputs): CalculationResults {
+    if (!inputs.voltage || isNaN(inputs.voltage) || inputs.voltage <= 0) {
+      throw new Error("Tensão de operação inválida.");
+    }
+
     const pf = inputs.powerFactor || this.COS_PHI_DEFAULT;
     const eff = inputs.efficiency || this.EFFICIENCY_DEFAULT;
     const fs = inputs.serviceFactor || 1.0;
