@@ -1,83 +1,47 @@
 import { CalculationEngine } from './CalculationEngine';
-import { CalculationInputs } from '../../types';
+import { findCompatibleProduct } from '../catalog';
 
-async function runAudit() {
-  console.log("--- 1. AUDITORIA DE MÉTODOS DE INSTALAÇÃO ---");
-  const baseInputs: CalculationInputs = {
-    power: 10,
+export const generateAuditEvidence = () => {
+  const scenario = {
+    power: 75,
     powerUnit: 'cv',
     voltage: 220,
     phase: 'trifasico',
-    distance: 20,
+    distance: 50,
+    starterType: 'direta',
     maxVoltageDrop: 2,
-    powerFactor: 0.85,
-    efficiency: 0.90,
-    serviceFactor: 1.0,
+    preferredManufacturer: 'any',
     installationMethod: 'B1',
     groupingCount: 1,
-    ambientTempFactor: 1.0,
-    starterType: 'direta',
-    preferredManufacturer: 'any',
-    dataSource: 'manual',
-    quantity: 1
+    ambientTempFactor: 0.87, // 40°C
+    powerFactor: 0.85,
+    serviceFactor: 1.10,
+    efficiency: 0.90
   };
 
-  const methods = ['B1', 'B2', 'C', 'D', 'E', 'F'];
-  methods.forEach(m => {
-    console.log("Teste Método: " + m);
-    try {
-      const inputs = { ...baseInputs, installationMethod: m };
-      const results = CalculationEngine.performFullCalculation(inputs);
-      console.log("  Método recebido: " + (inputs.installationMethod || "N/A"));
-      console.log("  Seção comercial (Ampacidade): " + results.cableByAmpacity + " mm²");
-    } catch (e: any) {
-      console.log("  ERRO/AVISO: " + e.message);
-    }
-  });
+  const In = CalculationEngine.calculateNominalCurrent(
+    scenario.power, scenario.powerUnit, scenario.voltage, scenario.phase, scenario.powerFactor, scenario.efficiency
+  );
+  const Ib = In * scenario.serviceFactor;
+  const fCorr = 0.87 * 1.0; // temp * agrup
+  const I_corrigida = Ib / fCorr;
 
-  console.log("\n--- 2. TESTE REAL DO ΔV SELECIONADO ---");
-  const dvTests = [1, 2, 3, 4];
-  dvTests.forEach(dv => {
-    const inputs = { ...baseInputs, maxVoltageDrop: dv };
-    const results = CalculationEngine.performFullCalculation(inputs);
-    const dropDetails = CalculationEngine.getSectionByVoltageDrop(
-        results.nominalCurrent * (inputs.serviceFactor || 1), 
+  // Encontra disjuntor
+  const breaker = findCompatibleProduct('disjuntor', Ib, 'WEG');
+  const In_disj = breaker ? breaker.nominalCurrent : Ib;
 
-        inputs.distance, 
-        inputs.voltage, 
-        inputs.maxVoltageDrop, 
-        inputs.powerFactor || 0.85, 
-        inputs.phase
-    );
-    console.log("ΔV selecionado: " + dv + "%");
-    console.log("  Valor recebido pela função: " + dv);
-    console.log("  Seção teórica calculada: " + dropDetails.requiredSection.toFixed(4) + " mm²");
-    console.log("  Seção comercial selecionada: " + dropDetails.selectedSection + " mm²");
-  });
+  const results = CalculationEngine.performFullCalculation(scenario as any);
 
-  console.log("\n--- 4. TESTE DA CONVERSÃO PARA SEÇÃO COMERCIAL ---");
-  const conversionTests = [1.2, 1.5, 1.6, 2.1, 2.5, 2.6, 4.1, 10.1, 17, 25.1];
-  const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
-  
-  conversionTests.forEach(t => {
-    let selected = standardSections[standardSections.length - 1];
-    for (const s of standardSections) {
-      if (s >= t) {
-        selected = s;
-        break;
-      }
-    }
-    console.log("Teórica: " + t + " mm² -> Comercial: " + selected + " mm²");
-  });
+  console.log('--- EVIDÊNCIA DE AUDITORIA TÉCNICA ---');
+  console.log(`Motor: ${scenario.power}CV / ${scenario.voltage}V`);
+  console.log(`In: ${In.toFixed(2)} A`);
+  console.log(`Ib (In * FS): ${Ib.toFixed(2)} A`);
+  console.log(`Corrente Corrigida (Ib / (ft * fg)): ${I_corrigida.toFixed(2)} A`);
+  console.log(`Disjuntor Selecionado: ${breaker?.model} (${In_disj} A)`);
+  console.log(`Critério Ib <= In_disj <= Iz: ${Ib.toFixed(2)} <= ${In_disj} <= Iz`);
+  console.log(`Bitola Final Calculada: ${results.finalCableSection} mm²`);
+  console.log(`Queda de Tensão (rho=0.0213): ${results.voltageDropCalculated.toFixed(2)}%`);
+  console.log('--------------------------------------');
+};
 
-  console.log("\n--- 5. TESTE DE INDEPENDÊNCIA ---");
-  console.log("Cenário 1: Forçando S_qt > S_amp");
-  const results1 = CalculationEngine.performFullCalculation({ ...baseInputs, distance: 100, maxVoltageDrop: 1 });
-  console.log("  S_amp: " + results1.cableByAmpacity + " | S_qt: " + results1.cableByVoltageDrop + " | Final: " + results1.finalCableSection);
-
-  console.log("Cenário 2: Forçando S_amp > S_qt");
-  const results2 = CalculationEngine.performFullCalculation({ ...baseInputs, groupingCount: 6, distance: 5 });
-  console.log("  S_amp: " + results2.cableByAmpacity + " | S_qt: " + results2.cableByVoltageDrop + " | Final: " + results2.finalCableSection);
-}
-
-runAudit();
+generateAuditEvidence();
