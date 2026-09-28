@@ -63,6 +63,12 @@ export const AppLayout = () => {
           <p className="text-center text-metadata max-w-2xl mx-auto leading-relaxed">
             Ferramenta de apoio ao dimensionamento. Os resultados não substituem projeto elétrico ou avaliação de profissional habilitado.
           </p>
+          <div className="mt-6 text-center text-xs text-muted-foreground space-y-1">
+            <p>Copyright © 2026</p>
+            <p className="font-semibold text-foreground">Academia do Eletricista</p>
+            <p>Instituto Brasileiro de Qualificação Profissional Ltda - ME</p>
+            <p>CNPJ: 10.984.548/0001-77</p>
+          </div>
         </div>
       </footer>
       <Toaster />
