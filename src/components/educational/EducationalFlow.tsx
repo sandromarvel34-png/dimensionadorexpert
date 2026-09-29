@@ -33,7 +33,9 @@ export const EducationalFlow = () => {
     ? 'ampacidade'
     : currentResults.limitingCriterion === 'voltageDrop'
       ? 'queda de tensão'
-      : 'seção mínima';
+      : currentResults.limitingCriterion === 'shortCircuit'
+        ? 'curto-circuito'
+        : 'seção mínima';
 
   const renderStep = () => {
     switch (step) {
@@ -136,11 +138,14 @@ export const EducationalFlow = () => {
       case 5:
         return (
           <div className="space-y-6 text-left">
-            <p className="text-slate-600">A seção final é a maior entre o critério de ampacidade, a queda de tensão e a seção mínima de força.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <p className="text-slate-600">A seção final é a maior entre ampacidade, queda de tensão, seção mínima e, quando Icc/tempo são informados, o critério térmico de curto-circuito.</p>
+            <div className={`grid grid-cols-1 gap-4 ${currentResults.cableByShortCircuit ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}>
               <div className="p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Ampacidade</p><p className="text-2xl font-bold">{currentResults.cableByAmpacity} mm²</p></div>
               <div className="p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Queda de tensão</p><p className="text-2xl font-bold">{currentResults.cableByVoltageDrop} mm²</p></div>
               <div className="p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Seção mínima</p><p className="text-2xl font-bold">2,5 mm²</p></div>
+              {currentResults.cableByShortCircuit && (
+                <div className="p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Curto-circuito</p><p className="text-2xl font-bold">{currentResults.cableByShortCircuit} mm²</p></div>
+              )}
             </div>
             <div className="bg-slate-900 text-white p-6 rounded-xl text-center">
               <p className="text-sm text-slate-400">Critério limitante: {limitingLabel}</p>
@@ -189,7 +194,7 @@ export const EducationalFlow = () => {
           <div className="space-y-6 text-center">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-700"><CheckCircle2 className="w-10 h-10" /></div>
             <h3 className="text-2xl font-bold text-foreground">Cálculo concluído</h3>
-            <p className="text-slate-600 max-w-xl mx-auto">Foram calculados corrente nominal, corrente de projeto, ampacidade com fatores de correção, seção mínima e queda de tensão pelo modelo informado. Curto-circuito e coordenação final da proteção permanecem como verificações complementares do profissional.</p>
+            <p className="text-slate-600 max-w-xl mx-auto">Foram calculados corrente nominal, corrente de projeto, ampacidade com fatores de correção, seção mínima e queda de tensão pelo modelo informado.{currentResults.shortCircuitCheckPerformed ? ' A verificação térmica do cabo sob curto-circuito também foi incluída com os dados informados.' : ' A verificação térmica de curto-circuito depende de Icc e tempo de atuação.'} A capacidade de interrupção e a coordenação final da proteção permanecem como verificações do profissional.</p>
             <Button onClick={() => setView('results')} className="mt-4">Voltar aos resultados</Button>
           </div>
         );
