@@ -42,7 +42,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
       </div>
 
       {title && (
-        <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4">
+        <h4 className="text-xs font-semibold text-primary tracking-wide mb-4">
           {title}
         </h4>
       )}
@@ -56,7 +56,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
 
       {legend && legend.length > 0 && (
         <div className="pt-6 border-t border-slate-800/50">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Onde:</p>
+          <p className="text-xs font-semibold text-slate-500 mb-3">Onde:</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6">
             {legend.map((item, idx) => (
               <div key={idx} className="flex items-center gap-2 py-1">
@@ -66,7 +66,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
                     __html: item.symbol ? katex.renderToString(item.symbol, { throwOnError: false, output: 'html' }) : '' 
                   }} 
                 />
-                <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
+                <span className="text-xs text-slate-400 font-medium">
                   = {item.label}
                 </span>
               </div>
