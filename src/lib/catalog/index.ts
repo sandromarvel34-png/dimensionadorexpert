@@ -285,8 +285,22 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'siemens-3rb-300', manufacturer: 'Siemens', category: 'releTermico', model: '3RB2066-1MC2', commercialCode: '3RB2066-1MC2', description: 'Relé Eletrônico Sirius, 160-630A', nominalCurrent: 630, adjustmentRange: { min: 160, max: 630 }, price: 1650.00 },
 ];
 
-export const getProductsByCategory = (category: string) => 
-  MANUFACTURER_CATALOG.filter(p => p.category === category);
+const UNVERIFIED_PRODUCT_IDS = new Set([
+  'weg-cwm9',
+  'weg-mpw150-150',
+  'weg-mpw250-250',
+  'weg-mpw300-300',
+]);
+
+const isVerifiedEnoughForSuggestion = (product: ManufacturerProduct) => {
+  // Códigos 100000xx são placeholders legados, não referências comerciais verificadas.
+  if (/^100000\d*$/.test(product.commercialCode)) return false;
+  if (UNVERIFIED_PRODUCT_IDS.has(product.id)) return false;
+  return true;
+};
+
+export const getProductsByCategory = (category: string) =>
+  MANUFACTURER_CATALOG.filter(p => p.category === category && isVerifiedEnoughForSuggestion(p));
 
 export const findCompatibleProducts = (
   category: string,
@@ -299,6 +313,7 @@ export const findCompatibleProducts = (
 
   const filtered = MANUFACTURER_CATALOG.filter(p => {
     if (p.category !== category) return false;
+    if (!isVerifiedEnoughForSuggestion(p)) return false;
     if (mfr && p.manufacturer.toLowerCase() !== mfr.toLowerCase()) return false;
     if (systemVoltage && voltageSensitive.includes(category)) {
       if (!p.voltage || p.voltage < systemVoltage) return false;
