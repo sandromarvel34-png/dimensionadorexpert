@@ -176,13 +176,14 @@ export class CalculationEngine {
     const correctedCurrentForTable = Ib / combinedCorrectionFactor;
 
     const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
-    const compatibleBreaker = findCompatibleProduct('disjuntor', Ib, mfr);
-    const breakerNominalCurrent = compatibleBreaker?.nominalCurrent ?? Ib;
 
     const numConductors: 2 | 3 = inputs.phase === 'trifasico' ? 3 : 2;
+    // O cabo é dimensionado pela corrente de projeto corrigida. A proteção
+    // principal exige coordenação própria (Icc/Icu/curva/partida) e não é
+    // escolhida automaticamente sem esses dados.
     const secAmp = this.getSectionByAmpacity(
       correctedCurrentForTable,
-      breakerNominalCurrent / combinedCorrectionFactor,
+      correctedCurrentForTable,
       method,
       numConductors,
     );
@@ -208,12 +209,8 @@ export class CalculationEngine {
       limitingCriterion = 'minimumSection';
     }
 
-    // Mantido temporariamente; a etapa de coordenação de proteção será revisada na sequência da auditoria.
     const requirements: TechnicalRequirement[] = [
-      { category: 'disjuntor', current: breakerNominalCurrent, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' },
       { category: 'disjuntor', current: 6, quantity: 1, label: 'Disjuntor do Circuito Auxiliar (Comando)' },
-      { category: 'fusivel', current: Ib * 1.5, quantity: 3, label: 'Fusíveis do Circuito Principal (Força)' },
-      { category: 'disjuntorMotor', current: Ib, quantity: 1, label: 'Disjuntor Motor' },
     ];
 
     if (inputs.starterType === 'direta') {
@@ -237,21 +234,21 @@ export class CalculationEngine {
     requirements.forEach((req) => {
       const brandMap: Record<string, ManufacturerProduct[]> = {};
       ['WEG', 'Siemens', 'Schneider'].forEach((brand) => {
-        brandMap[brand] = findCompatibleProducts(req.category, req.current ?? 0, brand);
+        brandMap[brand] = findCompatibleProducts(req.category, req.current ?? 0, brand, inputs.voltage);
       });
       compatibleProducts[req.label] = brandMap;
     });
 
     const protections: CalculationResults['protections'] = {
-      breaker: compatibleBreaker ?? null,
-      motorBreaker: findCompatibleProduct('disjuntorMotor', Ib, mfr) ?? null,
-      diazedFuse: findCompatibleProduct('fusivel', Ib * 1.5, mfr) ?? null,
-      nhFuse: findCompatibleProduct('fusivel', Ib * 1.5, mfr) ?? null,
-      thermalRelay: findCompatibleProduct('releTermico', inputs.starterType === 'estrelaTriangulo' ? Ib * 0.58 : Ib, mfr) ?? null,
-      contactor: findCompatibleProducts('contator', inputs.starterType === 'estrelaTriangulo' ? Ib * 0.58 : Ib, mfr),
-      timerRelay: inputs.starterType === 'estrelaTriangulo' ? (findCompatibleProduct('releTempo', 0, mfr) ?? null) : null,
-      softStarter: inputs.starterType === 'softStarter' ? (findCompatibleProduct('softStarter', Ib, mfr) ?? null) : null,
-      inverter: inputs.starterType === 'inversor' ? (findCompatibleProduct('inverter', Ib, mfr) ?? null) : null,
+      breaker: null,
+      motorBreaker: null,
+      diazedFuse: null,
+      nhFuse: null,
+      thermalRelay: findCompatibleProduct('releTermico', inputs.starterType === 'estrelaTriangulo' ? Ib * 0.58 : Ib, mfr, inputs.voltage) ?? null,
+      contactor: findCompatibleProducts('contator', inputs.starterType === 'estrelaTriangulo' ? Ib * 0.58 : Ib, mfr, inputs.voltage),
+      timerRelay: inputs.starterType === 'estrelaTriangulo' ? (findCompatibleProduct('releTempo', 0, mfr, inputs.voltage) ?? null) : null,
+      softStarter: inputs.starterType === 'softStarter' ? (findCompatibleProduct('softStarter', Ib, mfr, inputs.voltage) ?? null) : null,
+      inverter: inputs.starterType === 'inversor' ? (findCompatibleProduct('inverter', Ib, mfr, inputs.voltage) ?? null) : null,
     };
 
     return {
@@ -267,6 +264,14 @@ export class CalculationEngine {
         soilResistivity: fSoil,
         combined: combinedCorrectionFactor,
       },
+      voltageDropModel: 'resistiveApproximation',
+      shortCircuitCheckPerformed: false,
+      technicalLimitations: [
+        'A verificação de curto-circuito (Icc, Icu/Icn e solicitação térmica do condutor) não é realizada automaticamente nesta versão.',
+        'A proteção principal deve ser selecionada e coordenada pelo profissional após verificar a corrente de curto-circuito e as características de partida.',
+        'A queda de tensão usa modelo resistivo simplificado; a reatância do cabo não é considerada nesta versão.',
+        'Modelos e códigos comerciais de fabricantes devem ser confirmados no catálogo vigente antes da compra.',
+      ],
       technicalRequirements: requirements,
       compatibleProducts,
       protections,
