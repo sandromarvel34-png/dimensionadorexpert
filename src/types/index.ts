@@ -87,6 +87,9 @@ export interface CalculationResults {
     soilResistivity: number;
     combined: number;
   };
+  voltageDropModel?: 'resistiveApproximation';
+  shortCircuitCheckPerformed?: boolean;
+  technicalLimitations?: string[];
   technicalRequirements: TechnicalRequirement[];
   compatibleProducts: Record<string, Record<string, ManufacturerProduct[]>>; // Label -> Manufacturer -> Products
   protections: {
