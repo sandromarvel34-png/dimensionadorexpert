@@ -61,7 +61,7 @@ export const ProposalFlow = () => {
 
         initialItems.push({
           id: Math.random().toString(36).substr(2, 9),
-          desc: `${categoryPrefix}${product.manufacturer} ${product.model}`,
+          desc: `${categoryPrefix}${selectedManufacturer}${req.current !== undefined ? ` — mínimo ${req.current.toFixed(1)} A` : ''} (modelo a confirmar)`,
           qtd: req.quantity || 1,
           unit: 'un',
           price: ''
@@ -173,7 +173,7 @@ export const ProposalFlow = () => {
 
                         newItems.push({
                           id: Math.random().toString(36).substr(2, 9),
-                          desc: `${categoryPrefix}${product.manufacturer} ${product.model}`,
+                          desc: `${categoryPrefix}${mfr}${req.current !== undefined ? ` — mínimo ${req.current.toFixed(1)} A` : ''} (modelo a confirmar)`,
                           qtd: req.quantity || 1,
                           unit: 'un',
                           price: ''
