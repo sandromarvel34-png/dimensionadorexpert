@@ -82,6 +82,27 @@ describe('CalculationEngine — regressão técnica', () => {
     expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, maxVoltageDrop: 5 })).toThrow();
   });
 
+  test('dimensiona termicamente o cabo quando Icc e tempo são informados', () => {
+    const result = CalculationEngine.performFullCalculation({
+      ...baseInputs,
+      power: 1,
+      distance: 1,
+      shortCircuitCurrentKA: 10,
+      shortCircuitDurationSeconds: 0.1,
+    });
+    expect(result.shortCircuitCheckPerformed).toBe(true);
+    expect(result.cableByShortCircuit).toBe(35);
+    expect(result.finalCableSection).toBe(35);
+    expect(result.limitingCriterion).toBe('shortCircuit');
+  });
+
+  test('exige Icc e tempo de atuação em conjunto', () => {
+    expect(() => CalculationEngine.performFullCalculation({
+      ...baseInputs,
+      shortCircuitCurrentKA: 10,
+    })).toThrow(/Icc e tempo/i);
+  });
+
   test('rejeita estrela-triângulo em motor monofásico', () => {
     expect(() => CalculationEngine.performFullCalculation({
       ...baseInputs,
