@@ -28,7 +28,15 @@ export const GROUPING_BUNDLE_FACTORS: Record<number, number> = {
   16: 0.41, 17: 0.41, 18: 0.41, 19: 0.41, 20: 0.38,
 };
 
-/** Tabela 45: cabos unipolares em dutos individuais enterrados, distância nula. */
+/** Tabela 45: cabo multipolar em duto individual enterrado, distância nula entre dutos. */
+export const GROUPING_BURIED_MULTIPOLAR_DUCT_CONTACT_FACTORS: Record<number, number> = {
+  1: 1.00, 2: 0.85, 3: 0.75, 4: 0.70, 5: 0.65, 6: 0.60,
+  7: 0.57, 8: 0.54, 9: 0.52, 10: 0.49, 11: 0.47, 12: 0.45,
+  13: 0.44, 14: 0.42, 15: 0.41, 16: 0.39, 17: 0.38, 18: 0.37,
+  19: 0.35, 20: 0.34,
+};
+
+/** Tabela 45: cabos unipolares em dutos individuais enterrados, distância nula entre dutos. */
 export const GROUPING_BURIED_UNIPOLAR_DUCT_CONTACT_FACTORS: Record<number, number> = {
   1: 1.00, 2: 0.80, 3: 0.70, 4: 0.65, 5: 0.60, 6: 0.60,
   7: 0.53, 8: 0.50, 9: 0.47, 10: 0.45, 11: 0.43, 12: 0.41,
@@ -45,7 +53,11 @@ export function getTemperatureFactor(method: string, temperatureC: number): numb
   return factor;
 }
 
-export function getGroupingFactor(method: string, circuits: number): number {
+export function getGroupingFactor(
+  method: string,
+  circuits: number,
+  buriedConfiguration: 'unipolarDuct' | 'multipolarDuct' = 'unipolarDuct',
+): number {
   const normalized = Math.max(1, Math.min(20, Math.trunc(circuits || 1)));
   if (method.startsWith('G_')) {
     if (normalized > 1) {
@@ -53,7 +65,11 @@ export function getGroupingFactor(method: string, circuits: number): number {
     }
     return 1;
   }
-  const table = method === 'D' ? GROUPING_BURIED_UNIPOLAR_DUCT_CONTACT_FACTORS : GROUPING_BUNDLE_FACTORS;
+  const table = method === 'D'
+    ? (buriedConfiguration === 'multipolarDuct'
+      ? GROUPING_BURIED_MULTIPOLAR_DUCT_CONTACT_FACTORS
+      : GROUPING_BURIED_UNIPOLAR_DUCT_CONTACT_FACTORS)
+    : GROUPING_BUNDLE_FACTORS;
   return table[normalized] ?? table[20] ?? 1;
 }
 
