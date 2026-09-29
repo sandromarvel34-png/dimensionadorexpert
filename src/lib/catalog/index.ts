@@ -289,51 +289,46 @@ export const getProductsByCategory = (category: string) =>
   MANUFACTURER_CATALOG.filter(p => p.category === category);
 
 export const findCompatibleProducts = (
-  category: string, 
+  category: string,
   current: number,
-  manufacturer?: string
+  manufacturer?: string,
+  systemVoltage?: number
 ): ManufacturerProduct[] => {
   const mfr = (manufacturer === 'any' || !manufacturer) ? undefined : manufacturer;
-  
-  const filtered = MANUFACTURER_CATALOG.filter(p => 
-    p.category === category && 
-    (mfr ? p.manufacturer.toLowerCase() === mfr.toLowerCase() : true)
-  );
+  const voltageSensitive = ['disjuntor', 'contator', 'softStarter', 'inverter'];
+
+  const filtered = MANUFACTURER_CATALOG.filter(p => {
+    if (p.category !== category) return false;
+    if (mfr && p.manufacturer.toLowerCase() !== mfr.toLowerCase()) return false;
+    if (systemVoltage && voltageSensitive.includes(category)) {
+      if (!p.voltage || p.voltage < systemVoltage) return false;
+    }
+    return true;
+  });
 
   if (category === 'releTermico' || category === 'disjuntorMotor') {
-    return filtered.filter(p => 
-      (p.adjustmentRange && current >= p.adjustmentRange.min && current <= p.adjustmentRange.max) ||
-      (p.nominalCurrent && p.nominalCurrent >= current && p.nominalCurrent <= current * 2.0)
-    ).sort((a, b) => {
-      // Priorizar os que têm range de ajuste
-      const hasRangeA = !!a.adjustmentRange;
-      const hasRangeB = !!b.adjustmentRange;
-      if (hasRangeA && !hasRangeB) return -1;
-      if (!hasRangeA && hasRangeB) return 1;
-      return (a.nominalCurrent || 0) - (b.nominalCurrent || 0);
-    });
-  } else if (category === 'releTempo' || category === 'auxiliar' || category === 'softStarter' || category === 'inverter') {
-    return filtered.filter(p => !p.nominalCurrent || p.nominalCurrent >= current)
-      .sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
-  } else {
     return filtered
-      .filter(p => p.nominalCurrent && p.nominalCurrent >= current)
-      .sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
+      .filter(p => !!p.adjustmentRange && current >= p.adjustmentRange.min && current <= p.adjustmentRange.max)
+      .sort((a, b) => (a.adjustmentRange!.max - a.adjustmentRange!.min) - (b.adjustmentRange!.max - b.adjustmentRange!.min));
   }
+
+  if (category === 'releTempo' || category === 'auxiliar') {
+    return filtered;
+  }
+
+  return filtered
+    .filter(p => p.nominalCurrent !== undefined && p.nominalCurrent >= current)
+    .sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
 };
 
 export const findCompatibleProduct = (
-  category: string, 
-  current: number, 
-  manufacturer?: string
+  category: string,
+  current: number,
+  manufacturer?: string,
+  systemVoltage?: number
 ) => {
-  const products = findCompatibleProducts(category, current, manufacturer);
-  
-  // Se não encontrou do fabricante específico, tenta qualquer um como fallback técnico
-  if (products.length === 0) {
-    const fallbacks = findCompatibleProducts(category, current, undefined);
-    return fallbacks.length > 0 ? fallbacks[0] : null;
-  }
-  
+  const products = findCompatibleProducts(category, current, manufacturer, systemVoltage);
+  // Não faz fallback para outro fabricante: evita apresentar um produto
+  // diferente daquele explicitamente selecionado pelo usuário.
   return products.length > 0 ? products[0] : null;
 };
