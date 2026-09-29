@@ -90,6 +90,10 @@ export const CalculatorWizard = () => {
     if (isCalculating) return;
 
     const formData = new FormData(e.currentTarget);
+    const shortCircuitCurrentRaw = parseFloat(formData.get('shortCircuitCurrentKA') as string);
+    const shortCircuitDurationRaw = parseFloat(formData.get('shortCircuitDurationSeconds') as string);
+    const shortCircuitCurrentKA = Number.isFinite(shortCircuitCurrentRaw) ? shortCircuitCurrentRaw : undefined;
+    const shortCircuitDurationSeconds = Number.isFinite(shortCircuitDurationRaw) ? shortCircuitDurationRaw : undefined;
     
     let inputs: CalculationInputs;
 
@@ -131,6 +135,8 @@ export const CalculatorWizard = () => {
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
         soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
+        shortCircuitCurrentKA,
+        shortCircuitDurationSeconds,
         powerFactor: selectedMotor.power_factor,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
         efficiency: selectedMotor.efficiency,
@@ -164,6 +170,8 @@ export const CalculatorWizard = () => {
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
         soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
+        shortCircuitCurrentKA,
+        shortCircuitDurationSeconds,
         powerFactor: pf,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
         efficiency: eff,
@@ -673,6 +681,29 @@ export const CalculatorWizard = () => {
                   </Select>
                 </div>
               )}
+              </div>
+
+              <div className="mt-8 rounded-xl border border-border bg-muted/20 p-5">
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-foreground">Verificação térmica de curto-circuito (opcional)</h4>
+                  <p className="text-xs text-muted-foreground mt-1">Se você conhecer a corrente de falta presumida e o tempo de atuação da proteção, informe os dois dados para incluir este critério na seção final.</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Icc presumida</Label>
+                    <div className="relative">
+                      <Input name="shortCircuitCurrentKA" type="number" min="0" step="0.01" defaultValue={currentInputs?.shortCircuitCurrentKA ?? ''} placeholder="Ex.: 10" className="h-11 pr-12" />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">kA</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Tempo de atuação</Label>
+                    <div className="relative">
+                      <Input name="shortCircuitDurationSeconds" type="number" min="0" max="5" step="0.001" defaultValue={currentInputs?.shortCircuitDurationSeconds ?? ''} placeholder="Ex.: 0,1" className="h-11 pr-10" />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">s</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
