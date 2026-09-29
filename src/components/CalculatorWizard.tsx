@@ -21,6 +21,7 @@ export const CalculatorWizard = () => {
   const { setView, setCalculation, currentInputs } = useAppStore();
   const [isCalculating, setIsCalculating] = useState(false);
   const [dataSource, setDataSource] = useState<'manual' | 'catalog'>(currentInputs?.dataSource || 'manual');
+  const [installationMethod, setInstallationMethod] = useState<string>(currentInputs?.installationMethod || 'B1');
   
   // Catalog selection state
   const [filters, setFilters] = useState<any[]>([]);
@@ -128,7 +129,8 @@ export const CalculatorWizard = () => {
         installationMethod: formData.get('groupingType') as string || 'B1',
         groupingType: formData.get('groupingType') as string || 'B1',
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
-        ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
+        ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
+        soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
         powerFactor: selectedMotor.power_factor,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
         efficiency: selectedMotor.efficiency,
@@ -160,7 +162,8 @@ export const CalculatorWizard = () => {
         installationMethod: formData.get('groupingType') as string || 'B1',
         groupingType: formData.get('groupingType') as string || 'B1',
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
-        ambientTempFactor: CalculationEngine.TEMPERATURE_FACTORS[formData.get('ambientTemp') as string] || 1.0,
+        ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
+        soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
         powerFactor: pf,
         serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
         efficiency: eff,
@@ -178,6 +181,26 @@ export const CalculatorWizard = () => {
       toast.error('Informe uma distância válida.');
       hasError = true;
     }
+    if (!Number.isFinite(inputs.voltage) || inputs.voltage <= 0) {
+      toast.error('Informe uma tensão válida.');
+      hasError = true;
+    }
+    if ((inputs.powerFactor ?? 0) <= 0 || (inputs.powerFactor ?? 0) > 1) {
+      toast.error('O fator de potência deve estar entre 0 e 1.');
+      hasError = true;
+    }
+    if ((inputs.efficiency ?? 0) <= 0 || (inputs.efficiency ?? 0) > 1) {
+      toast.error('O rendimento deve estar entre 0 e 1.');
+      hasError = true;
+    }
+    if ((inputs.serviceFactor ?? 0) <= 0 || (inputs.serviceFactor ?? 0) > 2) {
+      toast.error('Informe um fator de serviço válido.');
+      hasError = true;
+    }
+    if (inputs.phase === 'monofasico' && inputs.starterType === 'estrelaTriangulo') {
+      toast.error('Partida estrela-triângulo não é aplicável a motor monofásico.');
+      hasError = true;
+    }
 
     if (hasError) return;
 
@@ -189,9 +212,8 @@ export const CalculatorWizard = () => {
       setCalculation(inputs, results);
       setView('results');
     } catch (error) {
-      toast.error("Erro no dimensionamento", {
-        description: "Auditoria técnica concluída. Verifique os limites normativos de ampacidade e queda de tensão."
-      });
+      const message = error instanceof Error ? error.message : 'Não foi possível concluir o dimensionamento.';
+      toast.error('Erro no dimensionamento', { description: message });
     } finally {
       setIsCalculating(false);
     }
@@ -551,8 +573,6 @@ export const CalculatorWizard = () => {
                     <SelectItem value="2">2%</SelectItem>
                     <SelectItem value="3">3%</SelectItem>
                     <SelectItem value="4">4%</SelectItem>
-                    <SelectItem value="5">5%</SelectItem>
-                    <SelectItem value="7">7%</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -576,21 +596,26 @@ export const CalculatorWizard = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Método de Instalação</Label>
-                <Select name="groupingType" defaultValue={currentInputs?.installationMethod || "B1"}>
+                <Select name="groupingType" value={installationMethod} onValueChange={setInstallationMethod}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    <SelectItem value="A1">Método A1: Condutores ou cabos unipolares em eletroduto embutido em parede.</SelectItem>
-                    <SelectItem value="A2">Método A2: Cabo multipolar em eletroduto embutido em parede.</SelectItem>
-                    <SelectItem value="B1">Método B1: Condutores ou cabos unipolares em eletroduto aparente na parede ou teto.</SelectItem>
-                    <SelectItem value="B2">Método B2: Cabo multipolar em eletroduto aparente.</SelectItem>
-                    <SelectItem value="C">Método C: Cabos unipolares ou multipolares fixados diretamente sobre a parede ou em canaletas fechadas não embutidas.</SelectItem>
-                    <SelectItem value="D">Método D: Cabos unipolares ou multipolares enterrados no solo diretamente ou em eletrodutos enterrados.</SelectItem>
-                    <SelectItem value="E">Método E: Cabos unipolares ou multipolares ao ar livre, fixados em perfilados, prateleiras ou leitos para cabos.</SelectItem>
-                    <SelectItem value="F_G">Métodos F e G: Cabos unipolares ao ar livre (F em trevo, G espaçados).</SelectItem>
+                    <SelectItem value="A1">A1 — condutores unipolares em eletroduto embutido</SelectItem>
+                    <SelectItem value="A2">A2 — cabo multipolar em eletroduto embutido</SelectItem>
+                    <SelectItem value="B1">B1 — condutores unipolares em eletroduto aparente</SelectItem>
+                    <SelectItem value="B2">B2 — cabo multipolar em eletroduto aparente</SelectItem>
+                    <SelectItem value="C">C — cabos fixados diretamente à superfície</SelectItem>
+                    <SelectItem value="D">D — cabos em eletroduto enterrado no solo</SelectItem>
+                    <SelectItem value="E">E — cabo multipolar ao ar livre</SelectItem>
+                    <SelectItem value="F2">F — 2 condutores carregados justapostos</SelectItem>
+                    <SelectItem value="F3_TREFOIL">F — 3 condutores em trifólio</SelectItem>
+                    <SelectItem value="F3_FLAT">F — 3 condutores no mesmo plano, justapostos</SelectItem>
+                    <SelectItem value="G_HORIZONTAL">G — 3 condutores espaçados, horizontal</SelectItem>
+                    <SelectItem value="G_VERTICAL">G — 3 condutores espaçados, vertical</SelectItem>
                   </SelectContent>
                 </Select>
+                <p className="text-[10px] text-muted-foreground">A disposição física altera a ampacidade. Selecione a condição real da instalação.</p>
               </div>
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Número de Circuitos Agrupados</Label>
@@ -599,15 +624,15 @@ export const CalculatorWizard = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+                    {Array.from({ length: 20 }, (_, i) => i + 1).map(n => (
                       <SelectItem key={n} value={n.toString()}>{n} circuito{n > 1 ? 's' : ''}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-3">
-                <Label className="text-foreground font-semibold">Temperatura Ambiente</Label>
-                <Select name="ambientTemp" defaultValue={Object.keys(CalculationEngine.TEMPERATURE_FACTORS).find(key => CalculationEngine.TEMPERATURE_FACTORS[key] === currentInputs?.ambientTempFactor) || "30"}>
+                <Label className="text-foreground font-semibold">Temperatura {installationMethod === 'D' ? 'do solo' : 'ambiente'}</Label>
+                <Select name="ambientTemp" defaultValue={currentInputs?.ambientTemperature?.toString() || (installationMethod === 'D' ? "20" : "30")}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
@@ -625,7 +650,27 @@ export const CalculatorWizard = () => {
                     <SelectItem value="60">60°C</SelectItem>
                   </SelectContent>
                 </Select>
+                {installationMethod === 'D' && (
+                  <p className="text-[10px] text-muted-foreground">Para o método D, use a temperatura do solo.</p>
+                )}
               </div>
+              {installationMethod === 'D' && (
+                <div className="space-y-3">
+                  <Label className="text-foreground font-semibold">Resistividade térmica do solo</Label>
+                  <Select name="soilThermalResistivity" defaultValue={currentInputs?.soilThermalResistivity?.toString() || "2.5"}>
+                    <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                    <SelectContent position="popper">
+                      <SelectItem value="0.5">0,5 K·m/W</SelectItem>
+                      <SelectItem value="0.7">0,7 K·m/W</SelectItem>
+                      <SelectItem value="1">1,0 K·m/W</SelectItem>
+                      <SelectItem value="1.5">1,5 K·m/W</SelectItem>
+                      <SelectItem value="2">2,0 K·m/W</SelectItem>
+                      <SelectItem value="2.5">2,5 K·m/W (referência)</SelectItem>
+                      <SelectItem value="3">3,0 K·m/W</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
           </div>
         </div>
