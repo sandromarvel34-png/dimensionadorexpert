@@ -198,7 +198,7 @@ export class CalculationEngine {
     const fTemp = inputs.ambientTemperature !== undefined
       ? getTemperatureFactor(method, ambientTemperature)
       : (inputs.ambientTempFactor ?? getTemperatureFactor(method, ambientTemperature));
-    const fGroup = getGroupingFactor(method, inputs.groupingCount ?? 1);
+    const fGroup = getGroupingFactor(method, inputs.groupingCount ?? 1, inputs.buriedCableConfiguration ?? 'unipolarDuct');
     const fSoil = getSoilResistivityFactor(method, inputs.soilThermalResistivity ?? 2.5);
     const combinedCorrectionFactor = fTemp * fGroup * fSoil;
 
