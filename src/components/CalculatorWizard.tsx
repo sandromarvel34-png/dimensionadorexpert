@@ -289,7 +289,7 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="pt-6 border-t border-border">
-            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6">Dados do Motor</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-6">Dados do Motor</h3>
             
             {dataSource === 'manual' ? (
               <div className="space-y-8">
@@ -331,7 +331,7 @@ export const CalculatorWizard = () => {
                     <Label className="text-foreground font-semibold">Fator de Serviço (FS)</Label>
                     <div className="relative">
                       <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor ? Number(currentInputs.serviceFactor).toFixed(2) : "1.00"} className="h-12 text-base" required />
-                      <p className="mt-1 text-[10px] text-slate-500 font-medium">Multiplicador de carga máxima contínua (ex: 1.15)</p>
+                      <p className="mt-1 text-xs text-slate-500 font-medium">Multiplicador de carga máxima contínua (ex: 1.15)</p>
                     </div>
                   </div>
                   <div className="space-y-3">
@@ -479,37 +479,37 @@ export const CalculatorWizard = () => {
                     <div className="flex items-start gap-3 mb-4">
                       <CheckCircle2 className="w-5 h-5 text-primary mt-0.5" />
                       <div>
-                        <h4 className="font-bold text-primary text-sm uppercase tracking-wider">Dados técnicos do catálogo WEG</h4>
+                        <h4 className="font-semibold text-primary text-sm">Dados técnicos do catálogo WEG</h4>
                         <p className="text-xs text-primary/70 italic">Valores carregados automaticamente para o modelo selecionado.</p>
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
                       <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Potência</p>
+                        <p className="text-xs font-semibold text-muted-foreground">Potência</p>
                         <p className="text-sm font-semibold text-foreground">{selectedMotor.power_cv} CV</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Tensão</p>
+                        <p className="text-xs font-semibold text-muted-foreground">Tensão</p>
                         <p className="text-sm font-semibold text-foreground">{selectedMotor.voltage}V</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">In (Corrente)</p>
+                        <p className="text-xs font-semibold text-muted-foreground">In (Corrente)</p>
                         <p className="text-sm font-semibold text-foreground">{selectedMotor.nominal_current} A</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Cos φ</p>
+                        <p className="text-xs font-semibold text-muted-foreground">Cos φ</p>
                         <p className="text-sm font-semibold text-foreground">{selectedMotor.power_factor?.toFixed(2)}</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Rendimento</p>
+                        <p className="text-xs font-semibold text-muted-foreground">Rendimento</p>
                         <p className="text-sm font-semibold text-foreground">{selectedMotor.efficiency?.toFixed(2)}</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Polos / Tipo</p>
+                        <p className="text-xs font-semibold text-muted-foreground">Polos / Tipo</p>
                         <p className="text-sm font-semibold text-foreground">{selectedMotor.poles}P / {selectedMotor.speed_type}</p>
                       </div>
-                      <div className="col-span-full mt-2 text-[9px] text-muted-foreground italic border-t pt-2">
+                      <div className="col-span-full mt-2 text-xs text-muted-foreground italic border-t pt-2">
                         Fonte: {selectedMotor.catalog_reference || 'Catálogo Oficial WEG'}
                       </div>
                     </div>
@@ -520,12 +520,12 @@ export const CalculatorWizard = () => {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div className="space-y-1.5">
-                          <Label className="text-[10px] text-muted-foreground uppercase font-bold flex items-center gap-1.5">
+                          <Label className="text-xs text-muted-foreground font-semibold flex items-center gap-1.5">
                             Fator de Serviço (FS)
                             <Info className="w-3 h-3 text-muted-foreground/50" />
                           </Label>
                           <Input name="serviceFactor" type="number" step="0.01" defaultValue={currentInputs?.serviceFactor ? Number(currentInputs.serviceFactor).toFixed(2) : "1.00"} className="h-10 bg-background border-border" required />
-                          <p className="text-[9px] text-muted-foreground italic">Padrão: 1.0 (verifique a placa do motor)</p>
+                          <p className="text-xs text-muted-foreground italic">Padrão: 1.0 (verifique a placa do motor)</p>
                         </div>
                       </div>
                     </div>
@@ -536,7 +536,7 @@ export const CalculatorWizard = () => {
           </div>
 
           <div className="pt-6 border-t border-border">
-            <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6">Dados da Instalação</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-6">Dados da Instalação</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Distância até a alimentação</Label>
@@ -593,9 +593,11 @@ export const CalculatorWizard = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+            <div className="mt-10 pt-6 border-t border-border/70">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-6">Condições de dimensionamento</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="space-y-3">
-                <Label className="text-foreground font-semibold">Método de Instalação</Label>
+                <Label className="text-foreground font-semibold">Método de instalação</Label>
                 <Select name="groupingType" value={installationMethod} onValueChange={setInstallationMethod}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
@@ -615,10 +617,10 @@ export const CalculatorWizard = () => {
                     <SelectItem value="G_VERTICAL">G — 3 condutores espaçados, vertical</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-[10px] text-muted-foreground">A disposição física altera a ampacidade. Selecione a condição real da instalação.</p>
+                <p className="text-xs text-muted-foreground">A disposição física altera a ampacidade. Selecione a condição real da instalação.</p>
               </div>
               <div className="space-y-3">
-                <Label className="text-foreground font-semibold">Número de Circuitos Agrupados</Label>
+                <Label className="text-foreground font-semibold">Número de circuitos agrupados</Label>
                 <Select name="groupingCount" defaultValue={currentInputs?.groupingCount?.toString() || "1"}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
@@ -651,7 +653,7 @@ export const CalculatorWizard = () => {
                   </SelectContent>
                 </Select>
                 {installationMethod === 'D' && (
-                  <p className="text-[10px] text-muted-foreground">Para o método D, use a temperatura do solo.</p>
+                  <p className="text-xs text-muted-foreground">Para o método D, use a temperatura do solo.</p>
                 )}
               </div>
               {installationMethod === 'D' && (
@@ -671,6 +673,7 @@ export const CalculatorWizard = () => {
                   </Select>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </div>
