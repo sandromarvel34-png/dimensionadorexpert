@@ -1,97 +1,103 @@
-import { describe, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { CalculationEngine } from './CalculationEngine';
+import { AMPACITY_TABLES_NBR5410 } from './ampacity-tables';
+import { getGroupingFactor, getTemperatureFactor } from './correction-factors';
 import { CalculationInputs } from '../../types';
 
-describe('CalculationEngine - Suíte de Testes de Regressão NBR 5410', () => {
-  const baseInputs: CalculationInputs = {
-    dataSource: 'manual',
-    power: 10,
-    powerUnit: 'cv',
-    voltage: 220,
-    phase: 'trifasico',
-    distance: 20,
-    starterType: 'direta',
-    maxVoltageDrop: 4,
-    quantity: 1,
-    installationMethod: 'B1',
-    groupingCount: 1,
-    ambientTempFactor: 1.0,
-    powerFactor: 0.85,
-    serviceFactor: 1.0,
-    efficiency: 0.90
-  };
+const baseInputs: CalculationInputs = {
+  dataSource: 'manual',
+  power: 10,
+  powerUnit: 'cv',
+  voltage: 380,
+  phase: 'trifasico',
+  distance: 20,
+  starterType: 'direta',
+  maxVoltageDrop: 4,
+  quantity: 1,
+  installationMethod: 'B1',
+  groupingCount: 1,
+  ambientTemperature: 30,
+  powerFactor: 0.85,
+  serviceFactor: 1.0,
+  efficiency: 0.90,
+};
 
-  // 1. TESTE — Validação de tensão obrigatória
-  test('TESTE 1 — Deve rejeitar tensão inválida (NaN ou 0)', () => {
-    const invalidInputs = { ...baseInputs, voltage: 0 };
-    // O motor de cálculo atual não lança erro explícito, ele pode retornar NaN.
-    // Vamos verificar se o resultado é sensato ou se lança erro se implementarmos a validação.
-    // Pela instrução: "confirmar que a função de validação rejeita com erro claro"
-    expect(() => CalculationEngine.performFullCalculation(invalidInputs)).toThrow();
-    
-    const nanInputs = { ...baseInputs, voltage: NaN };
-    expect(() => CalculationEngine.performFullCalculation(nanInputs)).toThrow();
+describe('CalculationEngine — regressão técnica', () => {
+  test('corrente nominal trifásica usa potência, tensão, FP e rendimento', () => {
+    const current = CalculationEngine.calculateNominalCurrent(10, 'cv', 380, 'trifasico', 0.85, 0.90);
+    expect(current).toBeCloseTo(14.6075, 3);
   });
 
-  // 2. TESTE — Consistência de Ib em toda a aplicação
-  test('TESTE 2 — Ib deve ser consistente para todos os componentes', () => {
-    const results = CalculationEngine.performFullCalculation(baseInputs);
-    const Ib = results.nominalCurrent * (baseInputs.serviceFactor || 1.0);
-    
-    // Verifica se Ib foi usado corretamente nos requisitos técnicos
-    results.technicalRequirements.forEach(req => {
-      if (req.label.includes('Principal') || req.label.includes('Motor') || req.label.includes('Contator (K1)') || req.label.includes('Relé Térmico')) {
-         // Ib deve ser a base. Alguns tem multiplicadores (fusível 1.5, etc)
-         if (req.category === 'disjuntor' && req.label.includes('Principal')) {
-            // Disjuntor >= Ib. O motor de cálculo seleciona o comercial. 
-            // Mas a corrente de referência passada para a busca deve ser Ib.
-            expect(req.current).toBeGreaterThanOrEqual(Ib);
-         }
-      }
+  test('tabela B1/3 condutores reproduz valores de referência', () => {
+    const table = AMPACITY_TABLES_NBR5410.find(t => t.method === 'B1' && t.conductors === 3)!;
+    expect(table.table[2.5]).toBe(21);
+    expect(table.table[25]).toBe(89);
+    expect(table.table[240]).toBe(370);
+  });
+
+  test('método C/3 não aceita 25 mm² para necessidade de 100 A', () => {
+    expect(CalculationEngine.getSectionByAmpacity(100, 100, 'C', 3)).toBe(35);
+  });
+
+  test('monofásico funciona também em A1 (2 condutores carregados)', () => {
+    const result = CalculationEngine.performFullCalculation({
+      ...baseInputs,
+      phase: 'monofasico',
+      voltage: 220,
+      installationMethod: 'A1',
     });
+    expect(result.finalCableSection).toBeGreaterThanOrEqual(2.5);
   });
 
-  // 3. TESTE — Critério de queda de tensão varia com o percentual selecionado
-  test('TESTE 3 — Seção por queda de tensão deve aumentar conforme o limite diminui', () => {
-    const scenario = { ...baseInputs, distance: 100 }; // Distância suficiente para influenciar
-    
+  test('temperatura usa tabela do ar fora do solo e tabela do solo em D', () => {
+    expect(getTemperatureFactor('B1', 40)).toBe(0.87);
+    expect(getTemperatureFactor('D', 40)).toBe(0.77);
+  });
+
+  test('agrupamento enterrado usa fator próprio', () => {
+    expect(getGroupingFactor('D', 8)).toBe(0.50);
+    expect(getGroupingFactor('B1', 8)).toBe(0.52);
+  });
+
+  test('seção mínima de força é identificada como critério limitante', () => {
+    const result = CalculationEngine.performFullCalculation({ ...baseInputs, power: 1, distance: 1 });
+    expect(result.finalCableSection).toBe(2.5);
+    expect(result.limitingCriterion).toBe('minimumSection');
+  });
+
+  test('queda admissível menor não pode reduzir a seção', () => {
+    const scenario = { ...baseInputs, distance: 100 };
     const res4 = CalculationEngine.performFullCalculation({ ...scenario, maxVoltageDrop: 4 });
     const res2 = CalculationEngine.performFullCalculation({ ...scenario, maxVoltageDrop: 2 });
     const res1 = CalculationEngine.performFullCalculation({ ...scenario, maxVoltageDrop: 1 });
-    
     expect(res1.cableByVoltageDrop).toBeGreaterThanOrEqual(res2.cableByVoltageDrop);
     expect(res2.cableByVoltageDrop).toBeGreaterThanOrEqual(res4.cableByVoltageDrop);
   });
 
-  // 4. TESTE — Seleção da maior bitola entre os dois critérios
-  test('TESTE 4 — Deve selecionar a maior bitola entre ampacidade e queda de tensão', () => {
-    // Curta distância
-    const shortDist = CalculationEngine.performFullCalculation({ ...baseInputs, distance: 5 });
-    expect(shortDist.finalCableSection).toBe(Math.max(shortDist.cableByAmpacity, shortDist.cableByVoltageDrop, 2.5));
-    
-    // Longa distância
-    const longDist = CalculationEngine.performFullCalculation({ ...baseInputs, distance: 300 });
-    expect(longDist.finalCableSection).toBe(longDist.cableByVoltageDrop);
-    expect(longDist.cableByVoltageDrop).toBeGreaterThan(longDist.cableByAmpacity);
+  test('rejeita parâmetros fisicamente inválidos', () => {
+    expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, voltage: 0 })).toThrow();
+    expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, powerFactor: 1.2 })).toThrow();
+    expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, efficiency: 1.2 })).toThrow();
+    expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, serviceFactor: -1 })).toThrow();
+    expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, maxVoltageDrop: 5 })).toThrow();
   });
 
-  // 5. TESTE — Fator de temperatura aplicado corretamente
-  test('TESTE 5 — Fator de temperatura deve influenciar a seção necessária', () => {
-    const temp30 = CalculationEngine.performFullCalculation({ ...baseInputs, ambientTempFactor: 1.0 }); // 30°C
-    const temp45 = CalculationEngine.performFullCalculation({ ...baseInputs, ambientTempFactor: 0.79 }); // 45°C
-    
-    // A corrente corrigida (Ib / fTemp) é maior para 45°C, logo a seção deve ser maior ou igual.
-    expect(temp45.cableByAmpacity).toBeGreaterThanOrEqual(temp30.cableByAmpacity);
+  test('rejeita estrela-triângulo em motor monofásico', () => {
+    expect(() => CalculationEngine.performFullCalculation({
+      ...baseInputs,
+      phase: 'monofasico',
+      voltage: 220,
+      starterType: 'estrelaTriangulo',
+    })).toThrow(/estrela-triângulo/i);
   });
 
-  // 6. TESTE — Disjuntor de força nunca menor que o disjuntor de comando
-  test('TESTE 6 — Disjuntor de força deve ser >= disjuntor de comando para motores > 5CV', () => {
-    const bigMotor = CalculationEngine.performFullCalculation({ ...baseInputs, power: 10 });
-    
-    const forceBreaker = bigMotor.technicalRequirements.find(r => r.label.includes('Principal'))?.current || 0;
-    const commandBreaker = bigMotor.technicalRequirements.find(r => r.label.includes('Auxiliar'))?.current || 0;
-    
-    expect(forceBreaker).toBeGreaterThanOrEqual(commandBreaker);
-    expect(commandBreaker).toBe(6); // Padrão MDW-C6
+  test('rejeita disposições F/G incompatíveis com número de condutores', () => {
+    expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, installationMethod: 'F2' })).toThrow();
+    expect(() => CalculationEngine.performFullCalculation({
+      ...baseInputs,
+      phase: 'monofasico',
+      voltage: 220,
+      installationMethod: 'G_HORIZONTAL',
+    })).toThrow();
   });
 });
