@@ -14,7 +14,9 @@ export const ResultsView = () => {
     ? 'Ampacidade'
     : currentResults.limitingCriterion === 'voltageDrop'
       ? 'Queda de tensão'
-      : 'Seção mínima';
+      : currentResults.limitingCriterion === 'shortCircuit'
+        ? 'Curto-circuito'
+        : 'Seção mínima';
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
@@ -63,7 +65,7 @@ export const ResultsView = () => {
             <span className="text-5xl md:text-7xl font-bold text-foreground leading-none">{currentResults.finalCableSection}</span>
             <span className="text-xl md:text-2xl font-semibold text-muted-foreground mb-2">mm²</span>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 border-t border-slate-100 pt-8">
+          <div className={cn('grid grid-cols-2 gap-5 border-t border-slate-100 pt-8', currentResults.cableByShortCircuit ? 'md:grid-cols-5' : 'md:grid-cols-4')}>
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-1">Ampacidade</p>
               <p className="text-xl font-semibold">{currentResults.cableByAmpacity} mm²</p>
@@ -76,6 +78,12 @@ export const ResultsView = () => {
               <p className="text-xs font-medium text-muted-foreground mb-1">Queda calculada</p>
               <p className="text-xl font-semibold text-primary">{currentResults.voltageDropCalculated.toFixed(2)}%</p>
             </div>
+            {currentResults.cableByShortCircuit && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Seção por Icc</p>
+                <p className="text-xl font-semibold">{currentResults.cableByShortCircuit} mm²</p>
+              </div>
+            )}
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-1">Critério limitante</p>
               <p className="text-base font-semibold">{limitingLabel}</p>
@@ -102,6 +110,12 @@ export const ResultsView = () => {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-slate-400 font-semibold">Fator combinado</span>
                 <span className="text-xl font-semibold">{currentResults.correctionFactors.combined.toFixed(3)}</span>
+              </div>
+            )}
+            {currentResults.shortCircuitCheckPerformed && currentInputs.shortCircuitCurrentKA !== undefined && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-400 font-semibold">Curto-circuito</span>
+                <span className="text-sm font-semibold text-green-300">{currentInputs.shortCircuitCurrentKA.toFixed(2)} kA verificado termicamente</span>
               </div>
             )}
             <div className="pt-4 border-t border-white/10">
