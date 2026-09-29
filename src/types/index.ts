@@ -46,6 +46,8 @@ export interface CalculationInputs {
   ambientTemperature?: number;
   ambientTempFactor?: number; // legado/compatibilidade
   soilThermalResistivity?: number; // K.m/W, aplicável ao método D
+  shortCircuitCurrentKA?: number; // corrente de falta presumida no ponto (kA)
+  shortCircuitDurationSeconds?: number; // tempo de eliminação da falta (s), até 5 s
   powerFactor?: number;
   serviceFactor?: number;
   efficiency?: number;
@@ -80,7 +82,7 @@ export interface CalculationResults {
   cableByVoltageDrop: number; // mm²
   finalCableSection: number; // mm²
   voltageDropCalculated: number; // %
-  limitingCriterion: 'ampacity' | 'voltageDrop' | 'minimumSection';
+  limitingCriterion: 'ampacity' | 'voltageDrop' | 'minimumSection' | 'shortCircuit';
   correctionFactors?: {
     temperature: number;
     grouping: number;
@@ -88,6 +90,8 @@ export interface CalculationResults {
     combined: number;
   };
   voltageDropModel?: 'resistiveApproximation';
+  cableByShortCircuit?: number;
+  shortCircuitWithstandCurrentKA?: number;
   shortCircuitCheckPerformed?: boolean;
   technicalLimitations?: string[];
   technicalRequirements: TechnicalRequirement[];
