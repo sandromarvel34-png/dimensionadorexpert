@@ -1,220 +1,181 @@
 import { useAppStore } from '@/lib/store';
-import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, CheckCircle2, Factory, Shield, Info, ShoppingCart, GraduationCap } from 'lucide-react';
-import { useState } from 'react';
-import { ManufacturerProduct } from '@/types';
+import { ArrowLeft, CheckCircle2, GraduationCap, Info, Shield, ShoppingCart, TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
-import { MathFormula } from '@/components/MathFormula';
 import katex from 'katex';
 
 export const ResultsView = () => {
-  const { currentResults, currentInputs, setView, selectedManufacturer, setSelectedManufacturer } = useAppStore();
+  const { currentResults, currentInputs, setView } = useAppStore();
 
   if (!currentResults || !currentInputs) return null;
 
-  const handleSelectManufacturer = (mfr: 'WEG' | 'Siemens' | 'Schneider') => {
-    setSelectedManufacturer(mfr);
-  };
-
-  const goToProposal = () => {
-    setView('proposal');
-
-    // Armazenar no estado (ou passar para o ProposalFlow)
-    // Opcionalmente podemos salvar no Zustand
-    setView('proposal');
-  };
+  const phaseLabel = currentInputs.phase === 'trifasico' ? '3φ' : '1φ';
+  const limitingLabel = currentResults.limitingCriterion === 'ampacity'
+    ? 'Ampacidade'
+    : currentResults.limitingCriterion === 'voltageDrop'
+      ? 'Queda de tensão'
+      : 'Seção mínima';
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
         <div className="space-y-4">
-          <button 
+          <button
             onClick={() => setView('wizard')}
-            className="flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors"
+            className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" /> REVISAR DADOS TÉCNICOS
+            <ArrowLeft className="w-4 h-4" /> Revisar dados técnicos
           </button>
-          <h1 className="text-2xl md:text-4xl font-black text-foreground tracking-tight uppercase">Dimensionamento Concluído</h1>
+          <h1 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">Dimensionamento concluído</h1>
           <div className="flex flex-wrap gap-2">
-            <span className="bg-primary/10 text-primary border border-primary/20 px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider">
-              {currentInputs.power} {currentInputs.powerUnit} • {currentInputs.voltage}V
+            <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs font-semibold">
+              {currentInputs.power} {currentInputs.powerUnit} • {currentInputs.voltage} V
             </span>
-            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider">
+            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-semibold">
               {currentInputs.starterType}
             </span>
-            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-2 md:px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider">
+            <span className="bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1 rounded-full text-xs font-semibold">
               {currentInputs.distance} m
             </span>
           </div>
         </div>
+
         <div className="flex items-center gap-4">
           <div className="hidden lg:block text-right">
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Status da Solução</p>
-            <p className="text-sm font-bold text-green-600 flex items-center justify-end gap-1">
-              <CheckCircle2 className="w-4 h-4" /> 100% Compatível NBR 5410
+            <p className="text-xs font-semibold text-muted-foreground">Status</p>
+            <p className="text-sm font-semibold text-green-700 flex items-center justify-end gap-1">
+              <CheckCircle2 className="w-4 h-4" /> Cálculo concluído
             </p>
           </div>
-          <Button 
-            onClick={goToProposal}
-            className="h-14 px-8 text-lg font-black uppercase tracking-tight shadow-xl shadow-primary/20 group"
-          >
-            Criar Orçamento <ShoppingCart className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <Button onClick={() => setView('proposal')} className="h-12 px-6 font-semibold shadow-lg shadow-primary/15 group">
+            Criar proposta comercial <ShoppingCart className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
 
-      {/* Cable Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 card-panel relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
             <Shield className="w-32 h-32" />
           </div>
-          <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">Condutor Recomendado</h3>
-          <div className="flex items-end gap-2 md:gap-4 mb-8">
-            <span className="text-5xl md:text-7xl font-black text-foreground leading-none">{currentResults.finalCableSection}</span>
-            <span className="text-xl md:text-2xl font-black text-muted-foreground mb-2">mm²</span>
+          <h3 className="text-xs font-semibold text-primary mb-6">Condutor recomendado</h3>
+          <div className="flex items-end gap-3 mb-8">
+            <span className="text-5xl md:text-7xl font-bold text-foreground leading-none">{currentResults.finalCableSection}</span>
+            <span className="text-xl md:text-2xl font-semibold text-muted-foreground mb-2">mm²</span>
           </div>
-          <div className="grid grid-cols-3 gap-8 border-t border-slate-100 pt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 border-t border-slate-100 pt-8">
             <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Ampacidade</p>
-              <p className="text-xl font-bold">{currentResults.cableByAmpacity} mm²</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Ampacidade</p>
+              <p className="text-xl font-semibold">{currentResults.cableByAmpacity} mm²</p>
             </div>
             <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Limite Queda ΔV</p>
-              <p className="text-xl font-bold">{currentInputs.maxVoltageDrop}%</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Seção por ΔV</p>
+              <p className="text-xl font-semibold">{currentResults.cableByVoltageDrop} mm²</p>
             </div>
             <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Seção para ΔV</p>
-              <p className="text-xl font-bold text-primary">{currentResults.cableByVoltageDrop} mm²</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Queda calculada</p>
+              <p className="text-xl font-semibold text-primary">{currentResults.voltageDropCalculated.toFixed(2)}%</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Critério limitante</p>
+              <p className="text-base font-semibold">{limitingLabel}</p>
             </div>
           </div>
-        </div>
-
-        {/* Educational Button Column */}
-        <div className="card-panel bg-primary/5 border-primary/20 flex flex-col items-center justify-center text-center p-8 space-y-4">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <GraduationCap className="w-8 h-8 text-primary" />
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-xl font-black text-foreground uppercase tracking-tight">🎓 Aprender o cálculo</h3>
-            <p className="text-sm text-muted-foreground font-medium">Entenda como cada resultado foi obtido passo a passo.</p>
-          </div>
-          <Button 
-            onClick={() => setView('educational')}
-            variant="outline"
-            className="w-full border-primary/30 text-primary hover:bg-primary hover:text-white font-bold"
-          >
-            Ver cálculo passo a passo
-          </Button>
         </div>
 
         <div className="card-panel bg-slate-900 text-white border-0">
-          <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">Resumo Elétrico</h3>
+          <h3 className="text-xs font-semibold text-primary mb-6">Resumo elétrico</h3>
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n', { throwOnError: false }) }} />
-              <span className="text-xl md:text-2xl font-black">{currentResults.nominalCurrent.toFixed(1)} A</span>
+              <span className="text-sm text-slate-400 font-semibold" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n', { throwOnError: false }) }} />
+              <span className="text-2xl font-bold">{currentResults.nominalCurrent.toFixed(1)} A</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider">Freq. / Sistema</span>
-              <span className="text-xl font-bold">60Hz / 3{"\u03C6"}</span>
+              <span className="text-sm text-slate-400 font-semibold">Freq. / sistema</span>
+              <span className="text-xl font-semibold">60 Hz / {phaseLabel}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-400 font-bold uppercase tracking-wider" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_b \\text{ (Corrente de Projeto)}', { throwOnError: false }) }} />
-              <span className="text-xl font-bold">{(currentResults.nominalCurrent * (currentInputs.serviceFactor || 1)).toFixed(1)} A</span>
+              <span className="text-sm text-slate-400 font-semibold" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_b', { throwOnError: false }) }} />
+              <span className="text-xl font-semibold">{(currentResults.nominalCurrent * (currentInputs.serviceFactor || 1)).toFixed(1)} A</span>
             </div>
+            {currentResults.correctionFactors && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-400 font-semibold">Fator combinado</span>
+                <span className="text-xl font-semibold">{currentResults.correctionFactors.combined.toFixed(3)}</span>
+              </div>
+            )}
             <div className="pt-4 border-t border-white/10">
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1">
-                <Info className="w-3 h-3" /> Referência Técnica
+              <p className="text-xs font-semibold text-slate-400 mb-2 flex items-center gap-1">
+                <Info className="w-3 h-3" /> Referência técnica
               </p>
-              <p className="text-xs text-slate-300 leading-relaxed italic">
-                Cálculos baseados na NBR 5410:2004. Queda de tensão calculada com resistividade do cobre a 70°C (0,0213 Ω·mm²/m) conforme Anexo B para isolação em PVC.
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Ampacidade e fatores de correção baseados nas tabelas configuradas da NBR 5410:2004. A queda de tensão usa modelo resistivo simplificado nesta versão.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Comparison Grid */}
+      <div className="card-panel bg-primary/5 border-primary/20 flex flex-col md:flex-row md:items-center gap-5 p-6">
+        <div className="w-12 h-12 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+          <GraduationCap className="w-6 h-6 text-primary" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-foreground">Entenda como chegamos a esses resultados</h3>
+          <p className="text-sm text-muted-foreground">Veja o cálculo passo a passo e os critérios utilizados no dimensionamento.</p>
+        </div>
+        <Button onClick={() => setView('educational')} variant="outline" className="border-primary/30 text-primary hover:bg-primary hover:text-white font-semibold">
+          Ver cálculo passo a passo
+        </Button>
+      </div>
+
+      {!!currentResults.technicalLimitations?.length && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex items-start gap-3">
+            <TriangleAlert className="w-5 h-5 text-amber-700 mt-0.5 shrink-0" />
+            <div>
+              <h3 className="font-semibold text-amber-950">Verificações complementares necessárias</h3>
+              <ul className="mt-2 space-y-1.5 text-sm text-amber-900 list-disc pl-5">
+                {currentResults.technicalLimitations.map((item, index) => <li key={index}>{item}</li>)}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-black text-foreground tracking-tight uppercase">Base de Fabricantes Compatíveis</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-foreground tracking-tight">Referências de fabricantes</h2>
+          <p className="text-sm text-muted-foreground mt-1">Sugestões da base interna por corrente/tensão. Confirme modelo, código e aplicação no catálogo vigente do fabricante.</p>
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-10">
           {currentResults.technicalRequirements.map((req, idx) => (
-            <div key={idx} className="space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-xs">
-                  {idx + 1}
-                </div>
-                <h3 className="text-lg font-black text-foreground uppercase tracking-tight">{req.label}</h3>
-                {req.isOptional && (
-                  <span className="text-[9px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full uppercase">Opcional</span>
-                )}
-                {req.current && (
-                  <span className="text-[9px] font-black text-primary uppercase">Requisito: {req.current.toFixed(1)}A</span>
-                )}
+            <div key={idx} className="space-y-5">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-semibold text-xs">{idx + 1}</div>
+                <h3 className="text-lg font-semibold text-foreground">{req.label}</h3>
+                {req.isOptional && <span className="text-xs font-semibold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">Opcional</span>}
+                {req.current !== undefined && <span className="text-xs font-semibold text-primary">Requisito: {req.current.toFixed(1)} A</span>}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {['WEG', 'Siemens', 'Schneider'].map(mfr => {
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {['WEG', 'Siemens', 'Schneider'].map((mfr) => {
                   const products = currentResults.compatibleProducts[req.label]?.[mfr] || [];
                   const product = products[0];
-                  const isMfrSelected = true; // No ResultView, we show all as compatible but don't force a single selection UI anymore
-
                   return (
-                    <div 
-                      key={mfr}
-                      className={cn(
-                        "card-panel border-2 transition-all relative group",
-                        product 
-                          ? "border-slate-200 bg-white"
-                          : "border-slate-100 bg-slate-50/50 grayscale opacity-40 cursor-not-allowed"
-                      )}
-                    >
-                      
-                      <div className="mb-4">
-                        <p className={cn(
-                          "text-[9px] font-black uppercase tracking-[0.2em] mb-1",
-                          mfr === 'WEG' ? "text-primary" : mfr === 'Siemens' ? "text-blue-600" : "text-green-600"
-                        )}>
-                          {mfr}
-                        </p>
-                        {product ? (
-                          <>
-                            <p className="text-lg font-black text-foreground group-hover:text-primary transition-colors leading-tight">
-                              {product.model}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground font-bold mt-1 line-clamp-2">
-                              {product.description}
-                            </p>
-                          </>
-                        ) : (
-                          <p className="text-xs font-bold text-slate-400 italic py-4">
-                            Nenhum produto compatível encontrado na base {mfr}.
-                          </p>
-                        )}
-                      </div>
-
-                      {product && (
-                        <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                          <div className="space-y-0.5">
-                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Código</p>
-                            <p className="text-xs font-bold text-foreground">{product.commercialCode}</p>
+                    <div key={mfr} className={cn('card-panel border transition-all', product ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-50/50 opacity-60')}>
+                      <p className="text-xs font-semibold text-primary mb-2">{mfr}</p>
+                      {product ? (
+                        <>
+                          <p className="text-lg font-semibold text-foreground leading-tight">{product.model}</p>
+                          <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{product.description}</p>
+                          <div className="pt-4 mt-4 border-t border-slate-100">
+                            <p className="text-xs font-medium text-amber-700">Confirmar referência e aplicação no catálogo do fabricante.</p>
                           </div>
-                          <div className="text-right">
-                            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1 text-green-600">
-                              ✓ Compatível
-                            </p>
-                            <p className="text-xs font-bold text-foreground">
-                                Atende aos requisitos
-                            </p>
-                          </div>
-                        </div>
+                        </>
+                      ) : (
+                        <p className="text-sm text-slate-400 italic py-4">Nenhuma referência compatível validada na base atual.</p>
                       )}
                     </div>
                   );
@@ -225,19 +186,15 @@ export const ResultsView = () => {
         </div>
       </div>
 
-      {/* Action Footer */}
-      <div className="pt-12 border-t border-slate-200 flex flex-col items-center gap-6">
+      <div className="pt-10 border-t border-slate-200 flex flex-col items-center gap-5">
         <div className="text-center space-y-2">
-          <p className="text-lg font-black text-foreground uppercase tracking-tight">Solução Técnica Validada</p>
-          <p className="text-sm text-muted-foreground max-w-xl mx-auto">
-            Ao prosseguir, você irá para a revisão final onde poderá editar quantidades, adicionar mão de obra e incluir os dados do cliente para a proposta comercial.
+          <p className="text-lg font-semibold text-foreground">Revise as condições reais da instalação antes da especificação final.</p>
+          <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+            A ferramenta apoia o dimensionamento, mas não substitui a verificação de curto-circuito, coordenação de proteção e responsabilidade técnica do profissional.
           </p>
         </div>
-        <Button 
-          onClick={goToProposal}
-          className="h-20 px-16 text-2xl font-black uppercase tracking-tight shadow-2xl shadow-primary/30"
-        >
-          Criar Orçamento →
+        <Button onClick={() => setView('proposal')} className="h-14 px-10 text-lg font-semibold shadow-xl shadow-primary/20">
+          Criar proposta comercial →
         </Button>
       </div>
     </div>
