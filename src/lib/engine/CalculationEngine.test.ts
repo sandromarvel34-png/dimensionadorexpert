@@ -55,7 +55,8 @@ describe('CalculationEngine — regressão técnica', () => {
   });
 
   test('agrupamento enterrado usa fator próprio', () => {
-    expect(getGroupingFactor('D', 8)).toBe(0.50);
+    expect(getGroupingFactor('D', 8, 'unipolarDuct')).toBe(0.50);
+    expect(getGroupingFactor('D', 8, 'multipolarDuct')).toBe(0.54);
     expect(getGroupingFactor('B1', 8)).toBe(0.52);
   });
 
