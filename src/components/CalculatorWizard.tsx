@@ -135,6 +135,7 @@ export const CalculatorWizard = () => {
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
         soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
+        buriedCableConfiguration: (formData.get('buriedCableConfiguration') as 'unipolarDuct' | 'multipolarDuct') || 'unipolarDuct',
         shortCircuitCurrentKA,
         shortCircuitDurationSeconds,
         powerFactor: selectedMotor.power_factor,
@@ -170,6 +171,7 @@ export const CalculatorWizard = () => {
         groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
         ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
         soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
+        buriedCableConfiguration: (formData.get('buriedCableConfiguration') as 'unipolarDuct' | 'multipolarDuct') || 'unipolarDuct',
         shortCircuitCurrentKA,
         shortCircuitDurationSeconds,
         powerFactor: pf,
@@ -616,7 +618,7 @@ export const CalculatorWizard = () => {
                     <SelectItem value="B1">B1 — condutores unipolares em eletroduto aparente</SelectItem>
                     <SelectItem value="B2">B2 — cabo multipolar em eletroduto aparente</SelectItem>
                     <SelectItem value="C">C — cabos fixados diretamente à superfície</SelectItem>
-                    <SelectItem value="D">D — cabos em eletroduto enterrado no solo</SelectItem>
+                    <SelectItem value="D">D — cabos em dutos individuais enterrados no solo</SelectItem>
                     <SelectItem value="E">E — cabo multipolar ao ar livre</SelectItem>
                     <SelectItem value="F2">F — 2 condutores carregados justapostos</SelectItem>
                     <SelectItem value="F3_TREFOIL">F — 3 condutores em trifólio</SelectItem>
@@ -665,21 +667,34 @@ export const CalculatorWizard = () => {
                 )}
               </div>
               {installationMethod === 'D' && (
-                <div className="space-y-3">
-                  <Label className="text-foreground font-semibold">Resistividade térmica do solo</Label>
-                  <Select name="soilThermalResistivity" defaultValue={currentInputs?.soilThermalResistivity?.toString() || "2.5"}>
-                    <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
-                    <SelectContent position="popper">
-                      <SelectItem value="0.5">0,5 K·m/W</SelectItem>
-                      <SelectItem value="0.7">0,7 K·m/W</SelectItem>
-                      <SelectItem value="1">1,0 K·m/W</SelectItem>
-                      <SelectItem value="1.5">1,5 K·m/W</SelectItem>
-                      <SelectItem value="2">2,0 K·m/W</SelectItem>
-                      <SelectItem value="2.5">2,5 K·m/W (referência)</SelectItem>
-                      <SelectItem value="3">3,0 K·m/W</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <>
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Configuração enterrada</Label>
+                    <Select name="buriedCableConfiguration" defaultValue={currentInputs?.buriedCableConfiguration || "unipolarDuct"}>
+                      <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="unipolarDuct">Cabos unipolares em dutos individuais</SelectItem>
+                        <SelectItem value="multipolarDuct">Cabo multipolar em duto individual</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">O fator de agrupamento considera dutos em contato, condição conservadora quando o espaçamento não é informado.</p>
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="text-foreground font-semibold">Resistividade térmica do solo</Label>
+                    <Select name="soilThermalResistivity" defaultValue={currentInputs?.soilThermalResistivity?.toString() || "2.5"}>
+                      <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="0.5">0,5 K·m/W</SelectItem>
+                        <SelectItem value="0.7">0,7 K·m/W</SelectItem>
+                        <SelectItem value="1">1,0 K·m/W</SelectItem>
+                        <SelectItem value="1.5">1,5 K·m/W</SelectItem>
+                        <SelectItem value="2">2,0 K·m/W</SelectItem>
+                        <SelectItem value="2.5">2,5 K·m/W (referência)</SelectItem>
+                        <SelectItem value="3">3,0 K·m/W</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
               )}
               </div>
 
