@@ -41,7 +41,7 @@ const testCases: TestCase[] = [
       powerFactor: 0.86, efficiency: 0.92, serviceFactor: 1.0, maxVoltageDrop: 2,
       installationMethod: 'B1', groupingCount: 8, ambientTempFactor: 1.0, starterType: 'direta'
     },
-    expectedMinSection: 70 // High correction factor (0.52)
+    expectedMinSection: 50 // 134 A × 0,52 = 69,68 A, suficiente para a corrente de projeto deste cenário
   }
 ];
 
