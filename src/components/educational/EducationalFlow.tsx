@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
-import katex from 'katex';
+import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { Button } from '@/components/ui/button';
-import { BookOpen, ChevronLeft, ChevronRight, CheckCircle2, Info } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { BookOpen, ChevronLeft, ChevronRight, CheckCircle2, TriangleAlert } from 'lucide-react';
 import { MathFormula } from '@/components/MathFormula';
 
 export const EducationalFlow = () => {
@@ -14,428 +11,224 @@ export const EducationalFlow = () => {
   if (!currentInputs || !currentResults) return null;
 
   const steps = [
-    { id: 1, title: 'Dados de entrada' },
-    { id: 2, title: 'Corrente de projeto' },
-    { id: 3, title: 'Capacidade de corrente' },
-    { id: 4, title: 'Queda de tensão' },
-    { id: 5, title: 'Seleção da bitola' },
-    { id: 6, title: 'Proteções' },
-    { id: 7, title: 'Componentes' },
-    { id: 8, title: 'Resultado final' },
+    'Dados de entrada',
+    'Corrente de projeto',
+    'Capacidade de corrente',
+    'Queda de tensão',
+    'Seleção da bitola',
+    'Proteções',
+    'Componentes',
+    'Resultado final',
   ];
 
-  const currentStepData = steps[step - 1]!;
-  const pf = currentInputs.powerFactor || 0.85;
-  const eff = currentInputs.efficiency || 0.90;
-  const fs = currentInputs.serviceFactor || 1.0;
-  const phaseFactor = currentInputs.phase === 'trifasico' ? '\\sqrt{3}' : '2';
+  const pf = currentInputs.powerFactor ?? 0.85;
+  const eff = currentInputs.efficiency ?? 0.90;
+  const fs = currentInputs.serviceFactor ?? 1.0;
+  const ib = currentResults.nominalCurrent * fs;
+  const combinedFactor = currentResults.correctionFactors?.combined ?? 1;
+  const correctedCurrent = ib / combinedFactor;
+  const phaseFactor = currentInputs.phase === 'trifasico' ? '\\sqrt{3}' : '1';
+  const dropFactor = currentInputs.phase === 'trifasico' ? '\\sqrt{3}' : '2';
+  const limitingLabel = currentResults.limitingCriterion === 'ampacity'
+    ? 'ampacidade'
+    : currentResults.limitingCriterion === 'voltageDrop'
+      ? 'queda de tensão'
+      : 'seção mínima';
 
-  const renderStepContent = () => {
+  const renderStep = () => {
     switch (step) {
       case 1:
         return (
-          <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">O dimensionamento começa com os dados técnicos fornecidos pelo usuário ou catálogo.</p>
+          <div className="space-y-6 text-left">
+            <p className="text-slate-600">O cálculo começa com os dados do motor e com as condições reais informadas para a instalação.</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Potência</p>
-                <p className="font-bold">{currentInputs.power} {currentInputs.powerUnit}</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Tensão</p>
-                <p className="font-bold">{currentInputs.voltage}V ({currentInputs.phase === 'trifasico' ? '3φ' : '1φ'})</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Distância</p>
-                <p className="font-bold">{currentInputs.distance} m</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Partida</p>
-                <p className="font-bold capitalize">{currentInputs.starterType}</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">cos φ</p>
-                <p className="font-bold">{pf}</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Rendimento (η)</p>
-                <p className="font-bold">{eff}</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Fator de Serviço</p>
-                <p className="font-bold">{fs}</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg border shadow-sm">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">ΔV Admissível</p>
-                <p className="font-bold">{currentInputs.maxVoltageDrop}%</p>
-              </div>
+              {[
+                ['Potência', `${currentInputs.power} ${currentInputs.powerUnit}`],
+                ['Tensão', `${currentInputs.voltage} V`],
+                ['Sistema', currentInputs.phase === 'trifasico' ? 'Trifásico' : 'Monofásico'],
+                ['Distância', `${currentInputs.distance} m`],
+                ['cos φ', pf.toFixed(2)],
+                ['Rendimento', eff.toFixed(2)],
+                ['FS', fs.toFixed(2)],
+                ['Método', currentInputs.installationMethod || '—'],
+              ].map(([label, value]) => (
+                <div key={label} className="bg-white p-4 rounded-lg border shadow-sm">
+                  <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+                  <p className="font-semibold mt-1">{value}</p>
+                </div>
+              ))}
             </div>
           </div>
         );
+
       case 2:
         return (
-          <div className="space-y-6 text-left w-full">
-            <div className="space-y-4">
-              <p className="font-bold text-sm text-primary uppercase">1. Corrente Nominal (I_n):</p>
-              <MathFormula
-                title="Cálculo da Corrente Nominal"
-                legend={[
-                  { symbol: 'I_n', label: 'Corrente nominal (A)' },
-                  { symbol: 'P_{(kW)}', label: 'Potência ativa (kW)' },
-                  { symbol: 'V', label: 'Tensão de linha (V)' },
-                  { symbol: '\\cos \\varphi', label: 'Fator de potência' },
-                  { symbol: '\\eta', label: 'Rendimento do motor' }
-                ]}
-              >
-                {`I_n = \\frac{P_{(kW)} \\cdot 1000}{${phaseFactor} \\cdot V \\cdot \\cos \\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)} \\text{ A}`}
-              </MathFormula>
-            </div>
-            
-            <div className="space-y-4">
-              <p className="font-bold text-sm text-primary uppercase">2. Corrente de Projeto (I_b):</p>
-              <p className="text-sm text-slate-600">Considera o Fator de Serviço (FS). A corrente corrigida para busca em tabela utiliza fatores de agrupamento e temperatura.</p>
-              <div className="space-y-6">
-                <MathFormula
-                  title="Cálculo da Corrente de Projeto"
-                  legend={[
-                    { symbol: 'I_b', label: 'Corrente de projeto (A)' },
-                    { symbol: 'I_n', label: 'Corrente nominal (A)' },
-                    { symbol: 'FS', label: 'Fator de serviço' }
-                  ]}
-                >
-                  {`I_b = I_n \\cdot FS = ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${fs.toFixed(2)} = ${(currentResults.nominalCurrent * fs).toFixed(2)} \\text{ A}`}
-                </MathFormula>
-
-                <MathFormula
-                  title="Cálculo da Corrente Corrigida para Tabela (Ampacidade)"
-                  legend={[
-                    { symbol: 'I_{corrigida}', label: 'Corrente para busca em tabela (A)' },
-                    { symbol: 'I_b', label: 'Corrente de projeto (A)' },
-                    { symbol: 'f_{agrup}', label: 'Fator de agrupamento' },
-                    { symbol: 'f_{temp}', label: 'Fator de temperatura' }
-                  ]}
-                >
-                  {`I_{corrigida} = \\frac{I_b}{f_{agrup} \\cdot f_{temp}} = \\frac{( ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${fs.toFixed(2)} )}{${(CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs.groupingCount?.toString() || '1'] || 1.0).toFixed(2)} \\cdot ${(currentInputs.ambientTempFactor || 1).toFixed(2)}} = ${((currentResults.nominalCurrent * fs) / ((CalculationEngine.GROUPING_COUNT_FACTORS[currentInputs.groupingCount?.toString() || '1'] || 1.0) * (currentInputs.ambientTempFactor || 1))).toFixed(2)} \\text{ A}`}
-                </MathFormula>
-              </div>
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Consultamos a **Tabela 36 da NBR 5410** (Método {currentInputs.groupingType || 'B1'}) para encontrar um cabo que suporte a corrente **corrigida para tabela (I_corrigida)**.</p>
-            <div className="bg-white p-6 rounded-xl border border-primary/20 shadow-sm">
-              <p className="text-sm font-bold text-slate-500 uppercase mb-4">Resultado da Ampacidade:</p>
-              <div className="flex items-end gap-2">
-                <span className="text-5xl font-black text-primary">{currentResults.cableByAmpacity}</span>
-                <span className="text-xl font-bold text-slate-400 mb-1">mm²</span>
-              </div>
-              <p className="mt-4 text-sm text-slate-500 italic">Este condutor suporta a carga térmica contínua sem degradação do isolamento.</p>
-            </div>
-          </div>
-        );
-      case 4:
-        return (
-          <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Calculamos a seção transversal mínima necessária para atender ao limite de queda de tensão de **{currentInputs.maxVoltageDrop}%**.</p>
+          <div className="space-y-6 text-left">
             <MathFormula
-              title="Cálculo da Seção Transversal por Queda de Tensão"
+              title="Corrente nominal"
               legend={[
-                { symbol: 'S', label: 'Seção do condutor (mm²)' },
-                { symbol: '\\rho', label: 'Resistividade a 70°C (0,0213 \\Omega\\cdot mm^2/m)' },
-                { symbol: 'L', label: 'Comprimento (m)' },
-                { symbol: 'I_b', label: 'Corrente de projeto (A)' },
-                { symbol: '\\Delta V_{\\%}', label: 'Limite admissível informado (%)' },
-                { symbol: 'V', label: 'Tensão nominal (V)' }
+                { symbol: 'I_n', label: 'Corrente nominal' },
+                { symbol: 'P', label: 'Potência ativa' },
+                { symbol: 'V', label: 'Tensão' },
+                { symbol: '\\cos\\varphi', label: 'Fator de potência' },
+                { symbol: '\\eta', label: 'Rendimento' },
               ]}
             >
-              {`S = \\frac{100 \\cdot ${phaseFactor} \\cdot 0{,}0213 \\cdot ${currentInputs.distance} \\cdot ${(currentResults.nominalCurrent * fs).toFixed(2)} \\cdot ${pf}}{\\Delta V_{\\%} \\cdot ${currentInputs.voltage}}`}
+              {currentInputs.phase === 'trifasico'
+                ? `I_n = \\frac{P}{${phaseFactor} \\cdot V \\cdot \\cos\\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)}\\,A`
+                : `I_n = \\frac{P}{V \\cdot \\cos\\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)}\\,A`}
             </MathFormula>
-            <div className="bg-white p-6 rounded-xl border border-primary/20">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Seção Mínima Necessária</p>
-                  <p className="text-3xl font-black text-primary">{currentResults.cableByVoltageDrop} mm²</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase mb-1">Limite do Usuário</p>
-                  <p className="text-xl font-bold text-slate-700">{currentInputs.maxVoltageDrop}%</p>
-                </div>
-              </div>
-              <p className="text-xs font-bold text-green-600 mt-2 flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> ATENDE AO LIMITE INFORMADO: A seção de {currentResults.cableByVoltageDrop}mm² garante uma queda de {currentResults.voltageDropCalculated.toFixed(2)}%, respeitando o teto de {currentInputs.maxVoltageDrop}%.
-              </p>
+            <MathFormula
+              title="Corrente de projeto"
+              legend={[
+                { symbol: 'I_b', label: 'Corrente de projeto' },
+                { symbol: 'FS', label: 'Fator de serviço informado' },
+              ]}
+            >
+              {`I_b = I_n \\cdot FS = ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${fs.toFixed(2)} = ${ib.toFixed(2)}\\,A`}
+            </MathFormula>
+            <MathFormula
+              title="Corrente corrigida para a tabela de ampacidade"
+              legend={[
+                { symbol: 'f_c', label: 'Produto dos fatores de temperatura, agrupamento e solo' },
+              ]}
+            >
+              {`I_{corr} = \\frac{I_b}{f_c} = \\frac{${ib.toFixed(2)}}{${combinedFactor.toFixed(3)}} = ${correctedCurrent.toFixed(2)}\\,A`}
+            </MathFormula>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-6 text-left">
+            <p className="text-slate-600">O sistema consulta a tabela de ampacidade correspondente ao método e ao número de condutores carregados. Os fatores ambientais são aplicados antes da consulta.</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Temperatura</p><p className="font-semibold">{currentResults.correctionFactors?.temperature.toFixed(2) ?? '1,00'}</p></div>
+              <div className="bg-white p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Agrupamento</p><p className="font-semibold">{currentResults.correctionFactors?.grouping.toFixed(2) ?? '1,00'}</p></div>
+              <div className="bg-white p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Solo</p><p className="font-semibold">{currentResults.correctionFactors?.soilResistivity.toFixed(2) ?? '1,00'}</p></div>
+              <div className="bg-primary/5 p-4 rounded-lg border border-primary/20"><p className="text-xs text-muted-foreground">Seção por ampacidade</p><p className="text-2xl font-bold text-primary">{currentResults.cableByAmpacity} mm²</p></div>
             </div>
           </div>
         );
+
+      case 4:
+        return (
+          <div className="space-y-6 text-left">
+            <p className="text-slate-600">Nesta versão, a queda de tensão é calculada por um modelo resistivo simplificado com resistividade do cobre a 70 °C. A reatância do cabo não é considerada.</p>
+            <MathFormula
+              title="Queda de tensão — modelo resistivo simplificado"
+              legend={[
+                { symbol: '\\rho', label: 'Resistividade do cobre a 70 °C' },
+                { symbol: 'L', label: 'Comprimento' },
+                { symbol: 'I_b', label: 'Corrente de projeto' },
+              ]}
+            >
+              {`S \\approx \\frac{100 \\cdot ${dropFactor} \\cdot 0{,}0213 \\cdot ${currentInputs.distance} \\cdot ${ib.toFixed(2)} \\cdot ${pf.toFixed(2)}}{${currentInputs.maxVoltageDrop} \\cdot ${currentInputs.voltage}}`}
+            </MathFormula>
+            <div className="bg-white p-5 rounded-xl border">
+              <p className="text-sm text-muted-foreground">Seção comercial selecionada por queda de tensão</p>
+              <p className="text-3xl font-bold text-primary mt-1">{currentResults.cableByVoltageDrop} mm²</p>
+              <p className="text-sm text-slate-600 mt-2">Queda calculada: {currentResults.voltageDropCalculated.toFixed(2)}% (limite informado: {currentInputs.maxVoltageDrop}%).</p>
+            </div>
+          </div>
+        );
+
       case 5:
         return (
-          <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">O sistema aplica o critério da **NBR 5410** onde a capacidade do cabo (Iz) deve ser maior ou igual à corrente do disjuntor, que por sua vez deve ser maior ou igual à corrente de projeto (**Ib ≤ Idisj ≤ Iz**).</p>
+          <div className="space-y-6 text-left">
+            <p className="text-slate-600">A seção final é a maior entre o critério de ampacidade, a queda de tensão e a seção mínima de força.</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-lg border border-slate-100 bg-slate-50/50">
-                <p className="text-[10px] font-black uppercase text-slate-500">Ampacidade (Ib)</p>
-                <p className="text-2xl font-black text-slate-700">{currentResults.cableByAmpacity} mm²</p>
-                <p className="text-[10px] text-slate-400 mt-1">Garante suporte térmico à carga</p>
-              </div>
-              <div className={cn("p-4 rounded-lg border-2", currentResults.limitingCriterion === 'ampacity' ? "border-primary bg-primary/5" : "border-slate-100 bg-slate-50/50")}>
-                <p className="text-[10px] font-black uppercase">Proteção (Idisj)</p>
-                <p className="text-2xl font-black">{currentResults.cableByAmpacity} mm²</p>
-                <p className="text-[10px] text-slate-400 mt-1">Coordenado com o disjuntor</p>
-              </div>
-              <div className={cn("p-4 rounded-lg border-2", currentResults.limitingCriterion === 'voltageDrop' ? "border-primary bg-primary/5" : "border-slate-100 bg-slate-50/50")}>
-                <p className="text-[10px] font-black uppercase">Queda de Tensão (ΔV)</p>
-                <p className="text-2xl font-black">{currentResults.cableByVoltageDrop} mm²</p>
-                <p className="text-[10px] text-slate-400 mt-1">Limite de {currentInputs.maxVoltageDrop}%</p>
-              </div>
+              <div className="p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Ampacidade</p><p className="text-2xl font-bold">{currentResults.cableByAmpacity} mm²</p></div>
+              <div className="p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Queda de tensão</p><p className="text-2xl font-bold">{currentResults.cableByVoltageDrop} mm²</p></div>
+              <div className="p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Seção mínima</p><p className="text-2xl font-bold">2,5 mm²</p></div>
             </div>
-            <div className="bg-slate-900 text-white p-6 rounded-xl text-center shadow-xl border-t-4 border-primary">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Bitola Final Selecionada (MAX)</p>
-              <p className="text-5xl font-black text-primary">{currentResults.finalCableSection} mm²</p>
-              <p className="text-[10px] text-slate-500 mt-2 font-medium tracking-tight">Atende NBR 5410: Ampacidade, Queda de Tensão e Coordenação com Proteção</p>
+            <div className="bg-slate-900 text-white p-6 rounded-xl text-center">
+              <p className="text-sm text-slate-400">Critério limitante: {limitingLabel}</p>
+              <p className="text-5xl font-bold text-primary mt-2">{currentResults.finalCableSection} mm²</p>
             </div>
           </div>
         );
+
       case 6:
         return (
-          <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Dimensionamento das proteções contra curto-circuito e sobrecarga.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white p-4 rounded-lg border space-y-2 shadow-sm">
-                <div className="flex justify-between items-start">
-                  <p className="font-bold text-sm uppercase text-slate-700">Circuito Principal (Força)</p>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500 flex items-center gap-1">
-                      Disjuntor (<span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} />)
-                    </span>
-                    <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)} A</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500 flex items-center gap-1">
-                      Fusíveis (<span dangerouslySetInnerHTML={{ __html: katex.renderToString('1{,}5 \\cdot I_b', { output: 'html' }) }} />)
-                    </span>
-                    <span className="font-black text-primary">{(currentResults.nominalCurrent * fs * 1.5).toFixed(1)} A</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs pt-2 border-t border-slate-100">
-                    <span className="text-slate-500 flex items-center gap-1">
-                      Disjuntor Motor (<span dangerouslySetInnerHTML={{ __html: katex.renderToString('I_n \\cdot FS', { output: 'html' }) }} />)
-                    </span>
-                    <span className="font-black text-primary">{(currentResults.nominalCurrent * fs).toFixed(1)} A</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-lg border space-y-2 shadow-sm">
-                <div className="flex justify-between items-start">
-                  <p className="font-bold text-sm uppercase text-slate-700">Circuito Auxiliar (Comando)</p>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Disjuntor de Comando</span>
-                    <span className="font-black text-primary">6 A</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500">Fusíveis de Comando</span>
-                    <span className="font-black text-primary">4 A</span>
-                  </div>
-                  <p className="text-[10px] text-slate-400 italic pt-2">Valores padronizados para proteção de bobinas e sinalização.</p>
-                </div>
+          <div className="space-y-6 text-left">
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 flex gap-3">
+              <TriangleAlert className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-amber-950">Proteção principal ainda requer verificação complementar</h3>
+                <p className="text-sm text-amber-900 mt-1">O aplicativo não seleciona automaticamente a proteção de curto-circuito sem Icc, Icu/Icn, curva e dados de coordenação. Isso evita apresentar uma proteção como “validada” sem os dados necessários.</p>
               </div>
             </div>
-          </div>
-        );
-      case 7:
-        const fsStep7 = currentInputs.serviceFactor || 1.0;
-        const starterType = currentInputs.starterType;
-        
-        let starterLabel = "Direta";
-        let starterLogic = (
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator:</span> Selecionado para suportar <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${currentResults.nominalCurrent.toFixed(2)} \\cdot ${fs.toFixed(2)} = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} /> em regime AC-3.</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-              <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir o valor de <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
+            <div className="bg-white p-5 rounded-xl border">
+              <p className="font-semibold">Circuito de comando</p>
+              <p className="text-sm text-slate-600 mt-2">A base inclui referência de disjuntor auxiliar de 6 A. A aplicação final deve ser conferida conforme tensão de comando e cargas conectadas.</p>
             </div>
           </div>
         );
 
-        if (starterType === 'estrelaTriangulo') {
-          starterLabel = "Estrela-Triângulo";
-          starterLogic = (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Selecionados para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`0{,}58 \\cdot I_n \\cdot FS = ${(currentResults.nominalCurrent * 0.58 * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contator (K3):</span> Selecionado para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`0{,}33 \\cdot I_n \\cdot FS = ${(currentResults.nominalCurrent * 0.33 * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Faixa de ajuste deve cobrir <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`0{,}58 \\cdot I_n \\cdot FS = ${(currentResults.nominalCurrent * 0.58 * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé de Tempo:</span> Ajustado para a rampa de aceleração (típico 5-10s).</p>
-              </div>
-            </div>
-          );
-        } else if (starterType === 'reversao') {
-          starterLabel = "Reversão";
-          starterLogic = (
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Contatores (K1/K2):</span> Dimensionados para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} /> com intertravamento.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-1 w-2 h-2 rounded-full bg-primary" />
-                <p className="text-sm font-medium"><span className="font-black text-primary mr-2">Relé Térmico:</span> Proteção única configurada para <span dangerouslySetInnerHTML={{ __html: katex.renderToString(`I_n \\cdot FS = ${(currentResults.nominalCurrent * fs).toFixed(2)} A`, { output: 'html' }) }} />.</p>
-              </div>
-            </div>
-          );
-        }
-
+      case 7: {
+        const starter = currentInputs.starterType;
+        const lines: string[] = [];
+        if (starter === 'direta') lines.push(`1 contator com referência de corrente ≥ ${ib.toFixed(1)} A`, `1 relé térmico cuja faixa cubra ${ib.toFixed(1)} A`);
+        if (starter === 'reversao') lines.push(`2 contatores com referência de corrente ≥ ${ib.toFixed(1)} A`, `1 relé térmico cuja faixa cubra ${ib.toFixed(1)} A`);
+        if (starter === 'estrelaTriangulo') lines.push(`Contatores K1/K2: referência ≥ ${(ib * 0.58).toFixed(1)} A`, `Contator K3: referência ≥ ${(ib * 0.33).toFixed(1)} A`, `Relé térmico: faixa cobrindo ${(ib * 0.58).toFixed(1)} A`, 'Relé de tempo estrela-triângulo');
+        if (starter === 'softStarter') lines.push(`Soft-starter: corrente nominal ≥ ${ib.toFixed(1)} A; confirmar tensão e coordenação no manual do fabricante`);
+        if (starter === 'inversor') lines.push(`Inversor: corrente nominal de saída ≥ ${ib.toFixed(1)} A; confirmar tensão, sobrecarga e aplicação no manual do fabricante`);
         return (
-          <div className="space-y-6 text-left w-full">
-            <p className="text-slate-600">Dimensionamento dos componentes de manobra baseados na categoria de emprego AC-3.</p>
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-              <div className="flex justify-between items-center mb-6 pb-4 border-b">
-                <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Método de Partida</span>
-                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">{starterLabel}</span>
-              </div>
-              {starterLogic}
+          <div className="space-y-6 text-left">
+            <p className="text-slate-600">A base de componentes é usada como referência inicial. Modelo, tensão, categoria de utilização e código comercial precisam ser confirmados no catálogo vigente.</p>
+            <div className="bg-white p-6 rounded-xl border space-y-3">
+              {lines.map((line) => <div key={line} className="flex gap-2"><CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" /><p className="text-sm">{line}</p></div>)}
             </div>
           </div>
         );
+      }
+
       case 8:
         return (
-          <div className="space-y-6 text-center w-full">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600">
-              <CheckCircle2 className="w-10 h-10" />
-            </div>
-            <h3 className="text-2xl font-black text-foreground uppercase tracking-tight">Dimensionamento Validado</h3>
-            <p className="text-slate-600 max-w-md mx-auto">
-              Todos os critérios da **NBR 5410** foram atendidos. O sistema garantiu a segurança térmica dos condutores e a eficiência operacional dos dispositivos.
-            </p>
-            <Button 
-              onClick={() => setView('results')}
-              className="mt-8 h-14 px-12 text-lg font-black uppercase tracking-tight"
-            >
-              Voltar aos Detalhes
-            </Button>
+          <div className="space-y-6 text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-700"><CheckCircle2 className="w-10 h-10" /></div>
+            <h3 className="text-2xl font-bold text-foreground">Cálculo concluído</h3>
+            <p className="text-slate-600 max-w-xl mx-auto">Foram calculados corrente nominal, corrente de projeto, ampacidade com fatores de correção, seção mínima e queda de tensão pelo modelo informado. Curto-circuito e coordenação final da proteção permanecem como verificações complementares do profissional.</p>
+            <Button onClick={() => setView('results')} className="mt-4">Voltar aos resultados</Button>
           </div>
         );
+
       default:
         return null;
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-4xl mx-auto px-6 py-12 space-y-8">
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => setView('results')} className="text-muted-foreground font-bold hover:text-primary">
-          <ChevronLeft className="w-4 h-4 mr-2" /> VOLTAR AO RESULTADO
+        <Button variant="ghost" onClick={() => setView('results')} className="text-muted-foreground font-semibold hover:text-primary">
+          <ChevronLeft className="w-4 h-4 mr-2" /> Voltar ao resultado
         </Button>
-        <div className="flex items-center gap-2 text-[10px] font-black text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-widest">
-           <BookOpen className="w-3 h-3" /> MODO EDUCACIONAL
+        <div className="flex items-center gap-2 text-xs font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
+          <BookOpen className="w-3 h-3" /> Modo educacional
         </div>
       </div>
 
       <div className="space-y-2 text-center">
-        <h1 className="text-2xl md:text-4xl font-black text-foreground uppercase tracking-tight">Como este dimensionamento foi calculado</h1>
-        <p className="text-sm md:text-base text-muted-foreground italic font-medium">Acompanhe cada etapa técnica e entenda as decisões do Dimensionador Expert.</p>
+        <h1 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">Como este dimensionamento foi calculado</h1>
+        <p className="text-sm md:text-base text-muted-foreground">Acompanhe as etapas e os limites do cálculo apresentado.</p>
       </div>
 
-      {/* Progress Stepper */}
       <div className="space-y-4">
         <div className="flex justify-between items-center px-2">
-          <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Etapa {step} de {steps.length}</span>
-          <span className="text-[10px] font-black uppercase text-primary tracking-widest">{Math.round((step / steps.length) * 100)}% CONCLUÍDO</span>
+          <span className="text-xs font-semibold text-slate-500">Etapa {step} de {steps.length}</span>
+          <span className="text-xs font-semibold text-primary">{steps[step - 1]}</span>
         </div>
-        <div className="h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
-          <div 
-            className="h-full bg-primary rounded-full transition-all duration-500 shadow-sm" 
-            style={{ width: `${(step / steps.length) * 100}%` }}
-          />
-        </div>
-        
-        {/* Step dots */}
-        <div className="flex justify-between px-1">
-          {steps.map((s) => (
-            <div 
-              key={s.id} 
-              className={cn(
-                "w-2 h-2 rounded-full transition-colors",
-                s.id <= step ? "bg-primary" : "bg-slate-200"
-              )} 
-            />
-          ))}
-        </div>
+        <div className="h-2 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-primary transition-all" style={{ width: `${(step / steps.length) * 100}%` }} /></div>
       </div>
 
-      {/* Main Educational Card */}
-      <div className="card-panel min-h-[500px] flex flex-col items-center p-8 md:p-12 space-y-8 relative overflow-hidden bg-white border-2 border-slate-100 shadow-2xl">
-        <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
-        
-        <div className="w-full flex items-center justify-between mb-4">
-           <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{currentStepData.title}</span>
-           <span className="text-4xl font-black text-slate-100">0{step}</span>
-        </div>
+      <div className="card-panel min-h-[420px] flex flex-col justify-center">{renderStep()}</div>
 
-        {renderStepContent()}
-
-        {/* Technical Note */}
-        <div className="w-full bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex gap-3 mt-auto">
-           <Info className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
-           <p className="text-xs text-blue-700 font-medium leading-relaxed">
-             {step === 2 && "A corrente de projeto (Ib) é a base de tudo. Ela considera não só a carga nominal, mas as condições reais onde os cabos serão instalados."}
-             {step === 3 && "A ampacidade é o limite físico do cabo. Ultrapassar este valor derrete o isolamento do condutor."}
-             {step === 4 && "Distâncias longas causam perda de energia. Se a queda for alta, o motor perde torque e aquece excessivamente."}
-             {step === 5 && "Segurança em primeiro lugar: sempre usamos a maior bitola encontrada para satisfazer todos os requisitos normativos."}
-             {step === 8 && "Este relatório técnico segue os padrões internacionais de engenharia elétrica."}
-             {![2,3,4,5,8].includes(step) && "Siga as recomendações da NBR 5410 para uma instalação segura e duradoura."}
-           </p>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex justify-between items-center pt-4">
-        <Button 
-          variant="outline" 
-          disabled={step === 1}
-          onClick={() => setStep(s => s - 1)}
-          className="h-10 md:h-12 px-4 md:px-8 font-black uppercase tracking-tight border-2"
-        >
-          <ChevronLeft className="w-4 h-4 mr-2" /> Anterior
-        </Button>
-        <div className="hidden md:flex gap-2">
-           {steps.map((s) => (
-             <button 
-               key={s.id}
-               onClick={() => setStep(s.id)}
-               className={cn(
-                 "w-8 h-8 rounded-full text-[10px] font-black transition-all",
-                 step === s.id ? "bg-primary text-white scale-110 shadow-lg" : "bg-slate-100 text-slate-400 hover:bg-slate-200"
-               )}
-             >
-               {s.id}
-             </button>
-           ))}
-        </div>
-        <Button 
-          disabled={step === steps.length}
-          onClick={() => setStep(s => s + 1)}
-          className="h-10 md:h-12 px-4 md:px-8 font-black uppercase tracking-tight shadow-xl shadow-primary/20"
-        >
-          {step === steps.length ? 'Concluído' : 'Próxima'} <ChevronRight className="w-4 h-4 ml-2" />
+      <div className="flex justify-between gap-4">
+        <Button variant="outline" onClick={() => setStep((value) => Math.max(1, value - 1))} disabled={step === 1}><ChevronLeft className="w-4 h-4 mr-2" /> Anterior</Button>
+        <Button onClick={() => step === steps.length ? setView('results') : setStep((value) => Math.min(steps.length, value + 1))}>
+          {step === steps.length ? 'Concluir' : 'Próxima'} {step < steps.length && <ChevronRight className="w-4 h-4 ml-2" />}
         </Button>
       </div>
     </div>
