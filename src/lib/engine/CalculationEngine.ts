@@ -1,45 +1,40 @@
-import { 
-  CalculationInputs, 
-  CalculationResults, 
-  ManufacturerProduct, 
-  TechnicalReference,
-  TechnicalRequirement
+import {
+  CalculationInputs,
+  CalculationResults,
+  ManufacturerProduct,
+  TechnicalRequirement,
 } from '../../types';
 import { findCompatibleProduct, findCompatibleProducts } from '../catalog';
 import { AMPACITY_TABLES_NBR5410 } from './ampacity-tables';
+import {
+  AIR_TEMPERATURE_FACTORS_PVC,
+  getGroupingFactor,
+  getSoilResistivityFactor,
+  getTemperatureFactor,
+} from './correction-factors';
 
 export class CalculationEngine {
-  // Constantes físicas (Referência: NBR 5410)
-  // Resistividade do cobre a 20°C: 1/56 = 0,0178
-  // Coeficiente de temperatura (alfa): 0,00393 para o cobre
-  // Rho(T) = Rho(20) * (1 + alpha * (T - 20))
-  // Para 70°C (regime permanente PVC): 0,0178 * (1 + 0,00393 * (70 - 20)) = 0,0178 * 1,1965 = 0,0213
-  private static readonly RHO_COPPER_20 = 0.0178; // Ω·mm²/m a 20°C
-  private static readonly RHO_COPPER_70 = 0.0213; // Ω·mm²/m a 70°C (conforme NBR 5410 Anexo B)
+  private static readonly RHO_COPPER_70 = 0.0213;
   private static readonly COS_PHI_DEFAULT = 0.85;
   private static readonly EFFICIENCY_DEFAULT = 0.90;
   private static readonly SECAO_MINIMA_FORCA = 2.5;
 
-  static readonly TEMPERATURE_FACTORS: Record<string, number> = {
-    '10': 1.22, '15': 1.17, '20': 1.12, '25': 1.06, '30': 1.00,
-    '35': 0.94, '40': 0.87, '45': 0.79, '50': 0.71, '55': 0.61, '60': 0.50
-  };
+  static readonly TEMPERATURE_FACTORS: Record<string, number> = Object.fromEntries(
+    Object.entries(AIR_TEMPERATURE_FACTORS_PVC).map(([k, v]) => [String(k), v]),
+  );
 
   static readonly GROUPING_COUNT_FACTORS: Record<string, number> = {
     '1': 1.00, '2': 0.80, '3': 0.70, '4': 0.65, '5': 0.60,
-    '6': 0.57, '7': 0.54, '8': 0.52, '9': 0.50
+    '6': 0.57, '7': 0.54, '8': 0.52, '9': 0.50,
   };
 
-  /**
-   * Calcula a corrente nominal (In) do motor
-   */
   static calculateNominalCurrent(
-    power: number, 
-    unit: string, 
-    voltage: number, 
+    power: number,
+    unit: string,
+    voltage: number,
     phase: string = 'trifasico',
     pf: number = 0.85,
-    eff: number = 0.90
+    eff: number = 0.90,
   ): number {
     let powerKW = power;
     if (unit === 'cv') powerKW = power * 0.7355;
@@ -47,178 +42,216 @@ export class CalculationEngine {
 
     if (phase === 'trifasico') {
       return (powerKW * 1000) / (Math.sqrt(3) * voltage * pf * eff);
-    } else {
-      return (powerKW * 1000) / (voltage * pf * eff);
+    }
+    return (powerKW * 1000) / (voltage * pf * eff);
+  }
+
+  private static validateInputs(inputs: CalculationInputs): void {
+    if (!Number.isFinite(inputs.power) || inputs.power <= 0) throw new Error('Potência do motor inválida.');
+    if (!Number.isFinite(inputs.voltage) || inputs.voltage <= 0) throw new Error('Tensão de operação inválida.');
+    if (!Number.isFinite(inputs.distance) || inputs.distance <= 0) throw new Error('Distância do circuito inválida.');
+    if (!Number.isFinite(inputs.maxVoltageDrop) || inputs.maxVoltageDrop <= 0 || inputs.maxVoltageDrop > 4) {
+      throw new Error('A queda de tensão admissível deve estar entre 0 e 4%.');
+    }
+
+    const pf = inputs.powerFactor ?? this.COS_PHI_DEFAULT;
+    const eff = inputs.efficiency ?? this.EFFICIENCY_DEFAULT;
+    const fs = inputs.serviceFactor ?? 1;
+
+    if (!Number.isFinite(pf) || pf <= 0 || pf > 1) throw new Error('Fator de potência deve estar entre 0 e 1.');
+    if (!Number.isFinite(eff) || eff <= 0 || eff > 1) throw new Error('Rendimento deve estar entre 0 e 1.');
+    if (!Number.isFinite(fs) || fs <= 0 || fs > 2) throw new Error('Fator de serviço inválido.');
+
+    const groupingCount = inputs.groupingCount ?? 1;
+    if (!Number.isInteger(groupingCount) || groupingCount < 1 || groupingCount > 20) {
+      throw new Error('Número de circuitos agrupados deve estar entre 1 e 20.');
+    }
+
+    if (inputs.phase === 'monofasico' && inputs.starterType === 'estrelaTriangulo') {
+      throw new Error('Partida estrela-triângulo não é aplicável a motor monofásico.');
+    }
+
+    if (!inputs.installationMethod) throw new Error('Método de instalação não especificado.');
+  }
+
+  private static normalizeInstallationMethod(method: string, phase: string): string {
+    if (method === 'F_G') return phase === 'trifasico' ? 'F3_TREFOIL' : 'F2';
+    return method;
+  }
+
+  private static validateMethodForPhase(method: string, phase: string): void {
+    if (phase === 'monofasico' && ['F3_TREFOIL', 'F3_FLAT', 'G_HORIZONTAL', 'G_VERTICAL'].includes(method)) {
+      throw new Error('A disposição selecionada exige três condutores carregados e não é compatível com circuito monofásico.');
+    }
+    if (phase === 'trifasico' && method === 'F2') {
+      throw new Error('O método F com dois condutores carregados não é compatível com circuito trifásico.');
     }
   }
 
-  /**
-   * Critério 1: Capacidade de Corrente (Ampacidade)
-   * Retorna a seção comercial que suporta a corrente Ib após correções.
-   */
-  static getSectionByAmpacity(current: number, breakerCurrent: number, method: string = 'B1', conductors: number = 3): number {
-    const tableData = AMPACITY_TABLES_NBR5410.find(t => t.method === method && t.conductors === conductors);
-    
+  static getSectionByAmpacity(
+    correctedLoadCurrent: number,
+    correctedBreakerCurrent: number,
+    method: string = 'B1',
+    conductors: 2 | 3 = 3,
+  ): number {
+    const tableData = AMPACITY_TABLES_NBR5410.find(
+      (entry) => entry.method === method && entry.conductors === conductors,
+    );
+
     if (!tableData) {
-      throw new Error(`Tabela técnica não encontrada para o método ${method} com ${conductors} condutores carregados.`);
+      throw new Error(`Tabela técnica não encontrada para ${method} com ${conductors} condutores carregados.`);
     }
 
-    const sortedSections = Object.keys(tableData.table)
-      .map(Number)
-      .sort((a, b) => a - b);
+    const requiredAmpacity = Math.max(correctedLoadCurrent, correctedBreakerCurrent);
+    const sortedSections = Object.keys(tableData.table).map(Number).sort((a, b) => a - b);
 
     for (const section of sortedSections) {
       const ampacity = tableData.table[section];
-      // Regra NBR 5410: Ib <= In_disjuntor <= Iz
-      if (ampacity !== undefined && ampacity >= current && ampacity >= breakerCurrent) {
-        return section;
-      }
+      if (ampacity !== undefined && ampacity >= requiredAmpacity) return section;
     }
 
-    const maxSection = sortedSections[sortedSections.length - 1];
-    const maxAmpacity = tableData.table[maxSection!];
-    throw new Error(`Corrente de projeto (${current.toFixed(2)} A) ou do disjuntor (${breakerCurrent.toFixed(2)} A) excede a capacidade máxima da tabela para o método ${method} (${maxAmpacity} A).`);
+    const maxSection = sortedSections[sortedSections.length - 1]!;
+    const maxAmpacity = tableData.table[maxSection]!;
+    throw new Error(
+      `Corrente corrigida necessária (${requiredAmpacity.toFixed(2)} A) excede a capacidade máxima da tabela ${method} (${maxAmpacity} A em ${maxSection} mm²).`,
+    );
   }
 
   /**
-   * Critério 2: Queda de Tensão
+   * Queda de tensão por modelo resistivo simplificado.
+   * Uma etapa posterior da auditoria substituirá este modelo por Rca + X_L.
    */
   static getSectionByVoltageDrop(
-    current: number, 
-    distance: number, 
-    voltage: number, 
+    current: number,
+    distance: number,
+    voltage: number,
     maxDropPercent: number,
     pf: number = 0.85,
-    phase: string = 'trifasico'
+    phase: string = 'trifasico',
   ): { requiredSection: number; selectedSection: number; actualDrop: number } {
     const k = phase === 'trifasico' ? Math.sqrt(3) : 2;
     const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
-    
-    // S = (100 * k * rho * L * In * cosphi) / (deltaV% * V)
-    // Conforme NBR 5410, para cabos em regime permanente (PVC 70°C), utiliza-se rho = 0,0213
-    const requiredSection = (100 * k * CalculationEngine.RHO_COPPER_70 * distance * current * pf) / (maxDropPercent * voltage);
-    
-    let selectedSection: number = standardSections[standardSections.length - 1]!;
-    let found = false;
-    for (const s of standardSections) {
-      if (s >= requiredSection) {
-        selectedSection = s;
-        found = true;
-        break;
-      }
+    const requiredSection = (100 * k * this.RHO_COPPER_70 * distance * current * pf) / (maxDropPercent * voltage);
+    const selectedSection = standardSections.find((section) => section >= requiredSection);
+
+    if (!selectedSection) {
+      throw new Error(`Seção teórica por queda de tensão (${requiredSection.toFixed(2)} mm²) excede 500 mm².`);
     }
 
-    if (!found) {
-      throw new Error(`Seção teórica necessária (${requiredSection.toFixed(2)} mm²) excede o limite do catálogo.`);
-    }
-
-    const actualDropPercent = (k * CalculationEngine.RHO_COPPER_70 * distance * current * pf * 100) / (selectedSection * voltage);
-
-    return { requiredSection, selectedSection, actualDrop: actualDropPercent };
+    const actualDrop = (k * this.RHO_COPPER_70 * distance * current * pf * 100) / (selectedSection * voltage);
+    return { requiredSection, selectedSection, actualDrop };
   }
 
   static performFullCalculation(inputs: CalculationInputs): CalculationResults {
-    if (!inputs.voltage || isNaN(inputs.voltage) || inputs.voltage <= 0) {
-      throw new Error("Tensão de operação inválida.");
-    }
+    this.validateInputs(inputs);
 
-    const pf = inputs.powerFactor || this.COS_PHI_DEFAULT;
-    const eff = inputs.efficiency || this.EFFICIENCY_DEFAULT;
-    const fs = inputs.serviceFactor || 1.0;
+    const pf = inputs.powerFactor ?? this.COS_PHI_DEFAULT;
+    const eff = inputs.efficiency ?? this.EFFICIENCY_DEFAULT;
+    const fs = inputs.serviceFactor ?? 1.0;
+    const method = this.normalizeInstallationMethod(inputs.installationMethod!, inputs.phase);
+    this.validateMethodForPhase(method, inputs.phase);
 
-    // 1. Corrente Nominal (In)
     let In: number;
     if (inputs.dataSource === 'catalog' && inputs.motorCatalogData) {
       In = inputs.motorCatalogData.nominalCurrent;
+      if (!Number.isFinite(In) || In <= 0) throw new Error('Corrente nominal do motor de catálogo inválida.');
     } else {
       In = this.calculateNominalCurrent(inputs.power, inputs.powerUnit, inputs.voltage, inputs.phase, pf, eff);
     }
-    
-    // 2. Fatores de Correção
-    const fGroup = CalculationEngine.GROUPING_COUNT_FACTORS[inputs.groupingCount?.toString() || '1'] || 1.0;
-    const fTemp = inputs.ambientTempFactor || 1.0;
-    
-    // 3. Corrente de Projeto (Ib) e Corrente Corrigida para Tabela
-    // NBR 5410: Ib = In * FS (conforme solicitado pelo usuário)
+
     const Ib = In * fs;
-    // Corrente Corrigida para busca na tabela de ampacidade (Iz >= Ib / (fGroup * fTemp))
-    const correctedCurrentForTable = Ib / (fGroup * fTemp);
-    
-    // 4. Dimensionamento do Disjuntor (Primeiro passo para o critério Ib <= Idisj <= Iz)
-    // O disjuntor deve ser >= Ib. Usamos In * fs como referência para encontrar o disjuntor comercial.
+
+    const ambientTemperature = inputs.ambientTemperature ?? (method === 'D' ? 20 : 30);
+    const fTemp = inputs.ambientTemperature !== undefined
+      ? getTemperatureFactor(method, ambientTemperature)
+      : (inputs.ambientTempFactor ?? getTemperatureFactor(method, ambientTemperature));
+    const fGroup = getGroupingFactor(method, inputs.groupingCount ?? 1);
+    const fSoil = getSoilResistivityFactor(method, inputs.soilThermalResistivity ?? 2.5);
+    const combinedCorrectionFactor = fTemp * fGroup * fSoil;
+
+    if (!Number.isFinite(combinedCorrectionFactor) || combinedCorrectionFactor <= 0) {
+      throw new Error('Fatores de correção inválidos.');
+    }
+
+    const correctedCurrentForTable = Ib / combinedCorrectionFactor;
+
     const mfr = inputs.preferredManufacturer === 'any' ? undefined : inputs.preferredManufacturer;
     const compatibleBreaker = findCompatibleProduct('disjuntor', Ib, mfr);
-    const breakerNominalCurrent = compatibleBreaker ? (compatibleBreaker.nominalCurrent || parseFloat(compatibleBreaker.model.match(/\d+/)?.[0] || Ib.toString())) : Ib;
+    const breakerNominalCurrent = compatibleBreaker?.nominalCurrent ?? Ib;
 
-    // 5. Dimensionamento Independente do Condutor
-    const method = inputs.installationMethod;
-    if (!method) {
-      throw new Error("Método de instalação não especificado.");
-    }
-    const numConductors = inputs.phase === 'trifasico' ? 3 : 2;
-    
-    // NBR 5410: Iz deve ser >= Idisjuntor (que por sua vez é >= Ib)
-    // Para ampacidade, o condutor deve suportar a corrente do disjuntor selecionado.
-    // Usamos breakerNominalCurrent / (fGroup * fTemp) para garantir que Iz (ampacidade nominal) >= In_disjuntor
-    const effectiveMethod = method === 'F_G' ? (numConductors === 3 ? 'F' : 'G') : method;
-    const secAmp = this.getSectionByAmpacity(correctedCurrentForTable, breakerNominalCurrent / (fGroup * fTemp), effectiveMethod, numConductors);
-    
-    // Garantia adicional de proteção: Iz do cabo selecionado * fGroup * fTemp deve ser >= In_disjuntor
-    // No entanto, getSectionByAmpacity já faz Iz >= correctedBreakerCurrent, o que é equivalente.
+    const numConductors: 2 | 3 = inputs.phase === 'trifasico' ? 3 : 2;
+    const secAmp = this.getSectionByAmpacity(
+      correctedCurrentForTable,
+      breakerNominalCurrent / combinedCorrectionFactor,
+      method,
+      numConductors,
+    );
 
-    const dropResult = this.getSectionByVoltageDrop(Ib, inputs.distance, inputs.voltage, inputs.maxVoltageDrop, pf, inputs.phase);
-    
-    // 6. Seleção Final (Maior entre os critérios)
+    const dropResult = this.getSectionByVoltageDrop(
+      Ib,
+      inputs.distance,
+      inputs.voltage,
+      inputs.maxVoltageDrop,
+      pf,
+      inputs.phase,
+    );
+
     const finalSection = Math.max(secAmp, dropResult.selectedSection, this.SECAO_MINIMA_FORCA);
-    const limitingCriterion = finalSection === secAmp ? 'ampacity' : 'voltageDrop';
+    let limitingCriterion: CalculationResults['limitingCriterion'];
+    if (finalSection === this.SECAO_MINIMA_FORCA && finalSection > secAmp && finalSection > dropResult.selectedSection) {
+      limitingCriterion = 'minimumSection';
+    } else if (secAmp >= dropResult.selectedSection && secAmp >= this.SECAO_MINIMA_FORCA) {
+      limitingCriterion = 'ampacity';
+    } else if (dropResult.selectedSection >= secAmp && dropResult.selectedSection >= this.SECAO_MINIMA_FORCA) {
+      limitingCriterion = 'voltageDrop';
+    } else {
+      limitingCriterion = 'minimumSection';
+    }
 
-    // Proteções
-    // Conforme NBR 5410, para coordenação com cabos, o disjuntor de força deve ser Ib <= In_disj <= Iz.
-    // Usamos o disjuntor já encontrado no passo 4.
+    // Mantido temporariamente; a etapa de coordenação de proteção será revisada na sequência da auditoria.
     const requirements: TechnicalRequirement[] = [
       { category: 'disjuntor', current: breakerNominalCurrent, quantity: 1, label: 'Disjuntor do Circuito Principal (Força)' },
       { category: 'disjuntor', current: 6, quantity: 1, label: 'Disjuntor do Circuito Auxiliar (Comando)' },
       { category: 'fusivel', current: Ib * 1.5, quantity: 3, label: 'Fusíveis do Circuito Principal (Força)' },
-      { category: 'disjuntorMotor', current: In * fs, quantity: 1, label: 'Disjuntor Motor' }
+      { category: 'disjuntorMotor', current: Ib, quantity: 1, label: 'Disjuntor Motor' },
     ];
 
     if (inputs.starterType === 'direta') {
-      requirements.push({ category: 'contator', current: In * fs, quantity: 1, label: 'Contator de Potência (K1)' });
-      requirements.push({ category: 'releTermico', current: In * fs, quantity: 1, label: 'Relé Térmico' });
+      requirements.push({ category: 'contator', current: Ib, quantity: 1, label: 'Contator de Potência (K1)' });
+      requirements.push({ category: 'releTermico', current: Ib, quantity: 1, label: 'Relé Térmico' });
     } else if (inputs.starterType === 'reversao') {
-      requirements.push({ category: 'contator', current: In * fs, quantity: 2, label: 'Contatores de Potência (K1, K2)' });
-      requirements.push({ category: 'releTermico', current: In * fs, quantity: 1, label: 'Relé Térmico' });
+      requirements.push({ category: 'contator', current: Ib, quantity: 2, label: 'Contatores de Potência (K1, K2)' });
+      requirements.push({ category: 'releTermico', current: Ib, quantity: 1, label: 'Relé Térmico' });
     } else if (inputs.starterType === 'estrelaTriangulo') {
-      requirements.push({ category: 'contator', current: In * fs * 0.58, quantity: 2, label: 'Contatores de Potência (K1, K2)' });
-      requirements.push({ category: 'contator', current: In * fs * 0.33, quantity: 1, label: 'Contator de Estrela (K3)' });
-      requirements.push({ category: 'releTermico', current: In * fs * 0.58, quantity: 1, label: 'Relé Térmico' });
+      requirements.push({ category: 'contator', current: Ib * 0.58, quantity: 2, label: 'Contatores de Potência (K1, K2)' });
+      requirements.push({ category: 'contator', current: Ib * 0.33, quantity: 1, label: 'Contator de Estrela (K3)' });
+      requirements.push({ category: 'releTermico', current: Ib * 0.58, quantity: 1, label: 'Relé Térmico' });
       requirements.push({ category: 'releTempo', quantity: 1, label: 'Relé de Tempo Estrela-Triângulo' });
     } else if (inputs.starterType === 'softStarter') {
-      requirements.push({ category: 'softStarter', current: In * fs, quantity: 1, label: 'Soft-Starter' });
+      requirements.push({ category: 'softStarter', current: Ib, quantity: 1, label: 'Soft-Starter' });
     } else if (inputs.starterType === 'inversor') {
-      requirements.push({ category: 'inverter', current: In * fs, quantity: 1, label: 'Inversor de Frequência' });
+      requirements.push({ category: 'inverter', current: Ib, quantity: 1, label: 'Inversor de Frequência' });
     }
 
     const compatibleProducts: Record<string, Record<string, ManufacturerProduct[]>> = {};
-    requirements.forEach(req => {
+    requirements.forEach((req) => {
       const brandMap: Record<string, ManufacturerProduct[]> = {};
-      ['WEG', 'Siemens', 'Schneider'].forEach(brand => {
-        brandMap[brand] = findCompatibleProducts(req.category, req.current || 0, brand);
+      ['WEG', 'Siemens', 'Schneider'].forEach((brand) => {
+        brandMap[brand] = findCompatibleProducts(req.category, req.current ?? 0, brand);
       });
       compatibleProducts[req.label] = brandMap;
     });
 
-    // Compatibilidade Legada (Mapeamento direto de proteções)
     const protections: CalculationResults['protections'] = {
-      breaker: findCompatibleProduct('disjuntor', Ib, mfr) || null,
-      motorBreaker: findCompatibleProduct('disjuntorMotor', In * fs, mfr) || null,
-      diazedFuse: findCompatibleProduct('fusivel', Ib * 1.5, mfr) || null,
-      nhFuse: findCompatibleProduct('fusivel', Ib * 1.5, mfr) || null,
-      thermalRelay: findCompatibleProduct('releTermico', In * (inputs.starterType === 'estrelaTriangulo' ? 0.58 : 1.0) * fs, mfr) || null,
-      contactor: findCompatibleProducts('contator', In * (inputs.starterType === 'estrelaTriangulo' ? 0.58 : 1.0) * fs, mfr),
-      timerRelay: inputs.starterType === 'estrelaTriangulo' ? (findCompatibleProduct('releTempo', 0, mfr) || null) : null,
-      softStarter: inputs.starterType === 'softStarter' ? (findCompatibleProduct('softStarter', In * fs, mfr) || null) : null,
-      inverter: inputs.starterType === 'inversor' ? (findCompatibleProduct('inverter', In * fs, mfr) || null) : null,
+      breaker: compatibleBreaker ?? null,
+      motorBreaker: findCompatibleProduct('disjuntorMotor', Ib, mfr) ?? null,
+      diazedFuse: findCompatibleProduct('fusivel', Ib * 1.5, mfr) ?? null,
+      nhFuse: findCompatibleProduct('fusivel', Ib * 1.5, mfr) ?? null,
+      thermalRelay: findCompatibleProduct('releTermico', inputs.starterType === 'estrelaTriangulo' ? Ib * 0.58 : Ib, mfr) ?? null,
+      contactor: findCompatibleProducts('contator', inputs.starterType === 'estrelaTriangulo' ? Ib * 0.58 : Ib, mfr),
+      timerRelay: inputs.starterType === 'estrelaTriangulo' ? (findCompatibleProduct('releTempo', 0, mfr) ?? null) : null,
+      softStarter: inputs.starterType === 'softStarter' ? (findCompatibleProduct('softStarter', Ib, mfr) ?? null) : null,
+      inverter: inputs.starterType === 'inversor' ? (findCompatibleProduct('inverter', Ib, mfr) ?? null) : null,
     };
 
     return {
@@ -228,14 +261,21 @@ export class CalculationEngine {
       finalCableSection: finalSection,
       voltageDropCalculated: dropResult.actualDrop,
       limitingCriterion,
+      correctionFactors: {
+        temperature: fTemp,
+        grouping: fGroup,
+        soilResistivity: fSoil,
+        combined: combinedCorrectionFactor,
+      },
       technicalRequirements: requirements,
       compatibleProducts,
       protections,
       references: [
-        { id: 'ref1', standardName: 'ABNT NBR 5410', version: '2004', section: '6.2.5', description: 'Dimensionamento por queda de tensão.' },
-        { id: 'ref2', standardName: 'ABNT NBR 5410', version: '2004', section: 'Tabela 6.1', description: 'Seção mínima para circuitos de força: 2,5 mm².' },
-        { id: 'ref3', standardName: 'ABNT NBR 5410', version: '2004', section: 'Tabelas 36-39', description: 'Capacidade de condução de corrente (Ampacidade).' }
-      ]
+        { id: 'ref1', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: '6.2.7', description: 'Critério de queda de tensão.' },
+        { id: 'ref2', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: 'Tabela 47', description: 'Seção mínima de 2,5 mm² Cu para circuitos de força em instalações fixas.' },
+        { id: 'ref3', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: 'Tabelas 36 e 38', description: 'Capacidade de condução de corrente.' },
+        { id: 'ref4', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: 'Tabelas 40 a 45', description: 'Fatores de correção de temperatura, solo e agrupamento.' },
+      ],
     };
   }
 }
