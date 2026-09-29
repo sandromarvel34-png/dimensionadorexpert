@@ -43,7 +43,9 @@ export interface CalculationInputs {
   groupingType?: string;
   groupingCount?: number;
   groupingFactor?: number;
-  ambientTempFactor?: number;
+  ambientTemperature?: number;
+  ambientTempFactor?: number; // legado/compatibilidade
+  soilThermalResistivity?: number; // K.m/W, aplicável ao método D
   powerFactor?: number;
   serviceFactor?: number;
   efficiency?: number;
@@ -78,7 +80,13 @@ export interface CalculationResults {
   cableByVoltageDrop: number; // mm²
   finalCableSection: number; // mm²
   voltageDropCalculated: number; // %
-  limitingCriterion: 'ampacity' | 'voltageDrop';
+  limitingCriterion: 'ampacity' | 'voltageDrop' | 'minimumSection';
+  correctionFactors?: {
+    temperature: number;
+    grouping: number;
+    soilResistivity: number;
+    combined: number;
+  };
   technicalRequirements: TechnicalRequirement[];
   compatibleProducts: Record<string, Record<string, ManufacturerProduct[]>>; // Label -> Manufacturer -> Products
   protections: {
