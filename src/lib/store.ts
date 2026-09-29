@@ -7,17 +7,19 @@ interface AppState {
   step: number;
   currentInputs: CalculationInputs | null;
   currentResults: CalculationResults | null;
+  currentHistoryId: string | null;
   selectedProducts: Record<string, any>;
   selectedManufacturer: 'WEG' | 'Siemens' | 'Schneider';
   history: any[];
-  
-  setView: (view: 'dashboard' | 'wizard' | 'results' | 'proposal' | 'educational') => void;
+
+  setView: (view: AppState['view']) => void;
   setStep: (step: number) => void;
   setCalculation: (inputs: CalculationInputs, results: CalculationResults) => void;
   setSelectedProducts: (products: Record<string, any>) => void;
   setSelectedManufacturer: (manufacturer: 'WEG' | 'Siemens' | 'Schneider') => void;
   addToHistory: (item: any) => void;
   openHistoryItem: (item: any) => void;
+  markProposalSaved: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -27,6 +29,7 @@ export const useAppStore = create<AppState>()(
       step: 1,
       currentInputs: null,
       currentResults: null,
+      currentHistoryId: null,
       selectedProducts: {},
       selectedManufacturer: 'WEG',
       history: [],
@@ -34,40 +37,44 @@ export const useAppStore = create<AppState>()(
       setView: (view) => set({ view }),
       setStep: (step) => set({ step }),
       setCalculation: (inputs, results) => {
+        const id = Math.random().toString(36).slice(2, 11);
         const historyItem = {
-          id: Math.random().toString(36).substr(2, 9),
+          id,
           date: new Date().toISOString(),
           ...inputs,
           ...results,
-          hasProposal: false
+          hasProposal: false,
         };
-        set((state) => ({ 
-          currentInputs: inputs, 
+        set((state) => ({
+          currentInputs: inputs,
           currentResults: results,
-          selectedManufacturer: inputs.preferredManufacturer && inputs.preferredManufacturer !== 'any' 
-            ? inputs.preferredManufacturer as any 
+          currentHistoryId: id,
+          selectedManufacturer: inputs.preferredManufacturer && inputs.preferredManufacturer !== 'any'
+            ? inputs.preferredManufacturer as any
             : state.selectedManufacturer,
-          selectedProducts: {}, // Reset selection on new calculation
+          selectedProducts: {},
           view: 'results',
-          history: [historyItem, ...state.history].slice(0, 50)
+          history: [historyItem, ...state.history].slice(0, 50),
         }));
       },
       setSelectedProducts: (products) => set({ selectedProducts: products }),
       setSelectedManufacturer: (manufacturer) => set({ selectedManufacturer: manufacturer }),
       openHistoryItem: (item) => {
-        set({ 
-          currentInputs: item, 
-          currentResults: item.nominalCurrent ? item : null, 
+        set({
+          currentInputs: item,
+          currentResults: item.nominalCurrent ? item : null,
+          currentHistoryId: item.id ?? null,
           selectedProducts: {},
-          view: item.nominalCurrent ? 'results' : 'wizard' 
+          view: item.nominalCurrent ? 'results' : 'wizard',
         });
       },
-      addToHistory: (item) => set((state) => ({ 
-        history: [item, ...state.history].slice(0, 50) 
+      markProposalSaved: () => set((state) => ({
+        history: state.history.map(item => item.id === state.currentHistoryId ? { ...item, hasProposal: true } : item),
+      })),
+      addToHistory: (item) => set((state) => ({
+        history: [item, ...state.history].slice(0, 50),
       })),
     }),
-    {
-      name: 'calculadora-eletrica-pro-storage',
-    }
-  )
+    { name: 'calculadora-eletrica-pro-storage' },
+  ),
 );
