@@ -46,6 +46,7 @@ export interface CalculationInputs {
   ambientTemperature?: number;
   ambientTempFactor?: number; // legado/compatibilidade
   soilThermalResistivity?: number; // K.m/W, aplicável ao método D
+  buriedCableConfiguration?: 'unipolarDuct' | 'multipolarDuct';
   shortCircuitCurrentKA?: number; // corrente de falta presumida no ponto (kA)
   shortCircuitDurationSeconds?: number; // tempo de eliminação da falta (s), até 5 s
   powerFactor?: number;
