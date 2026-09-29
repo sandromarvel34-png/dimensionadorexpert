@@ -71,7 +71,40 @@ export class CalculationEngine {
       throw new Error('Partida estrela-triângulo não é aplicável a motor monofásico.');
     }
 
+    const hasIcc = inputs.shortCircuitCurrentKA !== undefined;
+    const hasTime = inputs.shortCircuitDurationSeconds !== undefined;
+    if (hasIcc !== hasTime) {
+      throw new Error('Para verificar curto-circuito, informe Icc e tempo de atuação.');
+    }
+    if (hasIcc && hasTime) {
+      if (!Number.isFinite(inputs.shortCircuitCurrentKA) || (inputs.shortCircuitCurrentKA ?? 0) <= 0) {
+        throw new Error('Corrente de curto-circuito deve ser maior que zero.');
+      }
+      if (!Number.isFinite(inputs.shortCircuitDurationSeconds) || (inputs.shortCircuitDurationSeconds ?? 0) <= 0 || (inputs.shortCircuitDurationSeconds ?? 0) > 5) {
+        throw new Error('Tempo de atuação do curto-circuito deve ser maior que zero e no máximo 5 s.');
+      }
+    }
+
     if (!inputs.installationMethod) throw new Error('Método de instalação não especificado.');
+  }
+
+  static getSectionByShortCircuit(
+    shortCircuitCurrentKA: number,
+    durationSeconds: number,
+  ): { selectedSection: number; withstandCurrentKA: number } {
+    const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
+    const currentA = shortCircuitCurrentKA * 1000;
+
+    for (const section of standardSections) {
+      // Cobre/PVC: k=115 até 300 mm² e k=103 acima de 300 mm².
+      const k = section <= 300 ? 115 : 103;
+      const withstandA = (k * section) / Math.sqrt(durationSeconds);
+      if (withstandA >= currentA) {
+        return { selectedSection: section, withstandCurrentKA: withstandA / 1000 };
+      }
+    }
+
+    throw new Error('A seção necessária pelo critério térmico de curto-circuito excede 500 mm².');
   }
 
   private static normalizeInstallationMethod(method: string, phase: string): string {
@@ -197,16 +230,23 @@ export class CalculationEngine {
       inputs.phase,
     );
 
-    const finalSection = Math.max(secAmp, dropResult.selectedSection, this.SECAO_MINIMA_FORCA);
+    const shortCircuitResult = inputs.shortCircuitCurrentKA !== undefined && inputs.shortCircuitDurationSeconds !== undefined
+      ? this.getSectionByShortCircuit(inputs.shortCircuitCurrentKA, inputs.shortCircuitDurationSeconds)
+      : null;
+
+    const shortCircuitSection = shortCircuitResult?.selectedSection ?? 0;
+    const finalSection = Math.max(secAmp, dropResult.selectedSection, this.SECAO_MINIMA_FORCA, shortCircuitSection);
     let limitingCriterion: CalculationResults['limitingCriterion'];
-    if (finalSection === this.SECAO_MINIMA_FORCA && finalSection > secAmp && finalSection > dropResult.selectedSection) {
+    if (shortCircuitResult && shortCircuitSection > secAmp && shortCircuitSection > dropResult.selectedSection && shortCircuitSection > this.SECAO_MINIMA_FORCA) {
+      limitingCriterion = 'shortCircuit';
+    } else if (finalSection === this.SECAO_MINIMA_FORCA && finalSection > secAmp && finalSection > dropResult.selectedSection) {
       limitingCriterion = 'minimumSection';
     } else if (secAmp >= dropResult.selectedSection && secAmp >= this.SECAO_MINIMA_FORCA) {
       limitingCriterion = 'ampacity';
     } else if (dropResult.selectedSection >= secAmp && dropResult.selectedSection >= this.SECAO_MINIMA_FORCA) {
       limitingCriterion = 'voltageDrop';
     } else {
-      limitingCriterion = 'minimumSection';
+      limitingCriterion = shortCircuitResult ? 'shortCircuit' : 'minimumSection';
     }
 
     const requirements: TechnicalRequirement[] = [
@@ -265,10 +305,12 @@ export class CalculationEngine {
         combined: combinedCorrectionFactor,
       },
       voltageDropModel: 'resistiveApproximation',
-      shortCircuitCheckPerformed: false,
+      cableByShortCircuit: shortCircuitResult?.selectedSection,
+      shortCircuitWithstandCurrentKA: shortCircuitResult?.withstandCurrentKA,
+      shortCircuitCheckPerformed: !!shortCircuitResult,
       technicalLimitations: [
-        'A verificação de curto-circuito (Icc, Icu/Icn e solicitação térmica do condutor) não é realizada automaticamente nesta versão.',
-        'A proteção principal deve ser selecionada e coordenada pelo profissional após verificar a corrente de curto-circuito e as características de partida.',
+        ...(!shortCircuitResult ? ['A verificação térmica de curto-circuito do condutor não foi realizada porque Icc e tempo de atuação não foram informados.'] : []),
+        'A capacidade de interrupção (Icu/Icn) e a coordenação da proteção principal ainda devem ser verificadas no dispositivo selecionado.',
         'A queda de tensão usa modelo resistivo simplificado; a reatância do cabo não é considerada nesta versão.',
         'Modelos e códigos comerciais de fabricantes devem ser confirmados no catálogo vigente antes da compra.',
       ],
@@ -280,6 +322,7 @@ export class CalculationEngine {
         { id: 'ref2', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: 'Tabela 47', description: 'Seção mínima de 2,5 mm² Cu para circuitos de força em instalações fixas.' },
         { id: 'ref3', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: 'Tabelas 36 e 38', description: 'Capacidade de condução de corrente.' },
         { id: 'ref4', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: 'Tabelas 40 a 45', description: 'Fatores de correção de temperatura, solo e agrupamento.' },
+        { id: 'ref5', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: '5.3.5', description: 'Verificação térmica dos condutores sob curto-circuito, quando Icc e tempo são informados.' },
       ],
     };
   }
