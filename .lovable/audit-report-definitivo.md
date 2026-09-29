@@ -1,3 +1,6 @@
+> **RELATÓRIO LEGADO — NÃO USAR COMO ESTADO TÉCNICO ATUAL.**
+> A auditoria de 29/09/2026 identificou divergências e substitui conclusões antigas de “precisão total”. Consulte `.lovable/audit-status-current.md`.
+
 # Relatório de Auditoria e Correção Técnica — Dimensionador Expert
 
 ## 1. Problemas Encontrados (Causa Raiz)
