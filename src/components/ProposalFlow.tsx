@@ -1,5 +1,4 @@
 import { useAppStore } from '@/lib/store';
-import { CalculationEngine } from '@/lib/engine/CalculationEngine';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,8 +9,14 @@ import { ArrowLeft, Plus, Trash2, Printer, Save, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import katex from 'katex';
 
+const getProtectiveConductorSection = (phaseSection: number) => {
+  const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
+  const required = phaseSection <= 16 ? phaseSection : phaseSection <= 35 ? 16 : phaseSection / 2;
+  return standardSections.find(section => section >= required) ?? required;
+};
+
 export const ProposalFlow = () => {
-  const { setView, currentResults, currentInputs, selectedManufacturer, setSelectedManufacturer } = useAppStore();
+  const { setView, currentResults, currentInputs, selectedManufacturer, setSelectedManufacturer, markProposalSaved } = useAppStore();
   const [clientData, setClientData] = useState({
     name: '',
     doc: '',
@@ -31,12 +36,13 @@ export const ProposalFlow = () => {
     // Regra: se trifásico 3x, se monofásico 2x a distância
     const phaseMultiplier = currentInputs.phase === 'trifasico' ? 3 : 2;
     const cableQty = Math.round((currentInputs.distance || 1) * phaseMultiplier);
-    const groundQty = Math.round(currentInputs.distance || 1); // Adicionando terra separadamente
+    const groundQty = Math.round(currentInputs.distance || 1);
+    const groundSection = getProtectiveConductorSection(currentResults.finalCableSection);
 
 
     const initialItems: any[] = [
       { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V PVC 70°C (Fases)`, qtd: cableQty, unit: 'm', price: '' },
-      { id: 'cable-ground', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V PVC 70°C (Terra)`, qtd: groundQty, unit: 'm', price: '' }
+      { id: 'cable-ground', desc: `Cabo Flexível ${groundSection}mm² 750V PVC 70°C (PE/Terra)`, qtd: groundQty, unit: 'm', price: '' }
 
     ];
 
@@ -119,6 +125,7 @@ export const ProposalFlow = () => {
       date: new Date().toISOString()
     };
     localStorage.setItem('last_proposal', JSON.stringify(proposalData));
+    markProposalSaved();
     toast.success('Proposta salva com sucesso!');
   };
 
@@ -328,7 +335,7 @@ export const ProposalFlow = () => {
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Critério</p>
-                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : 'Queda ΔV'}</p>
+                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : currentResults?.limitingCriterion === 'voltageDrop' ? 'Queda ΔV' : 'Seção mínima'}</p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-[9px] text-muted-foreground uppercase font-bold">Seção Final</p>
