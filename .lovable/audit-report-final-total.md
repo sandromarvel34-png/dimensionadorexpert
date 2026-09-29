@@ -1,3 +1,6 @@
+> **RELATÓRIO LEGADO — NÃO USAR COMO ESTADO TÉCNICO ATUAL.**
+> A auditoria de 29/09/2026 identificou divergências e substitui conclusões antigas de “precisão total”. Consulte `.lovable/audit-status-current.md`.
+
 # Relatório de Auditoria de Precisão Total - NBR 5410
 
 ## 1. Cenário de Validação Crítica (Motor 75cv, 220V)
