@@ -19,17 +19,18 @@ export const ResultsView = () => {
         : 'Seção mínima';
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-        <div className="space-y-4">
+    <div className="page-shell space-y-8 md:space-y-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
           <button
             onClick={() => setView('wizard')}
             className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Revisar dados técnicos
           </button>
-          <h1 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">Dimensionamento concluído</h1>
-          <div className="flex flex-wrap gap-2">
+          <span className="eyebrow block mt-5">Resultado técnico</span>
+          <h1 className="page-heading mt-2">Dimensionamento concluído</h1>
+          <div className="flex flex-wrap gap-2 mt-4">
             <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-xs font-semibold">
               {currentInputs.power} {currentInputs.powerUnit} • {currentInputs.voltage} V
             </span>
@@ -42,13 +43,10 @@ export const ResultsView = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden lg:block text-right">
-            <p className="text-xs font-semibold text-muted-foreground">Status</p>
-            <p className="text-sm font-semibold text-green-700 flex items-center justify-end gap-1">
-              <CheckCircle2 className="w-4 h-4" /> Cálculo concluído
-            </p>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <span className="status-pill border-emerald-200 bg-emerald-50 text-emerald-700 h-9 px-3">
+            <CheckCircle2 className="w-4 h-4" /> Cálculo concluído
+          </span>
           <Button onClick={() => setView('proposal')} className="h-12 px-6 font-semibold shadow-lg shadow-primary/15 group">
             Criar proposta comercial <ShoppingCart className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Button>
@@ -56,11 +54,17 @@ export const ResultsView = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 card-panel relative overflow-hidden group">
+        <div className="lg:col-span-2 relative overflow-hidden rounded-[20px] border border-slate-200 bg-white p-6 md:p-8 shadow-sm group">
           <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:scale-110 transition-transform">
             <Shield className="w-32 h-32" />
           </div>
-          <h3 className="text-xs font-semibold text-primary mb-6">Condutor recomendado</h3>
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <div>
+              <p className="eyebrow">Condutor recomendado</p>
+              <p className="text-sm text-slate-500 mt-1">Maior seção entre os critérios avaliados</p>
+            </div>
+            <span className="status-pill border-blue-100 bg-blue-50 text-blue-700">{limitingLabel}</span>
+          </div>
           <div className="flex items-end gap-3 mb-8">
             <span className="text-5xl md:text-7xl font-bold text-foreground leading-none">{currentResults.finalCableSection}</span>
             <span className="text-xl md:text-2xl font-semibold text-muted-foreground mb-2">mm²</span>
@@ -99,7 +103,7 @@ export const ResultsView = () => {
           </div>
         </div>
 
-        <div className="card-panel bg-slate-900 text-white border-0">
+        <div className="rounded-[20px] bg-slate-950 text-white p-6 md:p-7 shadow-sm">
           <h3 className="text-xs font-semibold text-primary mb-6">Resumo elétrico</h3>
           <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -156,7 +160,7 @@ export const ResultsView = () => {
         </div>
       </div>
 
-      <div className="card-panel bg-primary/5 border-primary/20 flex flex-col md:flex-row md:items-center gap-5 p-6">
+      <div className="rounded-[16px] border border-blue-100 bg-blue-50/70 flex flex-col md:flex-row md:items-center gap-5 p-5 md:p-6">
         <div className="w-12 h-12 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
           <GraduationCap className="w-6 h-6 text-primary" />
         </div>
@@ -170,7 +174,7 @@ export const ResultsView = () => {
       </div>
 
       {!!currentResults.technicalLimitations?.length && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+        <div className="rounded-[16px] border border-amber-200 bg-amber-50/80 p-5">
           <div className="flex items-start gap-3">
             <TriangleAlert className="w-5 h-5 text-amber-700 mt-0.5 shrink-0" />
             <div>
@@ -183,15 +187,19 @@ export const ResultsView = () => {
         </div>
       )}
 
-      <div className="space-y-8">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground tracking-tight">Referências de fabricantes</h2>
-          <p className="text-sm text-muted-foreground mt-1">Sugestões da base interna por corrente/tensão. Confirme modelo, código e aplicação no catálogo vigente do fabricante.</p>
+      <div className="section-card">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-7">
+          <div>
+            <span className="eyebrow">Componentes</span>
+            <h2 className="text-2xl font-bold text-foreground tracking-tight mt-1">Referências de fabricantes</h2>
+            <p className="text-sm text-muted-foreground mt-1">A base diferencia SKU conferido de família técnica que ainda depende da configuração final.</p>
+          </div>
+          <span className="status-pill border-slate-200 bg-slate-50 text-slate-600">WEG • Siemens • Schneider</span>
         </div>
 
-        <div className="space-y-10">
+        <div className="space-y-8">
           {currentResults.technicalRequirements.map((req, idx) => (
-            <div key={idx} className="space-y-5">
+            <div key={idx} className="rounded-[16px] border border-slate-200 bg-slate-50/40 p-4 md:p-5 space-y-4">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-semibold text-xs">{idx + 1}</div>
                 <h3 className="text-lg font-semibold text-foreground">{req.label}</h3>
@@ -204,7 +212,7 @@ export const ResultsView = () => {
                   const products = currentResults.compatibleProducts[req.label]?.[mfr] || [];
                   const product = products[0];
                   return (
-                    <div key={mfr} className={cn('card-panel border transition-all', product ? 'border-slate-200 bg-white' : 'border-slate-100 bg-slate-50/50 opacity-60')}>
+                    <div key={mfr} className={cn('rounded-[14px] border p-4 transition-all', product ? 'border-slate-200 bg-white shadow-sm' : 'border-slate-200 bg-slate-100/60 opacity-70')}>
                       <p className="text-xs font-semibold text-primary mb-2">{mfr}</p>
                       {product ? (
                         <>
@@ -234,14 +242,14 @@ export const ResultsView = () => {
         </div>
       </div>
 
-      <div className="pt-10 border-t border-slate-200 flex flex-col items-center gap-5">
+      <div className="rounded-[18px] bg-slate-950 text-white p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div className="text-center space-y-2">
-          <p className="text-lg font-semibold text-foreground">Revise as condições reais da instalação antes da especificação final.</p>
-          <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg font-semibold text-white">Pronto para transformar o cálculo em proposta.</p>
+          <p className="text-sm text-slate-400 max-w-2xl">
             A ferramenta apoia o dimensionamento, mas não substitui a verificação de curto-circuito, coordenação de proteção e responsabilidade técnica do profissional.
           </p>
         </div>
-        <Button onClick={() => setView('proposal')} className="h-14 px-10 text-lg font-semibold shadow-xl shadow-primary/20">
+        <Button onClick={() => setView('proposal')} className="h-12 px-7 font-semibold shrink-0">
           Criar proposta comercial →
         </Button>
       </div>
