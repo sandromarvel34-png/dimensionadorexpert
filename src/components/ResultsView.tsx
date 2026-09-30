@@ -118,12 +118,24 @@ export const ResultsView = () => {
                 <span className="text-sm font-semibold text-green-300">{currentInputs.shortCircuitCurrentKA.toFixed(2)} kA verificado termicamente</span>
               </div>
             )}
+            {currentResults.voltageDropModel === 'acImpedanceRX' && (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-slate-400 font-semibold">Modelo ΔV</span>
+                  <span className="text-sm font-semibold">Rca + XL</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-slate-400 font-semibold">R / X</span>
+                  <span className="text-sm font-semibold">{currentResults.voltageDropResistanceOhmKm?.toFixed(2)} / {currentResults.voltageDropReactanceOhmKm?.toFixed(2)} Ω/km</span>
+                </div>
+              </>
+            )}
             <div className="pt-4 border-t border-white/10">
               <p className="text-xs font-semibold text-slate-400 mb-2 flex items-center gap-1">
                 <Info className="w-3 h-3" /> Referência técnica
               </p>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Ampacidade e fatores de correção baseados nas tabelas configuradas da NBR 5410:2004. A queda de tensão usa modelo resistivo simplificado nesta versão.
+                Ampacidade e fatores de correção baseados nas tabelas configuradas da NBR 5410:2004. A queda de tensão usa Rca + XL de referência para cabo de cobre/PVC 70 °C a 60 Hz.
               </p>
             </div>
           </div>
