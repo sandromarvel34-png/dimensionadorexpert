@@ -107,6 +107,36 @@ describe('Dimensionador Expert — matriz funcional', () => {
     expect(multipolar.correctionFactors?.grouping).toBe(0.54);
   });
 
+  test('usa modelo R+X e registra o arranjo de queda de tensão', () => {
+    const result = CalculationEngine.performFullCalculation({
+      ...triBase,
+      installationMethod: 'F3_TREFOIL',
+      voltageDropArrangement: 'auto',
+    });
+
+    expect(result.voltageDropModel).toBe('acImpedanceRX');
+    expect(result.voltageDropArrangementUsed).toBe('trefoil');
+    expect(result.voltageDropResistanceOhmKm).toBeGreaterThan(0);
+    expect(result.voltageDropReactanceOhmKm).toBeGreaterThan(0);
+  });
+
+  test('arranjo informado pelo usuário substitui a inferência automática', () => {
+    const result = CalculationEngine.performFullCalculation({
+      ...triBase,
+      installationMethod: 'B1',
+      voltageDropArrangement: 'spaced13cm',
+    });
+
+    expect(result.voltageDropArrangementUsed).toBe('spaced13cm');
+  });
+
+  test('trifólio é rejeitado no circuito monofásico', () => {
+    expect(() => CalculationEngine.performFullCalculation({
+      ...monoBase,
+      voltageDropArrangement: 'trefoil',
+    })).toThrow(/trifólio/i);
+  });
+
   test('curto-circuito informado entra no critério final', () => {
     const result = CalculationEngine.performFullCalculation({
       ...triBase,
