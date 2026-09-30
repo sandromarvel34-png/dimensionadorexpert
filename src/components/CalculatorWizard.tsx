@@ -704,20 +704,18 @@ export const CalculatorWizard = () => {
                 )}
               </div>
               <div className="space-y-3">
-                <Label className="text-foreground font-semibold">Arranjo para queda de tensão</Label>
+                <Label className="text-foreground font-semibold">Disposição dos condutores</Label>
                 <Select name="voltageDropArrangement" defaultValue={currentInputs?.voltageDropArrangement || "auto"}>
                   <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                   <SelectContent position="popper">
                     <SelectItem value="auto">Automático pelo método de instalação</SelectItem>
-                    <SelectItem value="adjacent">Condutores unipolares justapostos</SelectItem>
+                    <SelectItem value="adjacent">Condutores carregados, justapostos</SelectItem>
                     <SelectItem value="multipolar">Cabo multipolar</SelectItem>
-                    <SelectItem value="spaced2D">Condutores espaçados — s = 2D</SelectItem>
-                    <SelectItem value="spaced13cm">Condutores espaçados — 13 cm</SelectItem>
-                    <SelectItem value="spaced20cm">Condutores espaçados — 20 cm</SelectItem>
-                    <SelectItem value="trefoil">Trifólio (apenas trifásico)</SelectItem>
+                    <SelectItem value="spaced2D">Condutores carregados, no mesmo plano, espaçados</SelectItem>
+                    <SelectItem value="trefoil">Três condutores carregados, em trifólio</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">Usado no cálculo Rca + XL. Se não souber, mantenha automático.</p>
+                <p className="text-xs text-muted-foreground">Terminologia apresentada conforme a ABNT NBR 5410. Se não souber a disposição, mantenha automático.</p>
               </div>
               {installationMethod === 'D' && (
                 <>
