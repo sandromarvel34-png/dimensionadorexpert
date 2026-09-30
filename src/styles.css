@@ -47,10 +47,27 @@ a[href*="lovable.app"] {
 
 @layer base {
   body {
-    background-color: var(--color-background);
+    background:
+      radial-gradient(circle at top left, rgba(37, 99, 235, 0.035), transparent 28rem),
+      var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgba(37, 99, 235, 0.14);
+    color: var(--color-foreground);
+  }
+
+  button, input, textarea, select {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.18);
+    outline-offset: 2px;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -61,10 +78,10 @@ a[href*="lovable.app"] {
 @layer components {
   /* Buttons */
   .btn-primary {
-    @apply h-12 px-6 bg-[var(--color-primary)] text-[var(--color-primary-foreground)] font-semibold rounded-[10px] transition-all duration-200 hover:bg-[#1D4ED8] flex items-center justify-center gap-2;
+    @apply h-12 px-6 bg-[var(--color-primary)] text-[var(--color-primary-foreground)] font-semibold rounded-[10px] transition-all duration-200 hover:bg-[#1D4ED8] active:translate-y-px flex items-center justify-center gap-2 shadow-sm;
   }
   .btn-secondary {
-    @apply h-12 px-6 bg-white border border-[var(--color-border)] text-[var(--color-foreground)] font-medium rounded-[10px] transition-all duration-200 hover:bg-[var(--color-background)] flex items-center justify-center gap-2;
+    @apply h-12 px-6 bg-white border border-[var(--color-border)] text-[var(--color-foreground)] font-medium rounded-[10px] transition-all duration-200 hover:bg-slate-50 hover:border-slate-300 active:translate-y-px flex items-center justify-center gap-2;
   }
   .btn-ghost {
     @apply h-12 px-4 text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] transition-all duration-200 flex items-center justify-center;
@@ -72,7 +89,43 @@ a[href*="lovable.app"] {
 
   /* Cards */
   .card-panel {
-    @apply bg-[var(--color-card)] border border-[var(--color-border)] rounded-[14px] p-6 shadow-sm;
+    @apply bg-[var(--color-card)] border border-[var(--color-border)] rounded-[16px] p-6 shadow-sm;
+  }
+
+  .page-shell {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12;
+  }
+
+  .page-heading {
+    @apply text-3xl md:text-4xl font-bold tracking-tight leading-tight text-[var(--color-foreground)];
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-primary)];
+  }
+
+  .section-card {
+    @apply bg-white border border-[var(--color-border)] rounded-[16px] p-5 md:p-6 shadow-sm;
+  }
+
+  .section-heading {
+    @apply flex items-start gap-3 mb-6;
+  }
+
+  .section-index {
+    @apply w-8 h-8 shrink-0 rounded-full bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center text-xs font-bold;
+  }
+
+  .metric-card {
+    @apply bg-white border border-[var(--color-border)] rounded-[14px] p-5 shadow-sm;
+  }
+
+  .soft-panel {
+    @apply rounded-[14px] border border-slate-200 bg-slate-50/70;
+  }
+
+  .status-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold;
   }
 
   /* Typography Scale */
