@@ -5,9 +5,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Printer, Save, Zap } from 'lucide-react';
+import { ArrowLeft, FileDown, Plus, Trash2, Save, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import katex from 'katex';
+import { generateProposalPdf } from '@/lib/pdf/generateProposalPdf';
 
 const getProtectiveConductorSection = (phaseSection: number) => {
   const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
@@ -29,6 +30,8 @@ export const ProposalFlow = () => {
     technicianName: '',
     executingCompany: ''
   });
+
+  const [observations, setObservations] = useState('');
   
   const [items, setItems] = useState<any[]>(() => {
     if (!currentResults || !currentInputs) return [];
@@ -122,11 +125,39 @@ export const ProposalFlow = () => {
       items,
       labor,
       costs,
+      observations,
+      selectedManufacturer,
       date: new Date().toISOString()
     };
     localStorage.setItem('last_proposal', JSON.stringify(proposalData));
     markProposalSaved();
     toast.success('Proposta salva com sucesso!');
+  };
+
+  const handleGeneratePdf = () => {
+    if (!currentInputs || !currentResults) {
+      toast.error('Não há dimensionamento disponível para gerar o PDF.');
+      return;
+    }
+
+    try {
+      generateProposalPdf({
+        clientData,
+        commercialData,
+        observations,
+        items,
+        labor,
+        costs,
+        selectedManufacturer,
+        currentInputs,
+        currentResults,
+      });
+      markProposalSaved();
+      toast.success('PDF gerado com sucesso.');
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      toast.error('Não foi possível gerar o PDF.');
+    }
   };
 
   return (
@@ -212,8 +243,8 @@ export const ProposalFlow = () => {
               </button>
             ))}
           </div>
-          <button onClick={() => window.print()} className="btn-secondary">
-            <Printer className="w-5 h-5" /> Imprimir PDF
+          <button onClick={handleGeneratePdf} className="btn-secondary">
+            <FileDown className="w-5 h-5" /> Gerar PDF
           </button>
           <button onClick={handleSave} className="btn-primary">
             <Save className="w-5 h-5" /> Salvar Proposta
@@ -435,7 +466,12 @@ export const ProposalFlow = () => {
                   </div>
                   <div>
                     <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em] mb-4">Observações Gerais</h3>
-                    <Textarea className="min-h-[80px] text-xs border-border" placeholder="Ex: Prazo de entrega de 5 dias úteis. Garantia de 12 meses nos equipamentos." />
+                    <Textarea
+                      value={observations}
+                      onChange={e => setObservations(e.target.value)}
+                      className="min-h-[80px] text-xs border-border"
+                      placeholder="Ex: Prazo de entrega, garantia, condições de pagamento ou observações específicas do serviço."
+                    />
                   </div>
                 </div>
 
@@ -535,8 +571,8 @@ export const ProposalFlow = () => {
               <button onClick={handleSave} className="btn-secondary w-full h-11">
                 <Save className="w-4 h-4" /> Salvar proposta
               </button>
-              <button onClick={() => window.print()} className="btn-primary w-full h-11">
-                <Printer className="w-4 h-4" /> Gerar versão para impressão
+              <button onClick={handleGeneratePdf} className="btn-primary w-full h-11">
+                <FileDown className="w-4 h-4" /> Gerar PDF profissional
               </button>
             </div>
           </div>
