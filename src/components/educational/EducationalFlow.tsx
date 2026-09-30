@@ -4,6 +4,15 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, ChevronLeft, ChevronRight, CheckCircle2, TriangleAlert } from 'lucide-react';
 import { MathFormula } from '@/components/MathFormula';
 
+const arrangementLabel: Record<string, string> = {
+  adjacent: 'Condutores carregados, justapostos',
+  multipolar: 'Cabo multipolar',
+  spaced2D: 'Condutores carregados, no mesmo plano, espaçados',
+  spaced13cm: 'Condutores carregados, no mesmo plano, espaçados',
+  spaced20cm: 'Condutores carregados, no mesmo plano, espaçados',
+  trefoil: 'Três condutores carregados, em trifólio',
+};
+
 export const EducationalFlow = () => {
   const { currentInputs, currentResults, setView } = useAppStore();
   const [step, setStep] = useState(1);
@@ -167,8 +176,12 @@ export const EducationalFlow = () => {
                 <p className="text-xl font-semibold">{currentResults.voltageDropReactanceOhmKm?.toFixed(2)} Ω/km</p>
               </div>
               <div className="bg-white p-4 rounded-xl border">
-                <p className="text-xs text-muted-foreground">Arranjo</p>
-                <p className="text-sm font-semibold">{currentResults.voltageDropArrangementUsed || '—'}</p>
+                <p className="text-xs text-muted-foreground">Disposição dos condutores</p>
+                <p className="text-sm font-semibold">
+                  {currentResults.voltageDropArrangementUsed
+                    ? arrangementLabel[currentResults.voltageDropArrangementUsed] || '—'
+                    : '—'}
+                </p>
               </div>
             </div>
             <div className="bg-white p-5 rounded-xl border">
