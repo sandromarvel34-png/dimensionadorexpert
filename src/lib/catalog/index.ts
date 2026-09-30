@@ -26,18 +26,18 @@ const RAW_MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'weg-cfw300-15-380', manufacturer: 'WEG', category: 'inverter', model: 'CFW300C15P0T4DB20', commercialCode: '14148367', description: 'Inversor CFW300, 15 A, trifásico 380-480 V', nominalCurrent: 15, voltage: 480, voltageRange: { min: 380, max: 480 }, price: 2100.00 },
 
   // Disjuntores WEG MDW
-  { id: 'weg-mdw-c6', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C6', commercialCode: '10076440', description: 'Mini disjuntor MDW Curva C, 6A', nominalCurrent: 6, voltage: 440, price: 14.50 },
-  { id: 'weg-mdw-c10', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C10', commercialCode: '10076442', description: 'Mini disjuntor MDW Curva C, 10A', nominalCurrent: 10, voltage: 440, price: 15.50 },
-  { id: 'weg-mdw-c16', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C16', commercialCode: '10076444', description: 'Mini disjuntor MDW Curva C, 16A', nominalCurrent: 16, voltage: 440, price: 16.50 },
-  { id: 'weg-mdw-c20', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C20', commercialCode: '10076445', description: 'Mini disjuntor MDW Curva C, 20A', nominalCurrent: 20, voltage: 440, price: 18.50 },
-  { id: 'weg-mdw-c25', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C25', commercialCode: '10076446', description: 'Mini disjuntor MDW Curva C, 25A', nominalCurrent: 25, voltage: 440, price: 20.50 },
-  { id: 'weg-mdw-c32', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C32', commercialCode: '10076447', description: 'Mini disjuntor MDW Curva C, 32A', nominalCurrent: 32, voltage: 440, price: 24.50 },
-  { id: 'weg-mdw-c40', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C40', commercialCode: '10076448', description: 'Mini disjuntor MDW Curva C, 40A', nominalCurrent: 40, voltage: 440, price: 32.50 },
-  { id: 'weg-mdw-c50', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C50', commercialCode: '10076449', description: 'Mini disjuntor MDW Curva C, 50A', nominalCurrent: 50, voltage: 440, price: 45.00 },
-  { id: 'weg-mdw-c63', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C63', commercialCode: '10076450', description: 'Mini disjuntor MDW Curva C, 63A', nominalCurrent: 63, voltage: 440, price: 55.00 },
-  { id: 'weg-mdw-c80', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C80', commercialCode: '10076451', description: 'Mini disjuntor MDW Curva C, 80A', nominalCurrent: 80, voltage: 440, price: 85.00 },
-  { id: 'weg-mdw-c100', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C100', commercialCode: '10076452', description: 'Mini disjuntor MDW Curva C, 100A', nominalCurrent: 100, voltage: 440, price: 120.00 },
-  { id: 'weg-mdw-c125', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C125', commercialCode: '10076453', description: 'Mini disjuntor MDW Curva C, 125A', nominalCurrent: 125, voltage: 440, price: 155.00 },
+  { id: 'weg-mdw-c6', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C6', commercialCode: '10076397', description: 'Minidisjuntor WEG MDW, 1P, curva C, 6 A', nominalCurrent: 6, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c10', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C10', commercialCode: '10076405', description: 'Minidisjuntor WEG MDW, 1P, curva C, 10 A', nominalCurrent: 10, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c16', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C16', commercialCode: '10076413', description: 'Minidisjuntor WEG MDW, 1P, curva C, 16 A', nominalCurrent: 16, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c20', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C20', commercialCode: '10076421', description: 'Minidisjuntor WEG MDW, 1P, curva C, 20 A', nominalCurrent: 20, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c25', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C25', commercialCode: '10076429', description: 'Minidisjuntor WEG MDW, 1P, curva C, 25 A', nominalCurrent: 25, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c32', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C32', commercialCode: '10076437', description: 'Minidisjuntor WEG MDW, 1P, curva C, 32 A', nominalCurrent: 32, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c40', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C40', commercialCode: '10076445', description: 'Minidisjuntor WEG MDW, 1P, curva C, 40 A', nominalCurrent: 40, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c50', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C50', commercialCode: '10076453', description: 'Minidisjuntor WEG MDW, 1P, curva C, 50 A', nominalCurrent: 50, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c63', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C63', commercialCode: '10076461', description: 'Minidisjuntor WEG MDW, 1P, curva C, 63 A', nominalCurrent: 63, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c80', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C80', commercialCode: '10076469', description: 'Minidisjuntor WEG MDW, 1P, curva C, 80 A', nominalCurrent: 80, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c100', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C100', commercialCode: '10075743', description: 'Minidisjuntor WEG MDW, 1P, curva C, 100 A', nominalCurrent: 100, voltage: 440, poles: 1, price: 0 },
+  { id: 'weg-mdw-c125', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C125', commercialCode: '11807325', description: 'Minidisjuntor WEG MDW, 1P, curva C, 125 A', nominalCurrent: 125, voltage: 440, poles: 1, price: 0 },
 
   // Disjuntores Schneider Acti9
   { id: 'schneider-acti9-c6', manufacturer: 'Schneider', category: 'disjuntor', model: 'iC60N-C6', commercialCode: 'A9F74106', description: 'Mini disjuntor Acti9 iC60N Curva C, 6A', nominalCurrent: 6, voltage: 440, price: 55.00 },
@@ -179,7 +179,7 @@ const RAW_MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'siemens-3va400', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA400', commercialCode: '3VA400', description: 'Disjuntor 3VA1, 400A', nominalCurrent: 400, voltage: 440, price: 1180.00 },
 
   // Relés de Tempo WEG RTW
-  { id: 'weg-rtw-1', manufacturer: 'WEG', category: 'releTempo', model: 'RTW17-G02U030S', commercialCode: 'RTW17-G02U030S*', description: 'Relé temporizador WEG para partida estrela-triângulo; sufixo final depende da tensão de comando', price: 180.00 },
+  { id: 'weg-rtw-1', manufacturer: 'WEG', category: 'releTempo', model: 'RTW17-G02U030SE05', commercialCode: '13960132', description: 'Relé temporizador RTW17, função estrela-triângulo, 3-30 s, 24-240 V 50/60 Hz/CC', voltageRange: { min: 24, max: 240 }, price: 180.00 },
   
   // Relés de Tempo Schneider RE17
   { id: 'schneider-re22-star-delta', manufacturer: 'Schneider', category: 'releTempo', model: 'RE22R2QEMR', commercialCode: 'RE22R2QEMR', description: 'Relé temporizador Harmony, função estrela-triângulo, 0,3-30 s, 24-240 V CA/CC', voltageRange: { min: 24, max: 240 }, price: 210.00 },
@@ -315,9 +315,11 @@ const VERIFIED_EXACT_PRODUCT_IDS = new Set([
 
   // WEG relés com código conferido diretamente
   'weg-rw27-32','weg-rw317-215','weg-rw317-310',
+  'weg-mdw-c6','weg-mdw-c10','weg-mdw-c16','weg-mdw-c20','weg-mdw-c25','weg-mdw-c32',
+  'weg-mdw-c40','weg-mdw-c50','weg-mdw-c63','weg-mdw-c80','weg-mdw-c100','weg-mdw-c125',
 
   // Relés temporizadores estrela-triângulo com SKU completo
-  'schneider-re22-star-delta','siemens-3rp-star-delta',
+  'weg-rtw-1','schneider-re22-star-delta','siemens-3rp-star-delta',
 
   // Exemplos individuais conferidos diretamente em catálogo oficial
   'schneider-gv2me-10','siemens-3rv-10',
@@ -349,6 +351,19 @@ const OFFICIAL_SOURCE_BY_ID: Record<string, string> = {
   'weg-rw27-32': 'WEG catálogo — produto 10452382',
   'weg-rw317-215': 'WEG catálogo — produto 10410005',
   'weg-rw317-310': 'WEG catálogo — produto 10410006',
+  'weg-mdw-c6': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c10': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c16': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c20': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c25': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c32': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c40': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c50': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c63': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c80': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c100': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-mdw-c125': 'WEG Soluções Integradas — MDW monopolar curva C',
+  'weg-rtw-1': 'WEG catálogo — produto 13960132',
   'schneider-gv2me-10': 'Schneider Electric — GV2ME14',
   'siemens-3rv-10': 'Siemens Industry Mall — 3RV2011-1JA10',
   'schneider-re22-star-delta': 'Schneider Electric — RE22R2QEMR',
@@ -405,6 +420,7 @@ export const findCompatibleProducts = (
   const filtered = MANUFACTURER_CATALOG.filter(p => {
     if (p.category !== category) return false;
     if (p.verificationStatus === 'blocked') return false;
+    if (p.lifecycle === 'phase-out') return false;
     if (mfr && p.manufacturer.toLowerCase() !== mfr.toLowerCase()) return false;
 
     if (systemVoltage && voltageSensitive.includes(category)) {
