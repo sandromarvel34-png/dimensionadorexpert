@@ -2,6 +2,20 @@ export type MotorPhase = 'monofasico' | 'trifasico';
 export type PowerUnit = 'cv' | 'hp' | 'kW';
 export type StarterType = 'direta' | 'reversao' | 'estrelaTriangulo' | 'softStarter' | 'inversor';
 
+export interface CompanyProfile {
+  companyName: string;
+  document: string;
+  responsibleName: string;
+  professionalRegistration: string;
+  phone: string;
+  email: string;
+  address: string;
+  cityState: string;
+  website: string;
+  logoDataUrl: string;
+  brandColor: string;
+}
+
 export interface TechnicalReference {
   id: string;
   standardName: string;
