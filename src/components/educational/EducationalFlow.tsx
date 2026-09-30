@@ -255,7 +255,7 @@ export const EducationalFlow = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-12 space-y-7">
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => setView('results')} className="text-muted-foreground font-semibold hover:text-primary">
           <ChevronLeft className="w-4 h-4 mr-2" /> Voltar ao resultado
@@ -265,22 +265,43 @@ export const EducationalFlow = () => {
         </div>
       </div>
 
-      <div className="space-y-2 text-center">
-        <h1 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">Como este dimensionamento foi calculado</h1>
-        <p className="text-sm md:text-base text-muted-foreground">Acompanhe as etapas e os limites do cálculo apresentado.</p>
+      <div className="text-center max-w-2xl mx-auto">
+        <span className="eyebrow">Memorial de cálculo</span>
+        <h1 className="page-heading mt-2">Como este dimensionamento foi calculado</h1>
+        <p className="text-sm md:text-base text-slate-500 mt-2">Percorra cada etapa para entender os dados, fórmulas e critérios usados no resultado.</p>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex justify-between items-center px-2">
+      <div className="space-y-3">
+        <div className="flex justify-between items-center">
           <span className="text-xs font-semibold text-slate-500">Etapa {step} de {steps.length}</span>
           <span className="text-xs font-semibold text-primary">{steps[step - 1]}</span>
         </div>
-        <div className="h-2 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-primary transition-all" style={{ width: `${(step / steps.length) * 100}%` }} /></div>
+        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+          <div className="h-full bg-primary transition-all duration-300" style={{ width: `${(step / steps.length) * 100}%` }} />
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {steps.map((label, index) => {
+            const indexStep = index + 1;
+            return (
+              <button
+                key={label}
+                onClick={() => setStep(indexStep)}
+                className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${indexStep === step
+                  ? 'border-blue-200 bg-blue-50 text-primary'
+                  : indexStep < step
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                    : 'border-slate-200 bg-white text-slate-500 hover:text-slate-800'}`}
+              >
+                {indexStep}. {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="card-panel min-h-[420px] flex flex-col justify-center">{renderStep()}</div>
+      <div className="rounded-[18px] border border-slate-200 bg-white p-5 md:p-8 shadow-sm min-h-[420px] flex flex-col justify-center">{renderStep()}</div>
 
-      <div className="flex justify-between gap-4">
+      <div className="flex justify-between gap-3 sticky bottom-4 rounded-[14px] border border-slate-200 bg-white/95 backdrop-blur p-2 shadow-lg">
         <Button variant="outline" onClick={() => setStep((value) => Math.max(1, value - 1))} disabled={step === 1}><ChevronLeft className="w-4 h-4 mr-2" /> Anterior</Button>
         <Button onClick={() => step === steps.length ? setView('results') : setStep((value) => Math.min(steps.length, value + 1))}>
           {step === steps.length ? 'Concluir' : 'Próxima'} {step < steps.length && <ChevronRight className="w-4 h-4 ml-2" />}
