@@ -47,6 +47,7 @@ export const useAppStore = create<AppState>()(
         website: '',
         logoDataUrl: '',
         brandColor: '#2563EB',
+        logoBackground: 'light',
       },
 
       setView: (view) => set({ view }),
