@@ -66,6 +66,15 @@ export interface ManufacturerProduct {
   powerRange?: { min: number; max: number };
   voltage?: number;
   adjustmentRange?: { min: number; max: number };
+  voltageRange?: { min: number; max: number };
+  controlVoltage?: number;
+  poles?: number;
+  utilizationCategory?: string;
+  breakingCapacityKA?: number;
+  verificationStatus?: 'verified-exact' | 'verified-family' | 'blocked';
+  catalogSource?: string;
+  selectionNote?: string;
+  lifecycle?: 'active' | 'legacy' | 'phase-out';
   price?: number;
 }
 
