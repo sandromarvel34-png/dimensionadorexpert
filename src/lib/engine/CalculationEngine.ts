@@ -12,9 +12,9 @@ import {
   getSoilResistivityFactor,
   getTemperatureFactor,
 } from './correction-factors';
+import { getCableImpedance, inferVoltageDropArrangement, STANDARD_CABLE_SECTIONS, VoltageDropArrangement } from './voltage-drop-data';
 
 export class CalculationEngine {
-  private static readonly RHO_COPPER_70 = 0.0213;
   private static readonly COS_PHI_DEFAULT = 0.85;
   private static readonly EFFICIENCY_DEFAULT = 0.90;
   private static readonly SECAO_MINIMA_FORCA = 2.5;
@@ -150,29 +150,73 @@ export class CalculationEngine {
     );
   }
 
-  /**
-   * Queda de tensão por modelo resistivo simplificado.
-   * Uma etapa posterior da auditoria substituirá este modelo por Rca + X_L.
-   */
+  static calculateVoltageDropForSection(
+    current: number,
+    distance: number,
+    voltage: number,
+    pf: number,
+    phase: 'monofasico' | 'trifasico',
+    section: number,
+    arrangement: VoltageDropArrangement,
+  ): { percent: number; volts: number; resistance: number; reactance: number } {
+    const impedance = getCableImpedance(phase, arrangement, section);
+    if (!impedance) {
+      throw new Error(`Não há dados R/X disponíveis para ${section} mm² no arranjo selecionado.`);
+    }
+
+    const sinPhi = Math.sqrt(Math.max(0, 1 - pf * pf));
+    const lengthKm = distance / 1000;
+    const phaseFactor = phase === 'trifasico' ? Math.sqrt(3) : 2;
+    const volts = phaseFactor * (impedance.rca * pf + impedance.xl * sinPhi) * current * lengthKm;
+    const percent = (volts / voltage) * 100;
+
+    return {
+      percent,
+      volts,
+      resistance: impedance.rca,
+      reactance: impedance.xl,
+    };
+  }
+
   static getSectionByVoltageDrop(
     current: number,
     distance: number,
     voltage: number,
     maxDropPercent: number,
     pf: number = 0.85,
-    phase: string = 'trifasico',
-  ): { requiredSection: number; selectedSection: number; actualDrop: number } {
-    const k = phase === 'trifasico' ? Math.sqrt(3) : 2;
-    const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
-    const requiredSection = (100 * k * this.RHO_COPPER_70 * distance * current * pf) / (maxDropPercent * voltage);
-    const selectedSection = standardSections.find((section) => section >= requiredSection);
+    phase: 'monofasico' | 'trifasico' = 'trifasico',
+    arrangement: VoltageDropArrangement = 'adjacent',
+  ): { selectedSection: number; actualDrop: number; resistance: number; reactance: number } {
+    let lastSupportedSection = 0;
 
-    if (!selectedSection) {
-      throw new Error(`Seção teórica por queda de tensão (${requiredSection.toFixed(2)} mm²) excede 500 mm².`);
+    for (const section of STANDARD_CABLE_SECTIONS) {
+      const impedance = getCableImpedance(phase, arrangement, section);
+      if (!impedance) continue;
+      lastSupportedSection = section;
+
+      const result = this.calculateVoltageDropForSection(
+        current,
+        distance,
+        voltage,
+        pf,
+        phase,
+        section,
+        arrangement,
+      );
+
+      if (result.percent <= maxDropPercent) {
+        return {
+          selectedSection: section,
+          actualDrop: result.percent,
+          resistance: result.resistance,
+          reactance: result.reactance,
+        };
+      }
     }
 
-    const actualDrop = (k * this.RHO_COPPER_70 * distance * current * pf * 100) / (selectedSection * voltage);
-    return { requiredSection, selectedSection, actualDrop };
+    throw new Error(
+      `A queda de tensão excede ${maxDropPercent}% para todas as seções disponíveis no arranjo ${arrangement} (até ${lastSupportedSection || 'nenhuma'} mm²).`,
+    );
   }
 
   static performFullCalculation(inputs: CalculationInputs): CalculationResults {
@@ -221,6 +265,14 @@ export class CalculationEngine {
       numConductors,
     );
 
+    const voltageDropArrangement = inputs.voltageDropArrangement && inputs.voltageDropArrangement !== 'auto'
+      ? inputs.voltageDropArrangement
+      : inferVoltageDropArrangement(inputs.phase, method, inputs.buriedCableConfiguration);
+
+    if (inputs.phase === 'monofasico' && voltageDropArrangement === 'trefoil') {
+      throw new Error('Arranjo em trifólio não é compatível com circuito monofásico.');
+    }
+
     const dropResult = this.getSectionByVoltageDrop(
       Ib,
       inputs.distance,
@@ -228,6 +280,7 @@ export class CalculationEngine {
       inputs.maxVoltageDrop,
       pf,
       inputs.phase,
+      voltageDropArrangement,
     );
 
     const shortCircuitResult = inputs.shortCircuitCurrentKA !== undefined && inputs.shortCircuitDurationSeconds !== undefined
@@ -304,14 +357,18 @@ export class CalculationEngine {
         soilResistivity: fSoil,
         combined: combinedCorrectionFactor,
       },
-      voltageDropModel: 'resistiveApproximation',
+      voltageDropModel: 'acImpedanceRX',
+      voltageDropArrangementUsed: voltageDropArrangement,
+      voltageDropResistanceOhmKm: dropResult.resistance,
+      voltageDropReactanceOhmKm: dropResult.reactance,
       cableByShortCircuit: shortCircuitResult?.selectedSection,
       shortCircuitWithstandCurrentKA: shortCircuitResult?.withstandCurrentKA,
       shortCircuitCheckPerformed: !!shortCircuitResult,
       technicalLimitations: [
         ...(!shortCircuitResult ? ['A verificação térmica de curto-circuito do condutor não foi realizada porque Icc e tempo de atuação não foram informados.'] : []),
         'A capacidade de interrupção (Icu/Icn) e a coordenação da proteção principal ainda devem ser verificadas no dispositivo selecionado.',
-        'A queda de tensão usa modelo resistivo simplificado; a reatância do cabo não é considerada nesta versão.',
+        'A queda de tensão usa Rca + XL de referência para cabo de cobre/PVC 70 °C a 60 Hz; confirme se o arranjo físico informado corresponde à instalação real.',
+        'Os valores de Rca/XL usados na queda de tensão não se aplicam a conduto metálico fechado ferromagnético.',
         'Modelos e códigos comerciais de fabricantes devem ser confirmados no catálogo vigente antes da compra.',
       ],
       technicalRequirements: requirements,
@@ -323,6 +380,7 @@ export class CalculationEngine {
         { id: 'ref3', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: 'Tabelas 36 e 38', description: 'Capacidade de condução de corrente.' },
         { id: 'ref4', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: 'Tabelas 40 a 45', description: 'Fatores de correção de temperatura, solo e agrupamento.' },
         { id: 'ref5', standardName: 'ABNT NBR 5410', version: '2004 (Versão Corrigida: 2008)', section: '5.3.5', description: 'Verificação térmica dos condutores sob curto-circuito, quando Icc e tempo são informados.' },
+        { id: 'ref6', standardName: 'Prysmian — Guia de Dimensionamento BT Rev.10', version: 'Rev.10', section: '6.2 e Tabela 31', description: 'Fórmula de queda de tensão em CA e valores Rca/XL do cabo Sintenax Flex (cobre/PVC 70 °C, 60 Hz).' },
       ],
     };
   }
