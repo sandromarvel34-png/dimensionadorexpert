@@ -130,20 +130,21 @@ export const ProposalFlow = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 print:p-0 print:py-0">
-      <div className="mb-6 md:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6 md:gap-8 print:hidden">
-        <div className="space-y-2">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12 print:p-0 print:py-0">
+      <div className="mb-7 flex flex-col xl:flex-row xl:items-end justify-between gap-5 print:hidden">
+        <div>
           <button 
             onClick={() => setView('results')}
             className="btn-ghost px-0 h-auto gap-2 text-sm font-semibold"
           >
             <ArrowLeft className="w-4 h-4" /> Voltar aos resultados
           </button>
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">Proposta Comercial</h2>
-          <p className="text-muted-foreground text-base md:text-lg">Personalize e gere o orçamento profissional.</p>
+          <span className="eyebrow block mt-5">Documentação comercial</span>
+          <h2 className="page-heading mt-2">Proposta comercial</h2>
+          <p className="text-slate-600 text-base md:text-lg mt-2">Complete os dados do cliente, revise os materiais e prepare o documento para apresentação.</p>
         </div>
-        <div className="flex flex-wrap gap-4">
-          <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg border border-slate-200">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-[10px] border border-slate-200">
             {['WEG', 'Siemens', 'Schneider'].map((mfr) => (
               <button
                 key={mfr}
@@ -154,10 +155,13 @@ export const ProposalFlow = () => {
                   // Atualizar a lista de itens baseada no novo fabricante
                   if (currentResults && currentInputs) {
                     const multiplier = currentInputs.phase === 'trifasico' ? 3 : 2;
-                    const cableQty = (currentInputs.distance || 1) * multiplier;
+                    const cableQty = Math.round((currentInputs.distance || 1) * multiplier);
+                    const groundQty = Math.round(currentInputs.distance || 1);
+                    const groundSection = getProtectiveConductorSection(currentResults.finalCableSection);
                     
                     const newItems: any[] = [
-                      { id: 'cable', desc: `Cabo Flexível ${currentResults.finalCableSection}mm² 750V`, qtd: cableQty, unit: 'm', price: '' }
+                      { id: 'cable', desc: `Cabo de potência flexível Cu/PVC 70°C 0,6/1 kV ${currentResults.finalCableSection}mm² (Fases)`, qtd: cableQty, unit: 'm', price: '' },
+                      { id: 'cable-ground', desc: `Cabo de potência flexível Cu/PVC 70°C 0,6/1 kV ${groundSection}mm² (PE/Terra)`, qtd: groundQty, unit: 'm', price: '' }
                     ];
 
                     currentResults.technicalRequirements.forEach(req => {
@@ -198,7 +202,7 @@ export const ProposalFlow = () => {
                   }
                 }}
                 className={cn(
-                  "px-3 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest transition-all",
+                  "px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
                   selectedManufacturer === mfr 
                     ? "bg-white text-primary shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -217,11 +221,17 @@ export const ProposalFlow = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-2 space-y-8 print:col-span-3">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-6 lg:gap-8">
+        <div className="space-y-6 print:col-span-3">
           {/* Client Data Form - Hidden in Print if Empty */}
-          <div className="card-panel space-y-6 print:hidden">
-            <h3 className="text-card-title">Dados do Cliente</h3>
+          <div className="section-card print:hidden">
+            <div className="section-heading">
+              <div className="section-index">1</div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-950">Cliente e serviço</h3>
+                <p className="text-sm text-slate-500 mt-0.5">Informações que aparecerão na proposta comercial.</p>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
               <div className="space-y-2">
                 <Label className="text-label uppercase tracking-widest text-[10px]">Nome / Razão Social</Label>
@@ -253,7 +263,7 @@ export const ProposalFlow = () => {
           </div>
 
           {/* PDF Preview Container */}
-          <div className="bg-white border border-border rounded-[14px] shadow-2xl overflow-hidden print:border-0 print:shadow-none print:rounded-none">
+          <div className="bg-white border border-slate-200 rounded-[18px] shadow-lg shadow-slate-900/5 overflow-hidden print:border-0 print:shadow-none print:rounded-none">
             <div className="p-4 md:p-10 print:p-0 print:block">
               {/* PDF Header */}
               <div className="flex flex-col sm:flex-row justify-between items-start mb-10 border-b pb-8 border-slate-100 gap-4">
@@ -480,9 +490,13 @@ export const ProposalFlow = () => {
         </div>
 
         {/* Commercial Sidebar - Hidden in Print */}
-        <div className="lg:col-span-1 space-y-8 print:hidden">
-          <div className="card-panel space-y-8">
-            <h3 className="text-card-title">Configurações Comerciais</h3>
+        <div className="space-y-6 print:hidden">
+          <div className="section-card space-y-6 xl:sticky xl:top-24">
+            <div>
+              <span className="eyebrow">Configuração</span>
+              <h3 className="text-lg font-bold text-slate-950 mt-1">Dados comerciais</h3>
+              <p className="text-sm text-slate-500 mt-1">Defina responsável, validade e valor da hora técnica.</p>
+            </div>
             
             <div className="space-y-4">
               <div className="space-y-2">
@@ -511,15 +525,20 @@ export const ProposalFlow = () => {
               </div>
             </div>
 
-            <div className="pt-8 border-t border-border">
+            <div className="pt-5 border-t border-border">
               <p className="text-metadata leading-relaxed">
                 As informações técnicas do memorial são extraídas automaticamente do seu cálculo mais recente.
               </p>
             </div>
 
-            <button onClick={() => window.print()} className="btn-primary w-full shadow-lg shadow-primary/20">
-              <Printer className="w-5 h-5" /> Imprimir Documento
-            </button>
+            <div className="grid gap-2">
+              <button onClick={handleSave} className="btn-secondary w-full h-11">
+                <Save className="w-4 h-4" /> Salvar proposta
+              </button>
+              <button onClick={() => window.print()} className="btn-primary w-full h-11">
+                <Printer className="w-4 h-4" /> Gerar versão para impressão
+              </button>
+            </div>
           </div>
         </div>
       </div>
