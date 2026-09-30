@@ -2,13 +2,13 @@ import {
   ManufacturerProduct 
 } from '../../types';
 
-export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
+const RAW_MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   // Disjuntores Motores WEG MPW
-  { id: 'weg-mpw18-10', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW18-3-U010', commercialCode: '12428135', description: 'Disjuntor Motor MPW18, 6.3-10A', nominalCurrent: 10, adjustmentRange: { min: 6.3, max: 10 }, voltage: 690, price: 185.00 },
-  { id: 'weg-mpw18-16', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW18-3-U016', commercialCode: '12428136', description: 'Disjuntor Motor MPW18, 10-16A', nominalCurrent: 16, adjustmentRange: { min: 10, max: 16 }, voltage: 690, price: 195.00 },
-  { id: 'weg-mpw18-20', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW18-3-U020', commercialCode: '12428137', description: 'Disjuntor Motor MPW18, 16-20A', nominalCurrent: 20, adjustmentRange: { min: 16, max: 20 }, voltage: 690, price: 215.00 },
-  { id: 'weg-mpw40-25', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW40-3-U025', commercialCode: '12428138', description: 'Disjuntor Motor MPW40, 20-25A', nominalCurrent: 25, adjustmentRange: { min: 20, max: 25 }, voltage: 690, price: 245.00 },
-  { id: 'weg-mpw40-32', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW40-3-U032', commercialCode: '12428139', description: 'Disjuntor Motor MPW40, 25-32A', nominalCurrent: 32, adjustmentRange: { min: 25, max: 32 }, voltage: 690, price: 285.00 },
+  { id: 'weg-mpw18-10', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW18-3-U010', commercialCode: '12429372', description: 'Disjuntor-motor MPW18, 6,3-10 A', nominalCurrent: 10, adjustmentRange: { min: 6.3, max: 10 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 185.00 },
+  { id: 'weg-mpw18-16', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW18-3-U016', commercialCode: '12429373', description: 'Disjuntor-motor MPW18, 10-16 A', nominalCurrent: 16, adjustmentRange: { min: 10, max: 16 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 195.00 },
+  { id: 'weg-mpw40-20', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW40-3-U020', commercialCode: '12428129', description: 'Disjuntor-motor MPW40, 16-20 A', nominalCurrent: 20, adjustmentRange: { min: 16, max: 20 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 215.00 },
+  { id: 'weg-mpw40-25', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW40-3-U025', commercialCode: '12428133', description: 'Disjuntor-motor MPW40, 20-25 A', nominalCurrent: 25, adjustmentRange: { min: 20, max: 25 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 245.00 },
+  { id: 'weg-mpw40-32', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW40-3-U032', commercialCode: '12428131', description: 'Disjuntor-motor MPW40, 25-32 A', nominalCurrent: 32, adjustmentRange: { min: 25, max: 32 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 285.00 },
 
   // Fusíveis WEG Diazed e NH
   { id: 'weg-fd-16', manufacturer: 'WEG', category: 'fusivel', model: 'F D-16', commercialCode: '10000001', description: 'Fusível Diazed retardado, 16A', nominalCurrent: 16, voltage: 500, price: 12.00 },
@@ -17,13 +17,13 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'weg-fnh1-100', manufacturer: 'WEG', category: 'fusivel', model: 'F NH1-100', commercialCode: '10000004', description: 'Fusível NH tamanho 1 retardado, 100A', nominalCurrent: 100, voltage: 500, price: 85.00 },
 
   // Soft-Starters e Inversores WEG
-  { id: 'weg-ssw05-16', manufacturer: 'WEG', category: 'softStarter', model: 'SSW05-16A', commercialCode: '10000005', description: 'Soft-Starter SSW05, 16A', nominalCurrent: 16, price: 850.00 },
-  { id: 'weg-ssw05-30', manufacturer: 'WEG', category: 'softStarter', model: 'SSW05-30A', commercialCode: '10000007', description: 'Soft-Starter SSW05, 30A', nominalCurrent: 30, price: 1150.00 },
-  { id: 'weg-ssw05-45', manufacturer: 'WEG', category: 'softStarter', model: 'SSW05-45A', commercialCode: '10000008', description: 'Soft-Starter SSW05, 45A', nominalCurrent: 45, price: 1450.00 },
-  { id: 'weg-ssw05-60', manufacturer: 'WEG', category: 'softStarter', model: 'SSW05-60A', commercialCode: '10000009', description: 'Soft-Starter SSW05, 60A', nominalCurrent: 60, price: 1850.00 },
-  { id: 'weg-cfw300-15', manufacturer: 'WEG', category: 'inverter', model: 'CFW300-15A', commercialCode: '10000006', description: 'Inversor de Frequência CFW300, 15.2A', nominalCurrent: 15.2, price: 1200.00 },
-  { id: 'weg-cfw300-24', manufacturer: 'WEG', category: 'inverter', model: 'CFW300-24A', commercialCode: '10000010', description: 'Inversor de Frequência CFW300, 24A', nominalCurrent: 24, price: 1600.00 },
-  { id: 'weg-cfw300-33', manufacturer: 'WEG', category: 'inverter', model: 'CFW300-33A', commercialCode: '10000011', description: 'Inversor de Frequência CFW300, 33A', nominalCurrent: 33, price: 2100.00 },
+  { id: 'weg-ssw05-16', manufacturer: 'WEG', category: 'softStarter', model: 'SSW050016T2246TPZ', commercialCode: '10413821', description: 'Soft-Starter SSW05, 16 A, 220-460 V', nominalCurrent: 16, voltage: 460, voltageRange: { min: 220, max: 460 }, price: 850.00 },
+  { id: 'weg-ssw05-30', manufacturer: 'WEG', category: 'softStarter', model: 'SSW050030T2246TPZ', commercialCode: '10413823', description: 'Soft-Starter SSW05, 30 A, 220-460 V', nominalCurrent: 30, voltage: 460, voltageRange: { min: 220, max: 460 }, price: 1150.00 },
+  { id: 'weg-ssw05-45', manufacturer: 'WEG', category: 'softStarter', model: 'SSW050045T2246TPZ', commercialCode: '10413824', description: 'Soft-Starter SSW05, 45 A, 220-460 V', nominalCurrent: 45, voltage: 460, voltageRange: { min: 220, max: 460 }, price: 1450.00 },
+  { id: 'weg-ssw05-60', manufacturer: 'WEG', category: 'softStarter', model: 'SSW050060T2246TPZ', commercialCode: '10328754', description: 'Soft-Starter SSW05, 60 A, 220-460 V', nominalCurrent: 60, voltage: 460, voltageRange: { min: 220, max: 460 }, price: 1850.00 },
+  { id: 'weg-cfw300-15-220', manufacturer: 'WEG', category: 'inverter', model: 'CFW300B15P2T2DB20', commercialCode: '13059939', description: 'Inversor CFW300, 15,2 A, trifásico 200-240 V', nominalCurrent: 15.2, voltage: 240, voltageRange: { min: 200, max: 240 }, price: 1200.00 },
+  { id: 'weg-cfw300-10-380', manufacturer: 'WEG', category: 'inverter', model: 'CFW300C10P0T4DB20', commercialCode: '14148365', description: 'Inversor CFW300, 10 A, trifásico 380-480 V', nominalCurrent: 10, voltage: 480, voltageRange: { min: 380, max: 480 }, price: 1600.00 },
+  { id: 'weg-cfw300-15-380', manufacturer: 'WEG', category: 'inverter', model: 'CFW300C15P0T4DB20', commercialCode: '14148367', description: 'Inversor CFW300, 15 A, trifásico 380-480 V', nominalCurrent: 15, voltage: 480, voltageRange: { min: 380, max: 480 }, price: 2100.00 },
 
   // Disjuntores WEG MDW
   { id: 'weg-mdw-c6', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C6', commercialCode: '10076440', description: 'Mini disjuntor MDW Curva C, 6A', nominalCurrent: 6, voltage: 440, price: 14.50 },
@@ -115,14 +115,14 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
 
   // Relés Térmicos WEG RW27
   { id: 'weg-rw27-0d4', manufacturer: 'WEG', category: 'releTermico', model: 'RW27-1D3-D004', commercialCode: '10046931', description: 'Relé RW27, 0.28-0.4A', nominalCurrent: 0.4, adjustmentRange: { min: 0.28, max: 0.4 }, price: 58.00 },
-  { id: 'weg-rw27-32', manufacturer: 'WEG', category: 'releTermico', model: 'RW27-1D3-U032', commercialCode: '10046949', description: 'Relé RW27, 22-32A', nominalCurrent: 32, adjustmentRange: { min: 22, max: 32 }, price: 95.00 },
+  { id: 'weg-rw27-32', manufacturer: 'WEG', category: 'releTermico', model: 'RW27-1D3-U032', commercialCode: '10452382', description: 'Relé térmico RW27, 22-32 A', nominalCurrent: 32, adjustmentRange: { min: 22, max: 32 }, price: 245.00 },
   { id: 'weg-rw27-40', manufacturer: 'WEG', category: 'releTermico', model: 'RW27-1D3-U040', commercialCode: '10046950', description: 'Relé RW27, 28-40A', nominalCurrent: 40, adjustmentRange: { min: 28, max: 40 }, price: 115.00 },
   { id: 'weg-rw27-50', manufacturer: 'WEG', category: 'releTermico', model: 'RW27-1D3-U050', commercialCode: '10046951', description: 'Relé RW27, 40-50A', nominalCurrent: 50, adjustmentRange: { min: 40, max: 50 }, price: 145.00 },
   { id: 'weg-rw67-80', manufacturer: 'WEG', category: 'releTermico', model: 'RW67-1D3-U080', commercialCode: '10046952', description: 'Relé RW67, 57-80A', nominalCurrent: 80, adjustmentRange: { min: 57, max: 80 }, price: 285.00 },
   { id: 'weg-rw67-112', manufacturer: 'WEG', category: 'releTermico', model: 'RW67-1D3-U112', commercialCode: '10046953', description: 'Relé RW67, 80-112A', nominalCurrent: 112, adjustmentRange: { min: 80, max: 112 }, price: 345.00 },
   { id: 'weg-rw117-150', manufacturer: 'WEG', category: 'releTermico', model: 'RW117-1D3-U150', commercialCode: '10046954', description: 'Relé RW117, 100-150A', nominalCurrent: 150, adjustmentRange: { min: 100, max: 150 }, price: 485.00 },
-  { id: 'weg-rw317-215', manufacturer: 'WEG', category: 'releTermico', model: 'RW317-1D3-U215', commercialCode: '10046955', description: 'Relé RW317, 140-215A', nominalCurrent: 215, adjustmentRange: { min: 140, max: 215 }, price: 825.00 },
-  { id: 'weg-rw317-310', manufacturer: 'WEG', category: 'releTermico', model: 'RW317-1D3-U310', commercialCode: '10046956', description: 'Relé RW317, 200-310A', nominalCurrent: 310, adjustmentRange: { min: 200, max: 310 }, price: 985.00 },
+  { id: 'weg-rw317-215', manufacturer: 'WEG', category: 'releTermico', model: 'RW317-1D3-U215', commercialCode: '10410005', description: 'Relé térmico RW317, 140-215 A', nominalCurrent: 215, adjustmentRange: { min: 140, max: 215 }, price: 1250.00 },
+  { id: 'weg-rw317-310', manufacturer: 'WEG', category: 'releTermico', model: 'RW317-1D3-U310', commercialCode: '10410006', description: 'Relé térmico RW317, 200-310 A', nominalCurrent: 310, adjustmentRange: { min: 200, max: 310 }, price: 1650.00 },
 
   // Relés Térmicos Schneider LRD
   { id: 'schneider-lrd-04', manufacturer: 'Schneider', category: 'releTermico', model: 'LRD04', commercialCode: 'LRD04', description: 'Relé TeSys LRD, 0.4-0.63A', nominalCurrent: 0.63, adjustmentRange: { min: 0.4, max: 0.63 }, price: 110.00 },
@@ -179,13 +179,13 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'siemens-3va400', manufacturer: 'Siemens', category: 'disjuntor', model: '3VA400', commercialCode: '3VA400', description: 'Disjuntor 3VA1, 400A', nominalCurrent: 400, voltage: 440, price: 1180.00 },
 
   // Relés de Tempo WEG RTW
-  { id: 'weg-rtw-1', manufacturer: 'WEG', category: 'releTempo', model: 'RTW-ET', commercialCode: '10045600', description: 'Relé de tempo eletrônico RTW Estrela-Triângulo', nominalCurrent: 0, price: 75.00 },
+  { id: 'weg-rtw-1', manufacturer: 'WEG', category: 'releTempo', model: 'RTW17-G02U030S', commercialCode: 'RTW17-G02U030S*', description: 'Relé temporizador WEG para partida estrela-triângulo; sufixo final depende da tensão de comando', price: 180.00 },
   
   // Relés de Tempo Schneider RE17
-  { id: 'schneider-re17-1', manufacturer: 'Schneider', category: 'releTempo', model: 'RE17RMMW', commercialCode: 'RE17RMMW', description: 'Relé de tempo modular TeSys', nominalCurrent: 0, price: 125.00 },
+  { id: 'schneider-re22-star-delta', manufacturer: 'Schneider', category: 'releTempo', model: 'RE22R2QEMR', commercialCode: 'RE22R2QEMR', description: 'Relé temporizador Harmony, função estrela-triângulo, 0,3-30 s, 24-240 V CA/CC', voltageRange: { min: 24, max: 240 }, price: 210.00 },
 
   // Relés de Tempo Siemens Sirius 3RP
-  { id: 'siemens-3rp-1', manufacturer: 'Siemens', category: 'releTempo', model: '3RP25', commercialCode: '3RP25', description: 'Relé de tempo Sirius', nominalCurrent: 0, price: 115.00 },
+  { id: 'siemens-3rp-star-delta', manufacturer: 'Siemens', category: 'releTempo', model: '3RP2576-2NW30', commercialCode: '3RP2576-2NW30', description: 'Relé temporizador SIRIUS, função estrela-triângulo, 3-60 s, 12-240 V CA/CC', voltageRange: { min: 12, max: 240 }, price: 230.00 },
   
   // Itens Auxiliares
   { id: 'weg-btn-green', manufacturer: 'WEG', category: 'auxiliar', model: 'CSW-BF1', commercialCode: '10046000', description: 'Botão Faceado Verde (Liga)', nominalCurrent: 0, price: 25.00 },
@@ -253,11 +253,11 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'schneider-gv6-320', manufacturer: 'Schneider', category: 'disjuntorMotor', model: 'GV6P320', commercialCode: 'GV6P320', description: 'Disjuntor Motor TeSys GV6, 200-320A', nominalCurrent: 320, adjustmentRange: { min: 200, max: 320 }, voltage: 690, price: 2150.00 },
 
   // Disjuntores Motor WEG MPW Alta Potência
-  { id: 'weg-mpw65-65', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW65-3-U065', commercialCode: '12428140', description: 'Disjuntor Motor MPW65, 45-65A', nominalCurrent: 65, adjustmentRange: { min: 45, max: 65 }, voltage: 690, price: 580.00 },
-  { id: 'weg-mpw100-100', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW100-3-U100', commercialCode: '12428141', description: 'Disjuntor Motor MPW100, 70-100A', nominalCurrent: 100, adjustmentRange: { min: 70, max: 100 }, voltage: 690, price: 850.00 },
-  { id: 'weg-mpw150-150', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW150-3-U150', commercialCode: '12428142', description: 'Disjuntor Motor MPW150, 100-150A', nominalCurrent: 150, adjustmentRange: { min: 100, max: 150 }, voltage: 690, price: 1150.00 },
-  { id: 'weg-mpw250-250', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW250-3-U250', commercialCode: '12428143', description: 'Disjuntor Motor MPW250, 160-250A', nominalCurrent: 250, adjustmentRange: { min: 160, max: 250 }, voltage: 690, price: 1650.00 },
-  { id: 'weg-mpw300-300', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW300-3-U300', commercialCode: '12428144', description: 'Disjuntor Motor MPW300, 200-300A', nominalCurrent: 300, adjustmentRange: { min: 200, max: 300 }, voltage: 690, price: 1950.00 },
+  { id: 'weg-mpw80-50', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW80-3-U050', commercialCode: '12425428', description: 'Disjuntor-motor MPW80, 40-50 A', nominalCurrent: 50, adjustmentRange: { min: 40, max: 50 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 580.00 },
+  { id: 'weg-mpw80-65', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW80-3-U065', commercialCode: '12425429', description: 'Disjuntor-motor MPW80, 50-65 A', nominalCurrent: 65, adjustmentRange: { min: 50, max: 65 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 850.00 },
+  { id: 'weg-mpw80-80', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW80-3-U080', commercialCode: '12501063', description: 'Disjuntor-motor MPW80, 65-80 A', nominalCurrent: 80, adjustmentRange: { min: 65, max: 80 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 1150.00 },
+  { id: 'weg-mpw100-90', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW100-3-U090', commercialCode: '10076552', description: 'Disjuntor-motor MPW100, 70-90 A', nominalCurrent: 90, adjustmentRange: { min: 70, max: 90 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 1650.00 },
+  { id: 'weg-mpw100-100', manufacturer: 'WEG', category: 'disjuntorMotor', model: 'MPW100-3-U100', commercialCode: '10047295', description: 'Disjuntor-motor MPW100, 80-100 A', nominalCurrent: 100, adjustmentRange: { min: 80, max: 100 }, voltage: 690, poles: 3, utilizationCategory: 'AC-3', price: 1950.00 },
 
   // Fusíveis NH Alta Potência (Para motores até 100cv)
   { id: 'weg-fnh2-160', manufacturer: 'WEG', category: 'fusivel', model: 'F NH2-160', commercialCode: '10000012', description: 'Fusível NH2 retardado, 160A', nominalCurrent: 160, voltage: 500, price: 125.00 },
@@ -285,22 +285,113 @@ export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'siemens-3rb-300', manufacturer: 'Siemens', category: 'releTermico', model: '3RB2066-1MC2', commercialCode: '3RB2066-1MC2', description: 'Relé Eletrônico Sirius, 160-630A', nominalCurrent: 630, adjustmentRange: { min: 160, max: 630 }, price: 1650.00 },
 ];
 
-const UNVERIFIED_PRODUCT_IDS = new Set([
-  'weg-cwm9',
-  'weg-mpw150-150',
-  'weg-mpw250-250',
-  'weg-mpw300-300',
+const BLOCKED_PRODUCT_IDS = new Set([
+  // Fusíveis WEG com códigos sintéticos herdados.
+  'weg-fd-16','weg-fd-25','weg-fnh00-63','weg-fnh1-100','weg-fnh2-160','weg-fnh2-250','weg-fnh3-400',
+
+  // Referências de caixa moldada que eram famílias/configurações genéricas, não SKUs completos.
+  'schneider-nsx160','schneider-nsx250-200','schneider-nsx250-225','schneider-nsx250','schneider-nsx400',
+  'siemens-3va160','siemens-3va250-200','siemens-3va250-225','siemens-3va250','siemens-3va400',
+
+  // Registro incorreto: 3VA11 é família de MCCB, não disjuntor-motor SIRIUS 200-300 A.
+  'siemens-3rv-300',
+
+  // Fusíveis NH Schneider registrados com códigos genéricos, não referências comerciais exatas.
+  'schneider-nh-63','schneider-nh-100','schneider-nh-160','schneider-nh-250','schneider-nh-400',
+
+  // Faixas acima das famílias modulares confirmadas nesta auditoria.
+  'schneider-acti9-c80','schneider-acti9-c100','schneider-acti9-c125',
+  'siemens-5sy-c80','siemens-5sy-c100','siemens-5sy-c125',
 ]);
 
-const isVerifiedEnoughForSuggestion = (product: ManufacturerProduct) => {
-  // Códigos 100000xx são placeholders legados, não referências comerciais verificadas.
-  if (/^100000\d*$/.test(product.commercialCode)) return false;
-  if (UNVERIFIED_PRODUCT_IDS.has(product.id)) return false;
-  return true;
+const VERIFIED_EXACT_PRODUCT_IDS = new Set([
+  // WEG MPW
+  'weg-mpw18-10','weg-mpw18-16','weg-mpw40-20','weg-mpw40-25','weg-mpw40-32',
+  'weg-mpw80-50','weg-mpw80-65','weg-mpw80-80','weg-mpw100-90','weg-mpw100-100',
+
+  // WEG SSW05 e CFW300
+  'weg-ssw05-16','weg-ssw05-30','weg-ssw05-45','weg-ssw05-60',
+  'weg-cfw300-15-220','weg-cfw300-10-380','weg-cfw300-15-380',
+
+  // WEG relés com código conferido diretamente
+  'weg-rw27-32','weg-rw317-215','weg-rw317-310',
+
+  // Relés temporizadores estrela-triângulo com SKU completo
+  'schneider-re22-star-delta','siemens-3rp-star-delta',
+
+  // Exemplos individuais conferidos diretamente em catálogo oficial
+  'schneider-gv2me-10','siemens-3rv-10',
+]);
+
+const PHASE_OUT_PRODUCT_IDS = new Set([
+  'schneider-acti9-c6','schneider-acti9-c10','schneider-acti9-c16','schneider-acti9-c20',
+  'schneider-acti9-c25','schneider-acti9-c32','schneider-acti9-c40','schneider-acti9-c50','schneider-acti9-c63',
+]);
+
+const OFFICIAL_SOURCE_BY_ID: Record<string, string> = {
+  'weg-mpw18-10': 'WEG catálogo — produto 12429372',
+  'weg-mpw18-16': 'WEG catálogo — produto 12429373',
+  'weg-mpw40-20': 'WEG catálogo — produto 12428129',
+  'weg-mpw40-25': 'WEG catálogo — produto 12428133',
+  'weg-mpw40-32': 'WEG catálogo — produto 12428131',
+  'weg-mpw80-50': 'WEG catálogo — produto 12425428',
+  'weg-mpw80-65': 'WEG catálogo — produto 12425429',
+  'weg-mpw80-80': 'WEG catálogo — produto 12501063',
+  'weg-mpw100-90': 'WEG catálogo — produto 10076552',
+  'weg-mpw100-100': 'WEG catálogo — produto 10047295',
+  'weg-ssw05-16': 'WEG catálogo — produto 10413821',
+  'weg-ssw05-30': 'WEG catálogo — produto 10413823',
+  'weg-ssw05-45': 'WEG catálogo — produto 10413824',
+  'weg-ssw05-60': 'WEG catálogo — produto 10328754',
+  'weg-cfw300-15-220': 'WEG catálogo — produto 13059939',
+  'weg-cfw300-10-380': 'WEG catálogo — produto 14148365',
+  'weg-cfw300-15-380': 'WEG catálogo — produto 14148367',
+  'weg-rw27-32': 'WEG catálogo — produto 10452382',
+  'weg-rw317-215': 'WEG catálogo — produto 10410005',
+  'weg-rw317-310': 'WEG catálogo — produto 10410006',
+  'schneider-gv2me-10': 'Schneider Electric — GV2ME14',
+  'siemens-3rv-10': 'Siemens Industry Mall — 3RV2011-1JA10',
+  'schneider-re22-star-delta': 'Schneider Electric — RE22R2QEMR',
+  'siemens-3rp-star-delta': 'Siemens Industry Mall — 3RP2576-2NW30',
 };
 
+function auditProduct(product: ManufacturerProduct): ManufacturerProduct {
+  if (BLOCKED_PRODUCT_IDS.has(product.id) || /^100000\d*$/.test(product.commercialCode)) {
+    return {
+      ...product,
+      verificationStatus: 'blocked',
+      selectionNote: 'Registro bloqueado pela auditoria: referência comercial não confirmada ou tecnicamente inadequada.',
+    };
+  }
+
+  if (VERIFIED_EXACT_PRODUCT_IDS.has(product.id)) {
+    return {
+      ...product,
+      verificationStatus: 'verified-exact',
+      catalogSource: OFFICIAL_SOURCE_BY_ID[product.id],
+      lifecycle: PHASE_OUT_PRODUCT_IDS.has(product.id) ? 'phase-out' : 'active',
+      selectionNote: 'SKU conferido em fonte oficial. Ainda devem ser verificados os parâmetros de aplicação do circuito.',
+    };
+  }
+
+  return {
+    ...product,
+    verificationStatus: 'verified-family',
+    lifecycle: PHASE_OUT_PRODUCT_IDS.has(product.id) ? 'phase-out' : 'active',
+    selectionNote: product.category === 'contator'
+      ? 'Família/corrente de referência. O SKU exato depende, entre outros parâmetros, da tensão da bobina de comando.'
+      : product.category === 'disjuntor'
+        ? 'Família de referência. O dispositivo final exige polos, capacidade de interrupção e coordenação adequados.'
+        : product.category === 'releTempo'
+          ? 'Família de referência; confirmar a variante conforme a tensão do circuito de comando.'
+          : 'Família técnica validada; confirmar a referência comercial e a configuração no catálogo vigente.',
+  };
+}
+
+export const MANUFACTURER_CATALOG: ManufacturerProduct[] = RAW_MANUFACTURER_CATALOG.map(auditProduct);
+
 export const getProductsByCategory = (category: string) =>
-  MANUFACTURER_CATALOG.filter(p => p.category === category && isVerifiedEnoughForSuggestion(p));
+  MANUFACTURER_CATALOG.filter(p => p.category === category && p.verificationStatus !== 'blocked');
 
 export const findCompatibleProducts = (
   category: string,
@@ -313,27 +404,42 @@ export const findCompatibleProducts = (
 
   const filtered = MANUFACTURER_CATALOG.filter(p => {
     if (p.category !== category) return false;
-    if (!isVerifiedEnoughForSuggestion(p)) return false;
+    if (p.verificationStatus === 'blocked') return false;
     if (mfr && p.manufacturer.toLowerCase() !== mfr.toLowerCase()) return false;
+
     if (systemVoltage && voltageSensitive.includes(category)) {
-      if (!p.voltage || p.voltage < systemVoltage) return false;
+      if (p.voltageRange) {
+        if (systemVoltage < p.voltageRange.min || systemVoltage > p.voltageRange.max) return false;
+      } else if (!p.voltage || p.voltage < systemVoltage) {
+        return false;
+      }
+    }
+
+    // Soft-starters e inversores só podem ser sugeridos quando o SKU foi
+    // auditado como exato, pois corrente e faixa de tensão fazem parte da seleção.
+    if ((category === 'softStarter' || category === 'inverter') && p.verificationStatus !== 'verified-exact') {
+      return false;
     }
     return true;
   });
 
+  const verificationRank = (p: ManufacturerProduct) => p.verificationStatus === 'verified-exact' ? 0 : 1;
+
   if (category === 'releTermico' || category === 'disjuntorMotor') {
     return filtered
       .filter(p => !!p.adjustmentRange && current >= p.adjustmentRange.min && current <= p.adjustmentRange.max)
-      .sort((a, b) => (a.adjustmentRange!.max - a.adjustmentRange!.min) - (b.adjustmentRange!.max - b.adjustmentRange!.min));
+      .sort((a, b) => verificationRank(a) - verificationRank(b)
+        || (a.adjustmentRange!.max - a.adjustmentRange!.min) - (b.adjustmentRange!.max - b.adjustmentRange!.min));
   }
 
   if (category === 'releTempo' || category === 'auxiliar') {
-    return filtered;
+    return filtered.sort((a, b) => verificationRank(a) - verificationRank(b));
   }
 
   return filtered
     .filter(p => p.nominalCurrent !== undefined && p.nominalCurrent >= current)
-    .sort((a, b) => (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
+    .sort((a, b) => verificationRank(a) - verificationRank(b)
+      || (a.nominalCurrent || 0) - (b.nominalCurrent || 0));
 };
 
 export const findCompatibleProduct = (
@@ -343,7 +449,5 @@ export const findCompatibleProduct = (
   systemVoltage?: number
 ) => {
   const products = findCompatibleProducts(category, current, manufacturer, systemVoltage);
-  // Não faz fallback para outro fabricante: evita apresentar um produto
-  // diferente daquele explicitamente selecionado pelo usuário.
   return products.length > 0 ? products[0] : null;
 };
