@@ -9,6 +9,13 @@ export interface ProposalPdfItem {
   price: number | string;
 }
 
+export type PdfOutputAction = 'save' | 'print';
+
+export interface ProposalPdfRequest {
+  data: ProposalPdfData;
+  action?: PdfOutputAction;
+}
+
 export interface ProposalPdfData {
   companyProfile: CompanyProfile;
   clientData: {
@@ -68,6 +75,30 @@ const hexToRgb = (hex: string): [number, number, number] => {
     parseInt(clean.slice(2, 4), 16),
     parseInt(clean.slice(4, 6), 16),
   ];
+};
+
+const outputPdf = (doc: any, filename: string, action: PdfOutputAction = 'save') => {
+  if (action === 'save') {
+    doc.save(filename);
+    return;
+  }
+
+  // Open the finished A4 PDF in a dedicated browser tab so the user can
+  // print the actual document instead of printing the application screen.
+  try {
+    if (typeof doc.autoPrint === 'function') {
+      doc.autoPrint({ variant: 'non-conform' });
+    }
+  } catch {
+    // Some PDF viewers ignore auto-print instructions; opening the PDF still
+    // gives the user the native browser/PDF print control.
+  }
+
+  const blobUrl = doc.output('bloburl');
+  const printWindow = window.open(blobUrl, '_blank', 'noopener,noreferrer');
+  if (!printWindow) {
+    throw new Error('O navegador bloqueou a janela de impressão. Permita pop-ups para este site.');
+  }
 };
 
 const starterLabel = (starter: CalculationInputs['starterType']) => {
@@ -357,7 +388,7 @@ const addNumberedSection = (
   return y + 10 + lines.length * 4.2 + 5;
 };
 
-export const generateCommercialProposalPdf = createClientOnlyFn(async (data: ProposalPdfData) => {
+export const generateCommercialProposalPdf = createClientOnlyFn(async ({ data, action = 'save' }: ProposalPdfRequest) => {
   const [{ jsPDF }, autoTableModule] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
   const autoTable = autoTableModule.default;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
@@ -511,10 +542,14 @@ export const generateCommercialProposalPdf = createClientOnlyFn(async (data: Pro
   addFooters(doc, data, 'Proposta Comercial');
 
   const clientPart = filenamePart(data.clientData.name || 'cliente');
-  doc.save(`proposta-comercial-${clientPart}-${new Date().toISOString().slice(0, 10)}.pdf`);
+  outputPdf(
+    doc,
+    `proposta-comercial-${clientPart}-${new Date().toISOString().slice(0, 10)}.pdf`,
+    action,
+  );
 });
 
-export const generateDescriptiveMemorialPdf = createClientOnlyFn(async (data: ProposalPdfData) => {
+export const generateDescriptiveMemorialPdf = createClientOnlyFn(async ({ data, action = 'save' }: ProposalPdfRequest) => {
   const [{ jsPDF }, autoTableModule] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
   const autoTable = autoTableModule.default;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
@@ -599,5 +634,9 @@ export const generateDescriptiveMemorialPdf = createClientOnlyFn(async (data: Pr
   addFooters(doc, data, 'Memorial Descritivo');
 
   const clientPart = filenamePart(data.clientData.name || 'cliente');
-  doc.save(`memorial-descritivo-${clientPart}-${new Date().toISOString().slice(0, 10)}.pdf`);
+  outputPdf(
+    doc,
+    `memorial-descritivo-${clientPart}-${new Date().toISOString().slice(0, 10)}.pdf`,
+    action,
+  );
 });
