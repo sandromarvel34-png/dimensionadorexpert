@@ -400,6 +400,31 @@ export const ProposalFlow = () => {
                     <Input value={companyProfile.brandColor} onChange={e => setCompanyProfile({ brandColor: e.target.value })} className="max-w-40 uppercase" />
                   </div>
                 </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">Fundo da logomarca</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      ['light', 'Claro'],
+                      ['dark', 'Escuro'],
+                      ['brand', 'Cor da marca'],
+                    ].map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setCompanyProfile({ logoBackground: value as 'light' | 'dark' | 'brand' })}
+                        className={cn(
+                          'h-10 px-4 rounded-lg border text-sm font-semibold transition-all',
+                          companyProfile.logoBackground === value
+                            ? 'border-primary bg-blue-50 text-primary'
+                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-slate-500">Apenas o bloco da logo muda de fundo; o cabeçalho do documento permanece claro.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -449,13 +474,22 @@ export const ProposalFlow = () => {
               {/* PDF Header */}
               <div className="flex flex-col sm:flex-row justify-between items-start mb-10 border-b pb-8 border-slate-100 gap-4">
                 <div className="flex items-center gap-4">
-                  {companyProfile.logoDataUrl ? (
-                    <img src={companyProfile.logoDataUrl} alt="" className="max-h-14 max-w-36 object-contain" />
-                  ) : (
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center">
-                      <Building2 className="w-6 h-6" />
-                    </div>
-                  )}
+                  <div
+                    className="w-24 h-16 rounded-xl border border-slate-200 flex items-center justify-center p-2 shrink-0"
+                    style={{
+                      backgroundColor: companyProfile.logoBackground === 'dark'
+                        ? '#0F172A'
+                        : companyProfile.logoBackground === 'brand'
+                          ? companyProfile.brandColor
+                          : '#F8FAFC'
+                    }}
+                  >
+                    {companyProfile.logoDataUrl ? (
+                      <img src={companyProfile.logoDataUrl} alt="" className="max-h-12 max-w-20 object-contain" />
+                    ) : (
+                      <Building2 className="w-6 h-6 text-slate-400" />
+                    )}
+                  </div>
                   <div>
                     <h1 className="text-lg md:text-2xl font-black tracking-tight">{companyProfile.companyName || 'Sua empresa'}</h1>
                     <p className="text-[9px] md:text-[10px] uppercase tracking-[0.16em] font-bold text-muted-foreground">
@@ -468,7 +502,8 @@ export const ProposalFlow = () => {
                 </div>
                 <div className="text-left sm:text-right">
                   <h2 className="text-lg md:text-xl font-bold text-foreground">PROPOSTA COMERCIAL</h2>
-                  <p className="text-metadata font-bold">{new Date().toLocaleDateString('pt-BR')}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Solução, escopo e investimento</p>
+                  <p className="text-metadata font-bold mt-1">{new Date().toLocaleDateString('pt-BR')}</p>
                   {companyProfile.responsibleName && (
                     <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1">
                       Responsável: {companyProfile.responsibleName}
