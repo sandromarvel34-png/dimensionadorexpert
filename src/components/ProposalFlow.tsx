@@ -460,7 +460,7 @@ export const ProposalFlow = () => {
               {/* PDF Footer */}
               <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-end print:mt-2 print:pt-2">
                 <div className="text-[9px] text-muted-foreground max-w-sm leading-relaxed print:text-[7pt]">
-                  * Proposta válida por {costs.validity} dias. Dimensionamento realizado seguindo rigorosamente as prescrições da NBR 5410 para motores de indução. O instalador deve conferir as condições reais do local antes da execução.
+                  * Proposta válida por {costs.validity} dias. O dimensionamento utiliza os critérios configurados na ferramenta e deve ser conferido com as condições reais da instalação, coordenação das proteções, documentação dos fabricantes e responsabilidade técnica aplicável antes da execução.
                 </div>
                 <div className="text-center w-64 print:w-48">
                   <div className="text-[10px] font-bold uppercase tracking-widest mb-1 print:text-[8pt]">
