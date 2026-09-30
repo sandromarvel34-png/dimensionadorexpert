@@ -52,44 +52,6 @@ const safeNumber = (value: number | string | undefined) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-const sectionLabel = (
-  doc: any,
-  title: string,
-  y: number,
-  subtitle?: string,
-) => {
-  doc.setTextColor(...BLUE);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.text(title.toUpperCase(), 14, y);
-
-  if (subtitle) {
-    doc.setTextColor(...SLATE);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.text(subtitle, 14, y + 4);
-    return y + 8;
-  }
-
-  return y + 4;
-};
-
-const addContinuationHeader = (doc: any) => {
-  doc.setTextColor(...SLATE);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.text('DIMENSIONADOR EXPERT - PROPOSTA TECNICA', 14, 10);
-  doc.setDrawColor(...BORDER);
-  doc.line(14, 13, 196, 13);
-};
-
-const limitingCriterionLabel = (criterion: CalculationResults['limitingCriterion']) => {
-  if (criterion === 'ampacity') return 'Ampacidade';
-  if (criterion === 'voltageDrop') return 'Queda de tensao';
-  if (criterion === 'shortCircuit') return 'Curto-circuito';
-  return 'Secao minima';
-};
-
 const starterLabel = (starter: CalculationInputs['starterType']) => {
   if (starter === 'direta') return 'Partida direta';
   if (starter === 'reversao') return 'Reversao';
@@ -107,56 +69,29 @@ const filenamePart = (value: string) =>
     .replace(/\s+/g, '-')
     .toLowerCase();
 
-export const generateProposalPdf = createClientOnlyFn(async (data: ProposalPdfData) => {
-  const [{ jsPDF }, autoTableModule] = await Promise.all([
-    import('jspdf'),
-    import('jspdf-autotable'),
-  ]);
-  const autoTable = autoTableModule.default;
-  const {
-    clientData,
-    commercialData,
-    observations,
-    items,
-    labor,
-    costs,
-    selectedManufacturer,
-    currentInputs,
-    currentResults,
-  } = data;
+const sectionLabel = (doc: any, title: string, y: number, subtitle?: string) => {
+  doc.setTextColor(...BLUE);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.text(title.toUpperCase(), 14, y);
 
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
-    compress: true,
-  });
+  if (subtitle) {
+    doc.setTextColor(...SLATE);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(subtitle, 14, y + 4);
+    return y + 8;
+  }
 
-  doc.setProperties({
-    title: 'Proposta Tecnica - Dimensionador Expert',
-    subject: 'Memorial de dimensionamento e proposta comercial',
-    author: commercialData.executingCompany || commercialData.technicianName || 'Dimensionador Expert',
-    creator: 'Dimensionador Expert',
-  });
+  return y + 4;
+};
 
-  const totalMaterials = items.reduce(
-    (sum, item) => sum + safeNumber(item.qtd) * safeNumber(item.price),
-    0,
-  );
-  const totalLabor = safeNumber(labor.hours) * safeNumber(labor.rate);
-  const grandTotal =
-    totalMaterials +
-    totalLabor +
-    safeNumber(costs.travel) +
-    safeNumber(costs.others) -
-    safeNumber(costs.discount);
-
-  const ib = currentResults.nominalCurrent * (currentInputs.serviceFactor || 1);
-  const iCorr = currentResults.correctionFactors?.combined
-    ? ib / currentResults.correctionFactors.combined
-    : ib;
-
-  // Header
+const addHeader = (
+  doc: any,
+  title: string,
+  subtitle: string,
+  rightLines: string[],
+) => {
   doc.setFillColor(...NAVY);
   doc.rect(0, 0, 210, 35, 'F');
   doc.setFillColor(...BLUE);
@@ -164,40 +99,45 @@ export const generateProposalPdf = createClientOnlyFn(async (data: ProposalPdfDa
 
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(19);
-  doc.text('DIMENSIONADOR EXPERT', 14, 16);
+  doc.setFontSize(18);
+  doc.text('DIMENSIONADOR EXPERT', 14, 15);
 
-  doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
   doc.setTextColor(203, 213, 225);
-  doc.text('MEMORIAL DE DIMENSIONAMENTO E PROPOSTA TECNICA', 14, 22);
+  doc.text(subtitle, 14, 21);
 
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(10);
-  doc.text('PROPOSTA TECNICA', 196, 15, { align: 'right' });
+  doc.text(title, 196, 14, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
+  doc.setFontSize(7.5);
   doc.setTextColor(203, 213, 225);
-  doc.text(new Date().toLocaleDateString('pt-BR'), 196, 21, { align: 'right' });
-  doc.text(`Validade: ${costs.validity || 30} dias`, 196, 26, { align: 'right' });
+  rightLines.forEach((line, index) => doc.text(line, 196, 20 + index * 5, { align: 'right' }));
+};
 
-  let y = 46;
+const addContinuationHeader = (doc: any, title: string) => {
+  doc.setTextColor(...SLATE);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.text(`DIMENSIONADOR EXPERT - ${title}`, 14, 10);
+  doc.setDrawColor(...BORDER);
+  doc.line(14, 13, 196, 13);
+};
 
-  // Client and company
+const addClientBlock = (doc: any, autoTable: any, data: ProposalPdfData, y: number) => {
   y = sectionLabel(doc, 'Cliente e responsavel', y);
-  const clientRows = [
-    ['Cliente', clientData.name || '-'],
-    ['CPF/CNPJ', clientData.doc || '-'],
-    ['Contato', [clientData.phone, clientData.email].filter(Boolean).join(' | ') || '-'],
-    ['Responsavel', commercialData.technicianName || '-'],
-    ['Empresa executora', commercialData.executingCompany || '-'],
-  ];
-
   autoTable(doc, {
     startY: y,
-    body: clientRows,
+    body: [
+      ['Cliente', data.clientData.name || '-'],
+      ['CPF/CNPJ', data.clientData.doc || '-'],
+      ['Contato', [data.clientData.phone, data.clientData.email].filter(Boolean).join(' | ') || '-'],
+      ['Responsavel', data.commercialData.technicianName || '-'],
+      ['Empresa executora', data.commercialData.executingCompany || '-'],
+    ],
     theme: 'plain',
     margin: { left: 14, right: 14 },
     styles: { font: 'helvetica', fontSize: 8.5, cellPadding: 2.2, textColor: NAVY },
@@ -207,82 +147,110 @@ export const generateProposalPdf = createClientOnlyFn(async (data: ProposalPdfDa
     },
     alternateRowStyles: { fillColor: LIGHT },
   });
+  return (doc as any).lastAutoTable.finalY + 7;
+};
 
-  y = (doc as any).lastAutoTable.finalY + 7;
+const addServiceDescription = (doc: any, description: string, y: number) => {
+  if (!description) return y;
 
-  if (commercialData.serviceDescription) {
-    y = sectionLabel(doc, 'Descricao do servico', y);
-    doc.setFillColor(...LIGHT);
-    doc.setDrawColor(...BORDER);
-    const descriptionLines = doc.splitTextToSize(commercialData.serviceDescription, 174);
-    const h = Math.max(16, descriptionLines.length * 4.1 + 7);
-    doc.roundedRect(14, y, 182, h, 2, 2, 'FD');
-    doc.setTextColor(...NAVY);
+  y = sectionLabel(doc, 'Descricao do servico', y);
+  doc.setFillColor(...LIGHT);
+  doc.setDrawColor(...BORDER);
+  const lines = doc.splitTextToSize(description, 174);
+  const h = Math.max(16, lines.length * 4.1 + 7);
+  doc.roundedRect(14, y, 182, h, 2, 2, 'FD');
+  doc.setTextColor(...NAVY);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.text(lines, 18, y + 6);
+  return y + h + 7;
+};
+
+const addSignature = (doc: any, data: ProposalPdfData, y: number) => {
+  if (y > 248) {
+    doc.addPage();
+    y = 24;
+  }
+
+  doc.setDrawColor(...BORDER);
+  doc.line(14, y, 196, y);
+  const signatureY = y + 14;
+
+  doc.setDrawColor(...NAVY);
+  doc.line(132, signatureY, 196, signatureY);
+  doc.setTextColor(...NAVY);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.text(data.commercialData.technicianName || 'Responsavel pelo servico', 164, signatureY + 4, { align: 'center' });
+
+  if (data.commercialData.executingCompany) {
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.text(descriptionLines, 18, y + 6);
-    y += h + 7;
+    doc.setTextColor(...SLATE);
+    doc.setFontSize(6.5);
+    doc.text(data.commercialData.executingCompany, 164, signatureY + 8, { align: 'center' });
   }
+};
 
-  // Technical summary
-  y = sectionLabel(doc, 'Resumo do dimensionamento', y, 'Principais dados utilizados e resultado final.');
-
-  const technicalRows = [
-    ['Potencia', `${currentInputs.power} ${currentInputs.powerUnit}`, 'Tensao', `${currentInputs.voltage} V`],
-    ['Sistema', currentInputs.phase === 'trifasico' ? 'Trifasico' : 'Monofasico', 'Partida', starterLabel(currentInputs.starterType)],
-    ['Distancia', `${currentInputs.distance} m`, 'Metodo', currentInputs.installationMethod || '-'],
-    ['Corrente nominal', `${currentResults.nominalCurrent.toFixed(2)} A`, 'Corrente de projeto', `${ib.toFixed(2)} A`],
-    ['Corrente corrigida', `${iCorr.toFixed(2)} A`, 'Fator combinado', currentResults.correctionFactors?.combined.toFixed(3) || '1,000'],
-    ['Secao por ampacidade', `${currentResults.cableByAmpacity} mm2`, 'Secao por queda', `${currentResults.cableByVoltageDrop} mm2`],
-    ['Secao final', `${currentResults.finalCableSection} mm2`, 'Queda calculada', `${currentResults.voltageDropCalculated.toFixed(2)} %`],
-    ['Criterio limitante', limitingCriterionLabel(currentResults.limitingCriterion), 'Fabricante de referencia', selectedManufacturer],
-  ];
-
-  if (currentResults.shortCircuitCheckPerformed && currentInputs.shortCircuitCurrentKA) {
-    technicalRows.push([
-      'Icc informada',
-      `${currentInputs.shortCircuitCurrentKA.toFixed(2)} kA`,
-      'Secao por curto-circuito',
-      `${currentResults.cableByShortCircuit || '-'} mm2`,
-    ]);
+const addFooters = (doc: any, label: string) => {
+  const pageCount = doc.getNumberOfPages();
+  for (let page = 1; page <= pageCount; page += 1) {
+    doc.setPage(page);
+    doc.setDrawColor(...BORDER);
+    doc.line(14, 286, 196, 286);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...SLATE);
+    doc.text(`Dimensionador Expert | ${label}`, 14, 291);
+    doc.text(`Pagina ${page} de ${pageCount}`, 196, 291, { align: 'right' });
   }
+};
 
-  autoTable(doc, {
-    startY: y,
-    body: technicalRows,
-    theme: 'grid',
-    margin: { left: 14, right: 14 },
-    styles: {
-      font: 'helvetica',
-      fontSize: 7.8,
-      cellPadding: 2.4,
-      lineColor: BORDER,
-      lineWidth: 0.2,
-      textColor: NAVY,
-    },
-    columnStyles: {
-      0: { fontStyle: 'bold', textColor: SLATE, fillColor: LIGHT, cellWidth: 34 },
-      1: { cellWidth: 52 },
-      2: { fontStyle: 'bold', textColor: SLATE, fillColor: LIGHT, cellWidth: 34 },
-      3: { cellWidth: 62 },
-    },
+export const generateCommercialProposalPdf = createClientOnlyFn(async (data: ProposalPdfData) => {
+  const [{ jsPDF }, autoTableModule] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable'),
+  ]);
+  const autoTable = autoTableModule.default;
+
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+  const date = new Date().toLocaleDateString('pt-BR');
+
+  doc.setProperties({
+    title: 'Proposta Comercial - Dimensionador Expert',
+    subject: 'Proposta comercial de servicos e materiais',
+    author: data.commercialData.executingCompany || data.commercialData.technicianName || 'Dimensionador Expert',
+    creator: 'Dimensionador Expert',
   });
 
-  y = (doc as any).lastAutoTable.finalY + 8;
+  const totalMaterials = data.items.reduce(
+    (sum, item) => sum + safeNumber(item.qtd) * safeNumber(item.price),
+    0,
+  );
+  const totalLabor = safeNumber(data.labor.hours) * safeNumber(data.labor.rate);
+  const grandTotal =
+    totalMaterials +
+    totalLabor +
+    safeNumber(data.costs.travel) +
+    safeNumber(data.costs.others) -
+    safeNumber(data.costs.discount);
 
-  if (y > 245) {
-    doc.addPage();
-    addContinuationHeader(doc);
-    y = 21;
-  }
+  addHeader(
+    doc,
+    'PROPOSTA COMERCIAL',
+    'SERVICOS E MATERIAIS',
+    [date, `Validade: ${data.costs.validity || 30} dias`],
+  );
 
-  // Materials
-  y = sectionLabel(doc, 'Materiais e equipamentos', y, 'Quantidades e valores informados na proposta.');
+  let y = 46;
+  y = addClientBlock(doc, autoTable, data, y);
+  y = addServiceDescription(doc, data.commercialData.serviceDescription, y);
+
+  y = sectionLabel(doc, 'Materiais e servicos', y, 'Itens previstos para execucao do servico.');
 
   autoTable(doc, {
     startY: y,
     head: [['Descricao', 'Qtd.', 'Un.', 'Valor unit.', 'Total']],
-    body: items.map(item => {
+    body: data.items.map(item => {
       const price = safeNumber(item.price);
       return [
         item.desc || '-',
@@ -294,22 +262,8 @@ export const generateProposalPdf = createClientOnlyFn(async (data: ProposalPdfDa
     }),
     theme: 'grid',
     margin: { left: 14, right: 14, top: 20, bottom: 17 },
-    headStyles: {
-      fillColor: NAVY,
-      textColor: [255, 255, 255],
-      fontStyle: 'bold',
-      fontSize: 7.5,
-      cellPadding: 2.8,
-    },
-    styles: {
-      font: 'helvetica',
-      fontSize: 7.2,
-      cellPadding: 2.4,
-      lineColor: BORDER,
-      lineWidth: 0.2,
-      textColor: NAVY,
-      valign: 'middle',
-    },
+    headStyles: { fillColor: NAVY, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7.5, cellPadding: 2.8 },
+    styles: { font: 'helvetica', fontSize: 7.2, cellPadding: 2.4, lineColor: BORDER, lineWidth: 0.2, textColor: NAVY, valign: 'middle' },
     columnStyles: {
       0: { cellWidth: 92 },
       1: { cellWidth: 16, halign: 'right' },
@@ -318,47 +272,34 @@ export const generateProposalPdf = createClientOnlyFn(async (data: ProposalPdfDa
       4: { cellWidth: 33, halign: 'right', fontStyle: 'bold' },
     },
     alternateRowStyles: { fillColor: LIGHT },
-    didDrawPage: tableData => {
-      if (tableData.pageNumber > 1) addContinuationHeader(doc);
+    didDrawPage: (tableData: any) => {
+      if (tableData.pageNumber > 1) addContinuationHeader(doc, 'PROPOSTA COMERCIAL');
     },
   });
 
   y = (doc as any).lastAutoTable.finalY + 8;
-
   if (y > 225) {
     doc.addPage();
-    addContinuationHeader(doc);
+    addContinuationHeader(doc, 'PROPOSTA COMERCIAL');
     y = 21;
   }
 
-  // Commercial summary
   y = sectionLabel(doc, 'Resumo comercial', y);
-
   autoTable(doc, {
     startY: y,
     body: [
       ['Materiais', money(totalMaterials)],
-      [`Mao de obra (${safeNumber(labor.hours).toLocaleString('pt-BR')} h x ${money(safeNumber(labor.rate))})`, money(totalLabor)],
-      ['Deslocamento', money(safeNumber(costs.travel))],
-      ['Outros custos', money(safeNumber(costs.others))],
-      ['Desconto', `- ${money(safeNumber(costs.discount))}`],
+      ['Mao de obra e servicos', money(totalLabor)],
+      ['Deslocamento', money(safeNumber(data.costs.travel))],
+      ['Outros custos', money(safeNumber(data.costs.others))],
+      ['Desconto', `- ${money(safeNumber(data.costs.discount))}`],
       ['TOTAL GERAL', money(grandTotal)],
     ],
     theme: 'grid',
     margin: { left: 98, right: 14 },
-    styles: {
-      font: 'helvetica',
-      fontSize: 8.5,
-      cellPadding: 2.8,
-      lineColor: BORDER,
-      lineWidth: 0.2,
-      textColor: NAVY,
-    },
-    columnStyles: {
-      0: { fontStyle: 'bold', cellWidth: 55 },
-      1: { halign: 'right', cellWidth: 43 },
-    },
-    didParseCell: hook => {
+    styles: { font: 'helvetica', fontSize: 8.5, cellPadding: 2.8, lineColor: BORDER, lineWidth: 0.2, textColor: NAVY },
+    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 55 }, 1: { halign: 'right', cellWidth: 43 } },
+    didParseCell: (hook: any) => {
       if (hook.row.index === 5) {
         hook.cell.styles.fillColor = BLUE;
         hook.cell.styles.textColor = [255, 255, 255];
@@ -370,96 +311,147 @@ export const generateProposalPdf = createClientOnlyFn(async (data: ProposalPdfDa
 
   y = (doc as any).lastAutoTable.finalY + 8;
 
-  const notes = observations.trim();
-  if (notes) {
+  if (data.observations.trim()) {
     if (y > 245) {
       doc.addPage();
-      addContinuationHeader(doc);
+      addContinuationHeader(doc, 'PROPOSTA COMERCIAL');
       y = 21;
     }
-    y = sectionLabel(doc, 'Observacoes', y);
+    y = sectionLabel(doc, 'Condicoes e observacoes', y);
     doc.setTextColor(...NAVY);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
-    const lines = doc.splitTextToSize(notes, 182);
+    const lines = doc.splitTextToSize(data.observations.trim(), 182);
     doc.text(lines, 14, y);
-    y += lines.length * 4 + 5;
+    y += lines.length * 4 + 6;
   }
 
-  // Technical limitations
-  const limitations = currentResults.technicalLimitations || [];
-  if (limitations.length > 0) {
-    if (y > 225) {
-      doc.addPage();
-      addContinuationHeader(doc);
-      y = 21;
-    }
-    y = sectionLabel(doc, 'Verificacoes complementares', y);
-    doc.setTextColor(...SLATE);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7.5);
-    limitations.forEach((item, index) => {
-      const lines = doc.splitTextToSize(`${index + 1}. ${item}`, 178);
-      if (y + lines.length * 3.7 > 273) {
-        doc.addPage();
-        addContinuationHeader(doc);
-        y = 21;
-      }
-      doc.text(lines, 16, y);
-      y += lines.length * 3.7 + 1.5;
-    });
-    y += 3;
-  }
+  doc.setTextColor(...SLATE);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  const commercialNote =
+    'Os materiais e servicos descritos nesta proposta correspondem ao escopo apresentado. ' +
+    'Alteracoes solicitadas pelo cliente ou condicoes de campo nao previstas poderao exigir revisao dos valores e prazos.';
+  doc.text(doc.splitTextToSize(commercialNote, 112), 14, y);
 
-  if (y > 240) {
+  addSignature(doc, data, y + 13);
+  addFooters(doc, 'Proposta Comercial');
+
+  const clientPart = filenamePart(data.clientData.name || 'cliente');
+  const datePart = new Date().toISOString().slice(0, 10);
+  doc.save(`proposta-comercial-${clientPart}-${datePart}.pdf`);
+});
+
+export const generateDescriptiveMemorialPdf = createClientOnlyFn(async (data: ProposalPdfData) => {
+  const [{ jsPDF }, autoTableModule] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable'),
+  ]);
+  const autoTable = autoTableModule.default;
+
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+  const date = new Date().toLocaleDateString('pt-BR');
+
+  doc.setProperties({
+    title: 'Memorial Descritivo - Dimensionador Expert',
+    subject: 'Memorial descritivo do servico',
+    author: data.commercialData.executingCompany || data.commercialData.technicianName || 'Dimensionador Expert',
+    creator: 'Dimensionador Expert',
+  });
+
+  addHeader(
+    doc,
+    'MEMORIAL DESCRITIVO',
+    'DESCRICAO TECNICA DO SERVICO',
+    [date],
+  );
+
+  let y = 46;
+  y = addClientBlock(doc, autoTable, data, y);
+  y = addServiceDescription(doc, data.commercialData.serviceDescription, y);
+
+  y = sectionLabel(doc, 'Dados da instalacao', y, 'Caracteristicas principais consideradas para execucao.');
+  autoTable(doc, {
+    startY: y,
+    body: [
+      ['Carga', `${data.currentInputs.power} ${data.currentInputs.powerUnit}`, 'Alimentacao', `${data.currentInputs.voltage} V - ${data.currentInputs.phase === 'trifasico' ? 'trifasico' : 'monofasico'}`],
+      ['Acionamento', starterLabel(data.currentInputs.starterType), 'Distancia aproximada', `${data.currentInputs.distance} m`],
+      ['Metodo de instalacao', data.currentInputs.installationMethod || '-', 'Fabricante de referencia', data.selectedManufacturer],
+      ['Condutores de fase', `Cu/PVC 70 C - ${data.currentResults.finalCableSection} mm2`, 'Queda de tensao prevista', `${data.currentResults.voltageDropCalculated.toFixed(2)} %`],
+    ],
+    theme: 'grid',
+    margin: { left: 14, right: 14 },
+    styles: { font: 'helvetica', fontSize: 7.8, cellPadding: 2.5, lineColor: BORDER, lineWidth: 0.2, textColor: NAVY },
+    columnStyles: {
+      0: { fontStyle: 'bold', textColor: SLATE, fillColor: LIGHT, cellWidth: 34 },
+      1: { cellWidth: 52 },
+      2: { fontStyle: 'bold', textColor: SLATE, fillColor: LIGHT, cellWidth: 34 },
+      3: { cellWidth: 62 },
+    },
+  });
+
+  y = (doc as any).lastAutoTable.finalY + 8;
+  if (y > 235) {
     doc.addPage();
-    addContinuationHeader(doc);
+    addContinuationHeader(doc, 'MEMORIAL DESCRITIVO');
     y = 21;
   }
 
-  // Disclaimer and signature
-  doc.setDrawColor(...BORDER);
-  doc.line(14, y, 196, y);
-  y += 6;
+  y = sectionLabel(doc, 'Materiais e equipamentos previstos', y, 'Relacao tecnica sem valores comerciais.');
+  autoTable(doc, {
+    startY: y,
+    head: [['Descricao', 'Qtd.', 'Un.']],
+    body: data.items.map(item => [item.desc || '-', safeNumber(item.qtd).toLocaleString('pt-BR'), item.unit || 'un']),
+    theme: 'grid',
+    margin: { left: 14, right: 14, top: 20, bottom: 17 },
+    headStyles: { fillColor: NAVY, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 7.5, cellPadding: 2.8 },
+    styles: { font: 'helvetica', fontSize: 7.4, cellPadding: 2.5, lineColor: BORDER, lineWidth: 0.2, textColor: NAVY },
+    columnStyles: { 0: { cellWidth: 146 }, 1: { cellWidth: 20, halign: 'right' }, 2: { cellWidth: 16, halign: 'center' } },
+    alternateRowStyles: { fillColor: LIGHT },
+    didDrawPage: (tableData: any) => {
+      if (tableData.pageNumber > 1) addContinuationHeader(doc, 'MEMORIAL DESCRITIVO');
+    },
+  });
 
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...SLATE);
-  doc.setFontSize(7);
-  const disclaimer =
-    'Esta proposta utiliza os dados informados e os criterios configurados no Dimensionador Expert. ' +
-    'A especificacao final deve ser conferida com as condicoes reais da instalacao, capacidade de interrupcao, ' +
-    'coordenacao das protecoes, documentacao vigente dos fabricantes e responsabilidade tecnica aplicavel.';
-  doc.text(doc.splitTextToSize(disclaimer, 112), 14, y);
+  y = (doc as any).lastAutoTable.finalY + 8;
+  if (y > 220) {
+    doc.addPage();
+    addContinuationHeader(doc, 'MEMORIAL DESCRITIVO');
+    y = 21;
+  }
 
-  const signatureX = 132;
-  const signatureY = y + 13;
-  doc.setDrawColor(...NAVY);
-  doc.line(signatureX, signatureY, 196, signatureY);
+  y = sectionLabel(doc, 'Criterios de execucao', y);
+  const executionItems = [
+    'Montagem e instalacao conforme o escopo descrito e as condicoes verificadas no local.',
+    'Identificacao dos condutores e componentes, organizacao do painel e conexoes eletricas.',
+    'Conferencia de aperto, continuidade e conexoes antes da energizacao.',
+    'Testes funcionais do circuito de comando e do acionamento previstos no servico.',
+    'Ajustes e parametrizacoes aplicaveis aos equipamentos incluidos no escopo.',
+  ];
+
   doc.setTextColor(...NAVY);
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  executionItems.forEach((item, index) => {
+    const lines = doc.splitTextToSize(`${index + 1}. ${item}`, 176);
+    doc.text(lines, 16, y);
+    y += lines.length * 4 + 2;
+  });
+
+  y += 3;
+  y = sectionLabel(doc, 'Observacoes tecnicas', y);
+  const technicalNote =
+    'As especificacoes indicadas neste memorial correspondem ao escopo e aos dados informados para o servico. ' +
+    'A execucao deve considerar as condicoes encontradas em campo e a documentacao tecnica dos equipamentos instalados.';
+  doc.setTextColor(...SLATE);
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
-  doc.text(commercialData.technicianName || 'Responsavel tecnico', 164, signatureY + 4, { align: 'center' });
-  if (commercialData.executingCompany) {
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...SLATE);
-    doc.setFontSize(6.5);
-    doc.text(commercialData.executingCompany, 164, signatureY + 8, { align: 'center' });
-  }
+  doc.text(doc.splitTextToSize(technicalNote, 182), 14, y);
 
-  // Footer all pages
-  const pageCount = doc.getNumberOfPages();
-  for (let page = 1; page <= pageCount; page += 1) {
-    doc.setPage(page);
-    doc.setDrawColor(...BORDER);
-    doc.line(14, 286, 196, 286);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(6.5);
-    doc.setTextColor(...SLATE);
-    doc.text('Dimensionador Expert | Academia do Eletricista', 14, 291);
-    doc.text(`Pagina ${page} de ${pageCount}`, 196, 291, { align: 'right' });
-  }
+  addSignature(doc, data, y + 16);
+  addFooters(doc, 'Memorial Descritivo');
 
-  const clientPart = filenamePart(clientData.name || 'cliente');
+  const clientPart = filenamePart(data.clientData.name || 'cliente');
   const datePart = new Date().toISOString().slice(0, 10);
-  doc.save(`proposta-dimensionador-expert-${clientPart}-${datePart}.pdf`);
+  doc.save(`memorial-descritivo-${clientPart}-${datePart}.pdf`);
 });
