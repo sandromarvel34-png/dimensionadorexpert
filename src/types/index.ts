@@ -14,6 +14,7 @@ export interface CompanyProfile {
   website: string;
   logoDataUrl: string;
   brandColor: string;
+  logoBackground: 'light' | 'dark' | 'brand';
 }
 
 export interface TechnicalReference {
