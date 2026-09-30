@@ -10,269 +10,231 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
-      manufacturer_products: {
+      calculations: {
         Row: {
-          adjustment_range_max: number | null
-          adjustment_range_min: number | null
-          category: string
-          commercial_code: string
-          created_at: string | null
-          description: string | null
-          id: string
-          is_active: boolean | null
-          manufacturer: string
-          model: string
-          nominal_current: number | null
-          power_range_max: number | null
-          power_range_min: number | null
-          price: number | null
-          updated_at: string | null
-          voltage: number | null
-        }
-        Insert: {
-          adjustment_range_max?: number | null
-          adjustment_range_min?: number | null
-          category: string
-          commercial_code: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          manufacturer: string
-          model: string
-          nominal_current?: number | null
-          power_range_max?: number | null
-          power_range_min?: number | null
-          price?: number | null
-          updated_at?: string | null
-          voltage?: number | null
-        }
-        Update: {
-          adjustment_range_max?: number | null
-          adjustment_range_min?: number | null
-          category?: string
-          commercial_code?: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          manufacturer?: string
-          model?: string
-          nominal_current?: number | null
-          power_range_max?: number | null
-          power_range_min?: number | null
-          price?: number | null
-          updated_at?: string | null
-          voltage?: number | null
-        }
-        Relationships: []
-      }
-      motor_calculations: {
-        Row: {
-          client_name: string | null
-          created_at: string | null
+          created_at: string
           id: string
           inputs: Json
           results: Json
-          updated_at: string | null
-          user_id: string | null
+          selected_manufacturer: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          client_name?: string | null
-          created_at?: string | null
-          id?: string
-          inputs: Json
-          results: Json
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          client_name?: string | null
-          created_at?: string | null
+          created_at?: string
           id?: string
           inputs?: Json
           results?: Json
-          updated_at?: string | null
-          user_id?: string | null
+          selected_manufacturer?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inputs?: Json
+          results?: Json
+          selected_manufacturer?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
-      motor_catalog: {
+      clients: {
         Row: {
-          catalog_reference: string | null
-          created_at: string | null
-          efficiency: number
-          frame: string | null
-          frequency: number | null
+          created_at: string
+          document: string | null
+          email: string | null
           id: string
-          is_active: boolean | null
-          line: string
-          manufacturer: string
-          model_code: string | null
-          nominal_current: number
-          poles: string
-          power_cv: number
-          power_factor: number
-          power_kw: number
-          rpm: number | null
-          service_factor: number | null
-          speed_type: Database["public"]["Enums"]["motor_speed_type"]
-          updated_at: string | null
-          voltage: number
+          name: string
+          phone: string | null
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          catalog_reference?: string | null
-          created_at?: string | null
-          efficiency: number
-          frame?: string | null
-          frequency?: number | null
+          created_at?: string
+          document?: string | null
+          email?: string | null
           id?: string
-          is_active?: boolean | null
-          line: string
-          manufacturer?: string
-          model_code?: string | null
-          nominal_current: number
-          poles: string
-          power_cv: number
-          power_factor: number
-          power_kw: number
-          rpm?: number | null
-          service_factor?: number | null
-          speed_type?: Database["public"]["Enums"]["motor_speed_type"]
-          updated_at?: string | null
-          voltage: number
+          name?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          catalog_reference?: string | null
-          created_at?: string | null
-          efficiency?: number
-          frame?: string | null
-          frequency?: number | null
+          created_at?: string
+          document?: string | null
+          email?: string | null
           id?: string
-          is_active?: boolean | null
-          line?: string
-          manufacturer?: string
-          model_code?: string | null
-          nominal_current?: number
-          poles?: string
-          power_cv?: number
-          power_factor?: number
-          power_kw?: number
-          rpm?: number | null
-          service_factor?: number | null
-          speed_type?: Database["public"]["Enums"]["motor_speed_type"]
-          updated_at?: string | null
-          voltage?: number
+          name?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      company_profiles: {
+        Row: {
+          address: string | null
+          brand_color: string
+          city_state: string | null
+          company_name: string | null
+          created_at: string
+          document: string | null
+          email: string | null
+          logo_background: string
+          logo_path: string | null
+          phone: string | null
+          professional_registration: string | null
+          responsible_name: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          brand_color?: string
+          city_state?: string | null
+          company_name?: string | null
+          created_at?: string
+          document?: string | null
+          email?: string | null
+          logo_background?: string
+          logo_path?: string | null
+          phone?: string | null
+          professional_registration?: string | null
+          responsible_name?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          brand_color?: string
+          city_state?: string | null
+          company_name?: string | null
+          created_at?: string
+          document?: string | null
+          email?: string | null
+          logo_background?: string
+          logo_path?: string | null
+          phone?: string | null
+          professional_registration?: string | null
+          responsible_name?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
         }
         Relationships: []
       }
       profiles: {
         Row: {
-          created_at: string | null
+          created_at: string
           full_name: string | null
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          updated_at: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           full_name?: string | null
-          id: string
-          role?: Database["public"]["Enums"]["app_role"]
-          updated_at?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           full_name?: string | null
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          updated_at?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       proposals: {
         Row: {
           calculation_id: string | null
+          calculation_inputs: Json
+          calculation_results: Json
           client_data: Json
-          created_at: string | null
+          client_id: string | null
+          commercial_data: Json
+          company_snapshot: Json
+          costs: Json
+          created_at: string
           id: string
-          labor_info: Json | null
-          pricing_summary: Json
-          proposal_number: string
-          status: string | null
-          updated_at: string | null
-          user_id: string | null
+          items: Json
+          labor: Json
+          observations: string
+          selected_manufacturer: string | null
+          status: string
+          total: number
+          updated_at: string
+          user_id: string
         }
         Insert: {
           calculation_id?: string | null
-          client_data: Json
-          created_at?: string | null
+          calculation_inputs?: Json
+          calculation_results?: Json
+          client_data?: Json
+          client_id?: string | null
+          commercial_data?: Json
+          company_snapshot?: Json
+          costs?: Json
+          created_at?: string
           id?: string
-          labor_info?: Json | null
-          pricing_summary: Json
-          proposal_number: string
-          status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          items?: Json
+          labor?: Json
+          observations?: string
+          selected_manufacturer?: string | null
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id: string
         }
         Update: {
           calculation_id?: string | null
+          calculation_inputs?: Json
+          calculation_results?: Json
           client_data?: Json
-          created_at?: string | null
+          client_id?: string | null
+          commercial_data?: Json
+          company_snapshot?: Json
+          costs?: Json
+          created_at?: string
           id?: string
-          labor_info?: Json | null
-          pricing_summary?: Json
-          proposal_number?: string
-          status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          items?: Json
+          labor?: Json
+          observations?: string
+          selected_manufacturer?: string | null
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "proposals_calculation_id_fkey"
             columns: ["calculation_id"]
             isOneToOne: false
-            referencedRelation: "motor_calculations"
+            referencedRelation: "calculations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]
-      }
-      technical_references: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          section: string | null
-          source_document: string | null
-          standard_name: string
-          updated_at: string | null
-          version: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          section?: string | null
-          source_document?: string | null
-          standard_name: string
-          updated_at?: string | null
-          version?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          section?: string | null
-          source_document?: string | null
-          standard_name?: string
-          updated_at?: string | null
-          version?: string | null
-        }
-        Relationships: []
       }
     }
     Views: {
@@ -282,8 +244,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "user"
-      motor_speed_type: "SINGLE" | "DAHLANDER" | "DOUBLE_WINDING"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -410,9 +371,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "user"],
-      motor_speed_type: ["SINGLE", "DAHLANDER", "DOUBLE_WINDING"],
-    },
+    Enums: {},
   },
 } as const
