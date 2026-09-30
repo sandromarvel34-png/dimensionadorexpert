@@ -66,6 +66,38 @@ describe('CalculationEngine — regressão técnica', () => {
     expect(result.limitingCriterion).toBe('minimumSection');
   });
 
+  test('calcula queda de tensão CA com Rca + XL', () => {
+    const result = CalculationEngine.calculateVoltageDropForSection(
+      14.6075,
+      30,
+      380,
+      0.85,
+      'trifasico',
+      10,
+      'adjacent',
+    );
+
+    expect(result.resistance).toBe(2.44);
+    expect(result.reactance).toBe(0.14);
+    expect(result.percent).toBeCloseTo(0.429, 3);
+  });
+
+  test('arranjo multipolar usa reatância própria da tabela', () => {
+    const result = CalculationEngine.calculateVoltageDropForSection(
+      14.6075,
+      30,
+      380,
+      0.85,
+      'trifasico',
+      10,
+      'multipolar',
+    );
+
+    expect(result.resistance).toBe(2.44);
+    expect(result.reactance).toBe(0.10);
+    expect(result.percent).toBeLessThan(0.429);
+  });
+
   test('queda admissível menor não pode reduzir a seção', () => {
     const scenario = { ...baseInputs, distance: 100 };
     const res4 = CalculationEngine.performFullCalculation({ ...scenario, maxVoltageDrop: 4 });
