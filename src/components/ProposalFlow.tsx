@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, FileDown, Plus, Trash2, Save, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import katex from 'katex';
 import { generateCommercialProposalPdf, generateDescriptiveMemorialPdf } from '@/lib/pdf/generateProposalPdf';
 
 const getProtectiveConductorSection = (phaseSection: number) => {
@@ -64,7 +63,9 @@ export const ProposalFlow = () => {
 
         initialItems.push({
           id: Math.random().toString(36).substr(2, 9),
-          desc: `${categoryPrefix}${selectedManufacturer}${req.current !== undefined ? ` — mínimo ${req.current.toFixed(1)} A` : ''} (modelo a confirmar)`,
+          desc: product.verificationStatus === 'verified-exact'
+            ? `${categoryPrefix}${selectedManufacturer} ${product.model}${product.commercialCode ? ` — Ref. ${product.commercialCode}` : ''}`
+            : `${categoryPrefix}${selectedManufacturer}${req.current !== undefined ? ` — mínimo ${req.current.toFixed(1)} A` : ''}`,
           qtd: req.quantity || 1,
           unit: 'un',
           price: ''
@@ -231,7 +232,9 @@ export const ProposalFlow = () => {
 
                         newItems.push({
                           id: Math.random().toString(36).substr(2, 9),
-                          desc: `${categoryPrefix}${mfr}${req.current !== undefined ? ` — mínimo ${req.current.toFixed(1)} A` : ''} (modelo a confirmar)`,
+                          desc: product.verificationStatus === 'verified-exact'
+                            ? `${categoryPrefix}${mfr} ${product.model}${product.commercialCode ? ` — Ref. ${product.commercialCode}` : ''}`
+                            : `${categoryPrefix}${mfr}${req.current !== undefined ? ` — mínimo ${req.current.toFixed(1)} A` : ''}`,
                           qtd: req.quantity || 1,
                           unit: 'un',
                           price: ''
