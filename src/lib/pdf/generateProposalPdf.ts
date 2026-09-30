@@ -101,7 +101,8 @@ const drawLogo = (doc: any, profile: CompanyProfile) => {
       height = maxH;
       width = height * ratio;
     }
-    doc.addImage(profile.logoDataUrl, undefined, 14, 8.5, width, height, undefined, 'FAST');
+    const format = profile.logoDataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+    doc.addImage(profile.logoDataUrl, format, 14, 8.5, width, height, undefined, 'FAST');
     return true;
   } catch {
     return false;
@@ -141,7 +142,8 @@ const addBrandedHeader = (
   if (identityLine) doc.text(identityLine, textX, 19);
   const contact = companyContactLine(data.companyProfile);
   if (contact) doc.text(contact, textX, 24);
-  if (data.companyProfile.cityState) doc.text(data.companyProfile.cityState, textX, 29);
+  const location = [data.companyProfile.address, data.companyProfile.cityState].filter(Boolean).join(' - ');
+  if (location) doc.text(location, textX, 29);
 
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(255, 255, 255);
