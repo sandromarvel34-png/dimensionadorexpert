@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { FileText, FolderKanban, LayoutDashboard, Menu, Plus, X } from 'lucide-react';
+import { FileText, FolderKanban, LayoutDashboard, LogOut, Menu, Plus, X } from 'lucide-react';
 import logoAeAsset from '@/assets/logo-ae.png.asset.json';
 import { cn } from '@/lib/utils';
 import { Dashboard } from './Dashboard';
@@ -10,11 +10,13 @@ import { ProposalFlow } from './ProposalFlow';
 import { ProposalsView } from './ProposalsView';
 import { Toaster } from '@/components/ui/sonner';
 import { EducationalFlow } from './educational/EducationalFlow';
+import { useAuth } from './auth/AuthGate';
 
 type MainView = 'dashboard' | 'wizard' | 'results' | 'proposal' | 'proposals';
 
 export const AppLayout = () => {
   const { view, setView, currentResults } = useAppStore();
+  const { signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navigate = (target: MainView) => {
@@ -68,6 +70,14 @@ export const AppLayout = () => {
               </button>
             )}
             <button
+              onClick={() => void signOut()}
+              className="hidden md:flex w-10 h-10 rounded-lg border border-slate-200 bg-white items-center justify-center text-slate-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
+              title="Sair da conta"
+              aria-label="Sair da conta"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+            <button
               className="md:hidden w-10 h-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-slate-600"
               onClick={() => setMobileOpen(value => !value)}
               aria-label="Abrir menu"
@@ -97,6 +107,16 @@ export const AppLayout = () => {
             })}
             <button onClick={() => navigate('wizard')} className="btn-primary w-full mt-2 h-11">
               <Plus className="w-4 h-4" /> Novo dimensionamento
+            </button>
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                void signOut();
+              }}
+              className="w-full flex items-center gap-3 px-3 py-3 mt-2 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50"
+            >
+              <LogOut className="w-4 h-4" />
+              Sair da conta
             </button>
           </nav>
         )}
