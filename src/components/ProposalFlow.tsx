@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, FileDown, Plus, Trash2, Save, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import katex from 'katex';
-import { generateProposalPdf } from '@/lib/pdf/generateProposalPdf';
+import { generateCommercialProposalPdf, generateDescriptiveMemorialPdf } from '@/lib/pdf/generateProposalPdf';
 
 const getProtectiveConductorSection = (phaseSection: number) => {
   const standardSections = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400, 500];
@@ -134,29 +134,52 @@ export const ProposalFlow = () => {
     toast.success('Proposta salva com sucesso!');
   };
 
-  const handleGeneratePdf = async () => {
-    if (!currentInputs || !currentResults) {
-      toast.error('Não há dimensionamento disponível para gerar o PDF.');
+  const getPdfData = () => {
+    if (!currentInputs || !currentResults) return null;
+
+    return {
+      clientData,
+      commercialData,
+      observations,
+      items,
+      labor,
+      costs,
+      selectedManufacturer,
+      currentInputs,
+      currentResults,
+    };
+  };
+
+  const handleGenerateProposalPdf = async () => {
+    const data = getPdfData();
+    if (!data) {
+      toast.error('Não há dimensionamento disponível para gerar a proposta.');
       return;
     }
 
     try {
-      await generateProposalPdf({
-        clientData,
-        commercialData,
-        observations,
-        items,
-        labor,
-        costs,
-        selectedManufacturer,
-        currentInputs,
-        currentResults,
-      });
+      await generateCommercialProposalPdf(data);
       markProposalSaved();
-      toast.success('PDF gerado com sucesso.');
+      toast.success('Proposta comercial gerada com sucesso.');
     } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
-      toast.error('Não foi possível gerar o PDF.');
+      console.error('Erro ao gerar proposta comercial:', error);
+      toast.error('Não foi possível gerar a proposta comercial.');
+    }
+  };
+
+  const handleGenerateMemorialPdf = async () => {
+    const data = getPdfData();
+    if (!data) {
+      toast.error('Não há dimensionamento disponível para gerar o memorial.');
+      return;
+    }
+
+    try {
+      await generateDescriptiveMemorialPdf(data);
+      toast.success('Memorial descritivo gerado com sucesso.');
+    } catch (error) {
+      console.error('Erro ao gerar memorial descritivo:', error);
+      toast.error('Não foi possível gerar o memorial descritivo.');
     }
   };
 
@@ -243,8 +266,11 @@ export const ProposalFlow = () => {
               </button>
             ))}
           </div>
-          <button onClick={handleGeneratePdf} className="btn-secondary">
-            <FileDown className="w-5 h-5" /> Gerar PDF
+          <button onClick={handleGenerateProposalPdf} className="btn-secondary">
+            <FileDown className="w-5 h-5" /> Proposta PDF
+          </button>
+          <button onClick={handleGenerateMemorialPdf} className="btn-secondary">
+            <FileDown className="w-5 h-5" /> Memorial PDF
           </button>
           <button onClick={handleSave} className="btn-primary">
             <Save className="w-5 h-5" /> Salvar Proposta
@@ -302,11 +328,11 @@ export const ProposalFlow = () => {
                   <Zap className="w-8 h-8 md:w-10 md:h-10 fill-current" />
                   <div>
                     <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter">Dimensionador Expert</h1>
-                    <p className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Memorial e Orçamento Técnico</p>
+                    <p className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Proposta Comercial</p>
                   </div>
                 </div>
                 <div className="text-left sm:text-right">
-                  <h2 className="text-lg md:text-xl font-bold text-foreground">PROPOSTA TÉCNICA</h2>
+                  <h2 className="text-lg md:text-xl font-bold text-foreground">PROPOSTA COMERCIAL</h2>
                   <p className="text-metadata font-bold">{new Date().toLocaleDateString('pt-BR')}</p>
                   {commercialData.technicianName && (
                     <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1">
@@ -341,59 +367,31 @@ export const ProposalFlow = () => {
                 </div>
               )}
 
-              {/* Technical Data Table */}
+              {/* Commercial Service Summary */}
               <div className="mb-6 print:mb-4">
                 <div className="flex justify-between items-end mb-4">
-                  <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em]">Dados Técnicos da Carga</h3>
+                  <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em]">Resumo do Serviço</h3>
                   <span className="text-[9px] font-bold text-muted-foreground uppercase">
-                    Fonte: {currentInputs?.dataSource === 'catalog' ? 'Catálogo WEG' : 'Dados da Placa'}
+                    Fabricante de referência: {selectedManufacturer}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 bg-foreground/5 rounded-xl border border-foreground/10">
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Potência</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Carga</p>
                     <p className="text-sm font-bold">{currentInputs?.power} {currentInputs?.powerUnit}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Tensão</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Alimentação</p>
                     <p className="text-sm font-bold">{currentInputs?.voltage} V</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('I_{b}', { throwOnError: false }) }} />
-                    <p className="text-sm font-bold text-primary">{((currentResults?.nominalCurrent || 0) * (currentInputs?.serviceFactor || 1)).toFixed(1)} A</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Distância</p>
-                    <p className="text-sm font-bold">{currentInputs?.distance} m</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Partida</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Acionamento</p>
                     <p className="text-sm font-bold capitalize">{currentInputs?.starterType}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold" dangerouslySetInnerHTML={{ __html: katex.renderToString('\\cos \\varphi / \\eta / FS', { throwOnError: false }) }} />
-                    <p className="text-sm font-bold">{(currentInputs?.powerFactor || 0.85).toFixed(2)} / {(currentInputs?.efficiency || 0.90).toFixed(2)} / {(currentInputs?.serviceFactor || 1.0).toFixed(2)}</p>
+                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Distância aproximada</p>
+                    <p className="text-sm font-bold">{currentInputs?.distance} m</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Critério</p>
-                    <p className="text-sm font-bold truncate">{currentResults?.limitingCriterion === 'ampacity' ? 'Ampacidade' : currentResults?.limitingCriterion === 'voltageDrop' ? 'Queda ΔV' : 'Seção mínima'}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[9px] text-muted-foreground uppercase font-bold">Seção Final</p>
-                    <p className="text-sm font-bold text-primary">{currentResults?.finalCableSection} mm²</p>
-                  </div>
-                  {currentInputs?.dataSource === 'catalog' && (
-                    <div className="col-span-4 mt-2 pt-2 border-t border-foreground/5 grid grid-cols-2 gap-4">
-                      <div className="space-y-1">
-                        <p className="text-[9px] text-muted-foreground uppercase font-bold">Motor Selecionado</p>
-                        <p className="text-sm font-bold">WEG {currentInputs.motorCatalogData?.line} - {currentInputs.motorCatalogData?.model}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-[9px] text-muted-foreground uppercase font-bold">Carcaça / Rotação</p>
-                        <p className="text-sm font-bold">{currentInputs.motorCatalogData?.frame || '—'} / {currentInputs.motorCatalogData?.rpm || '—'} RPM</p>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -506,7 +504,7 @@ export const ProposalFlow = () => {
               {/* PDF Footer */}
               <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-end print:mt-2 print:pt-2">
                 <div className="text-[9px] text-muted-foreground max-w-sm leading-relaxed print:text-[7pt]">
-                  * Proposta válida por {costs.validity} dias. O dimensionamento utiliza os critérios configurados na ferramenta e deve ser conferido com as condições reais da instalação, coordenação das proteções, documentação dos fabricantes e responsabilidade técnica aplicável antes da execução.
+                  * Proposta válida por {costs.validity} dias. Alterações de escopo, materiais ou condições de campo não previstas poderão exigir revisão de valores e prazos.
                 </div>
                 <div className="text-center w-64 print:w-48">
                   <div className="text-[10px] font-bold uppercase tracking-widest mb-1 print:text-[8pt]">
@@ -571,8 +569,11 @@ export const ProposalFlow = () => {
               <button onClick={handleSave} className="btn-secondary w-full h-11">
                 <Save className="w-4 h-4" /> Salvar proposta
               </button>
-              <button onClick={handleGeneratePdf} className="btn-primary w-full h-11">
-                <FileDown className="w-4 h-4" /> Gerar PDF profissional
+              <button onClick={handleGenerateProposalPdf} className="btn-primary w-full h-11">
+                <FileDown className="w-4 h-4" /> Gerar proposta comercial
+              </button>
+              <button onClick={handleGenerateMemorialPdf} className="btn-secondary w-full h-11">
+                <FileDown className="w-4 h-4" /> Gerar memorial descritivo
               </button>
             </div>
           </div>
