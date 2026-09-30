@@ -159,7 +159,7 @@ export const ProposalsView = () => {
             </h3>
             <p className="text-sm text-slate-500 mt-1">
               {proposals.length === 0
-                ? 'Crie uma proposta a partir de um dimensionamento e use “Salvar dados da proposta”.'
+                ? 'Clique em “Criar proposta comercial” após um dimensionamento. O rascunho será salvo automaticamente.'
                 : 'Altere a busca ou o filtro selecionado.'}
             </p>
           </div>
