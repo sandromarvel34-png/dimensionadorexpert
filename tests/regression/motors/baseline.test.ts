@@ -46,9 +46,16 @@ describe('Regression: Motors Module Baseline', () => {
   });
 
   test('Voltage Drop Scaling (Long Distance)', () => {
-    const longDist = { ...baselineScenario, distance: 300 };
+    const longDist = { ...baselineScenario, distance: 100 };
     const results = CalculationEngine.performFullCalculation(longDist);
     expect(results.cableByVoltageDrop).toBeGreaterThan(results.cableByAmpacity);
     expect(results.limitingCriterion).toBe('voltageDrop');
+    expect(results.voltageDropCalculated).toBeLessThanOrEqual(2);
+  });
+
+  test('bloqueia circuito cuja queda de tensão não atende nem em 500 mm²', () => {
+    const extremeDistance = { ...baselineScenario, distance: 300 };
+    expect(() => CalculationEngine.performFullCalculation(extremeDistance))
+      .toThrow(/queda de tensão excede 2%/i);
   });
 });
