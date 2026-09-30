@@ -392,7 +392,7 @@ export const ProposalFlow = () => {
                   <div className="flex items-center gap-3">
                     <input
                       type="color"
-                      value={companyProfile.brandColor}
+                      value={/^#[0-9A-Fa-f]{6}$/.test(companyProfile.brandColor) ? companyProfile.brandColor : '#2563EB'}
                       onChange={e => setCompanyProfile({ brandColor: e.target.value })}
                       className="h-11 w-16 rounded-lg border border-slate-300 bg-white p-1 cursor-pointer"
                       aria-label="Cor da marca"
@@ -469,12 +469,12 @@ export const ProposalFlow = () => {
                 <div className="text-left sm:text-right">
                   <h2 className="text-lg md:text-xl font-bold text-foreground">PROPOSTA COMERCIAL</h2>
                   <p className="text-metadata font-bold">{new Date().toLocaleDateString('pt-BR')}</p>
-                  {commercialData.technicianName && (
+                  {companyProfile.responsibleName && (
                     <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1">
-                      {commercialData.executingCompany ? `${commercialData.executingCompany} — ` : ''}
-                      Técnico: {commercialData.technicianName}
+                      Responsável: {companyProfile.responsibleName}
+                      {companyProfile.professionalRegistration ? ` • ${companyProfile.professionalRegistration}` : ''}
                     </p>
-              )}
+                  )}
               
               {/* Service Description in PDF */}
               {commercialData.serviceDescription && (
@@ -505,7 +505,7 @@ export const ProposalFlow = () => {
               {/* Commercial Service Summary */}
               <div className="mb-6 print:mb-4">
                 <div className="flex justify-between items-end mb-4">
-                  <h3 className="text-[10px] text-primary uppercase font-bold tracking-[0.2em]">Resumo do Serviço</h3>
+                  <h3 className="text-[10px] uppercase font-bold tracking-[0.2em]" style={{ color: companyProfile.brandColor }}>Resumo do Serviço</h3>
                   <span className="text-[9px] font-bold text-muted-foreground uppercase">
                     Fabricante de referência: {selectedManufacturer}
                   </span>
@@ -643,11 +643,11 @@ export const ProposalFlow = () => {
                 </div>
                 <div className="text-center w-64 print:w-48">
                   <div className="text-[10px] font-bold uppercase tracking-widest mb-1 print:text-[8pt]">
-                    {commercialData.technicianName}
+                    {companyProfile.responsibleName || 'Responsável pelo serviço'}
                   </div>
-                  {commercialData.executingCompany && (
+                  {companyProfile.professionalRegistration && (
                     <div className="text-[9px] text-muted-foreground uppercase mb-1 print:text-[7pt]">
-                      {commercialData.executingCompany}
+                      {companyProfile.professionalRegistration}
                     </div>
                   )}
                   <div className="border-b border-foreground h-1 w-full mb-2 print:h-1 print:mb-1"></div>
