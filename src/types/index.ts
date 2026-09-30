@@ -17,6 +17,52 @@ export interface CompanyProfile {
   logoBackground: 'light' | 'dark' | 'brand';
 }
 
+export type ProposalStatus = 'rascunho' | 'enviada' | 'aprovada' | 'recusada';
+
+export interface ProposalLineItem {
+  id: string;
+  desc: string;
+  qtd: number;
+  unit?: string;
+  price: number | string;
+}
+
+export interface SavedProposal {
+  id: string;
+  calculationHistoryId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  status: ProposalStatus;
+  clientData: {
+    name: string;
+    doc: string;
+    phone: string;
+    email: string;
+  };
+  commercialData: {
+    serviceDescription: string;
+    technicianName: string;
+    executingCompany: string;
+  };
+  observations: string;
+  items: ProposalLineItem[];
+  labor: {
+    hours: number;
+    rate: number;
+  };
+  costs: {
+    travel: number;
+    others: number;
+    discount: number;
+    validity: number;
+  };
+  selectedManufacturer: 'WEG' | 'Siemens' | 'Schneider';
+  companyProfile: CompanyProfile;
+  currentInputs: CalculationInputs;
+  currentResults: CalculationResults;
+  total: number;
+}
+
 export interface TechnicalReference {
   id: string;
   standardName: string;
