@@ -232,27 +232,46 @@ export const CalculatorWizard = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
-      <div className="mb-10">
-        <div className="flex items-center gap-2 mb-4">
-          <button 
-            onClick={() => setView('dashboard')}
-            className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 text-sm font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" /> Dashboard
-          </button>
-        </div>
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Dimensionador Expert</h1>
-          <p className="text-muted-foreground text-lg">Informe os dados técnicos do motor e da instalação para iniciar o cálculo.</p>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-12">
+      <div className="mb-7">
+        <button 
+          onClick={() => setView('dashboard')}
+          className="text-slate-500 hover:text-primary transition-colors inline-flex items-center gap-1.5 text-sm font-semibold mb-5"
+        >
+          <ArrowLeft className="w-4 h-4" /> Voltar ao dashboard
+        </button>
+        <span className="eyebrow block">Novo dimensionamento</span>
+        <h1 className="page-heading mt-2">Configure os dados do cálculo</h1>
+        <p className="text-slate-600 text-base md:text-lg mt-2 max-w-3xl">
+          Preencha os dados do motor, as condições da instalação e os critérios que serão usados no dimensionamento.
+        </p>
+
+        <div className="grid grid-cols-3 gap-2 mt-6 max-w-2xl">
+          {[
+            ['1', 'Motor'],
+            ['2', 'Instalação'],
+            ['3', 'Critérios'],
+          ].map(([n, label]) => (
+            <div key={n} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
+              <span className="w-6 h-6 rounded-full bg-blue-50 text-primary text-xs font-bold flex items-center justify-center">{n}</span>
+              <span className="text-xs sm:text-sm font-semibold text-slate-700">{label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      <form onSubmit={handleCalculate} className="card-panel shadow-lg border-primary/5">
-        <div className="space-y-10">
+      <form onSubmit={handleCalculate} className="space-y-5">
+        <div className="space-y-5">
           {/* Data Source Selection */}
-          <div className="space-y-4">
-            <Label className="text-foreground font-semibold">Como deseja informar os dados do motor?</Label>
+          <div className="section-card space-y-4">
+            <div className="section-heading mb-4">
+              <div className="section-index">1</div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-950">Origem dos dados do motor</h2>
+                <p className="text-sm text-slate-500 mt-0.5">Use os dados da placa ou selecione um motor do catálogo disponível.</p>
+              </div>
+            </div>
+            <Label className="sr-only">Como deseja informar os dados do motor?</Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 type="button"
@@ -300,8 +319,14 @@ export const CalculatorWizard = () => {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-border">
-            <h3 className="text-sm font-semibold text-muted-foreground mb-6">Dados do Motor</h3>
+          <div className="section-card">
+            <div className="section-heading">
+              <div className="section-index">2</div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-950">Dados do motor</h2>
+                <p className="text-sm text-slate-500 mt-0.5">Características elétricas usadas para calcular a corrente de projeto.</p>
+              </div>
+            </div>
             
             {dataSource === 'manual' ? (
               <div className="space-y-8">
@@ -547,8 +572,14 @@ export const CalculatorWizard = () => {
             )}
           </div>
 
-          <div className="pt-6 border-t border-border">
-            <h3 className="text-sm font-semibold text-muted-foreground mb-6">Dados da Instalação</h3>
+          <div className="section-card">
+            <div className="section-heading">
+              <div className="section-index">3</div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-950">Instalação e acionamento</h2>
+                <p className="text-sm text-slate-500 mt-0.5">Distância, partida e limite de queda de tensão do circuito.</p>
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Distância até a alimentação</Label>
@@ -605,8 +636,12 @@ export const CalculatorWizard = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="mt-10 pt-6 border-t border-border/70">
-              <h3 className="text-sm font-semibold text-muted-foreground mb-6">Condições de dimensionamento</h3>
+            <div className="mt-8 soft-panel p-5 md:p-6">
+              <div className="mb-6">
+                <p className="eyebrow">Condições de dimensionamento</p>
+                <h3 className="text-base font-bold text-slate-900 mt-1">Como os condutores estão instalados</h3>
+                <p className="text-sm text-slate-500 mt-1">Esses dados alteram a ampacidade e a verificação da queda de tensão.</p>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Método de instalação</Label>
@@ -716,7 +751,7 @@ export const CalculatorWizard = () => {
               )}
               </div>
 
-              <div className="mt-8 rounded-xl border border-border bg-muted/20 p-5">
+              <div className="mt-6 rounded-[14px] border border-amber-200 bg-amber-50/60 p-5">
                 <div className="mb-4">
                   <h4 className="text-sm font-semibold text-foreground">Verificação térmica de curto-circuito (opcional)</h4>
                   <p className="text-xs text-muted-foreground mt-1">Se você conhecer a corrente de falta presumida e o tempo de atuação da proteção, informe os dois dados para incluir este critério na seção final.</p>
@@ -742,18 +777,18 @@ export const CalculatorWizard = () => {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-border">
+        <div className="sticky bottom-4 z-20 mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 rounded-[16px] border border-slate-200 bg-white/95 backdrop-blur p-3 shadow-xl shadow-slate-900/10">
           <button 
             type="button"
             onClick={() => setView('dashboard')}
-            className="btn-secondary w-full sm:w-auto px-8"
+            className="btn-secondary w-full sm:w-auto px-6 h-11"
           >
             Cancelar
           </button>
           <button 
             type="submit" 
             disabled={isCalculating}
-            className="btn-primary w-full sm:w-auto px-12 relative"
+            className="btn-primary w-full sm:w-auto px-8 h-11 relative"
           >
             {isCalculating ? (
               <>
