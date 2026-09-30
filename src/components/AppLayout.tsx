@@ -62,9 +62,9 @@ export const AppLayout = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            {view !== 'wizard' && (
+            {view !== 'wizard' && view !== 'dashboard' && (
               <button onClick={() => navigate('wizard')} className="hidden sm:flex btn-primary h-10 px-4 text-sm">
-                <Plus className="w-4 h-4" /> Novo cálculo
+                <Plus className="w-4 h-4" /> Novo dimensionamento
               </button>
             )}
             <button
