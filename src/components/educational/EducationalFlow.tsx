@@ -128,20 +128,24 @@ export const EducationalFlow = () => {
           <div className="space-y-6 text-left">
             <p className="text-slate-600">Em cálculos manuais simplificados, a seção transversal pode ser estimada diretamente pela resistividade do cobre. No motor atual do aplicativo, porém, a verificação final de queda de tensão é mais completa: cada seção comercial é testada usando resistência em CA (Rca), reatância indutiva (XL) e fator de potência.</p>
             <MathFormula
-              title="Seção transversal — aproximação resistiva didática"
+              title="1. Cálculo da seção transversal pelo critério de queda de tensão"
               legend={[
-                { symbol: 'S', label: 'Seção transversal estimada' },
-                { symbol: '\\rho', label: 'Resistividade do condutor' },
+                { symbol: 'S_{\\Delta V}', label: 'Seção transversal teórica calculada' },
+                { symbol: '\\rho', label: 'Resistividade do cobre a 70 °C' },
                 { symbol: 'L', label: 'Comprimento do circuito' },
                 { symbol: '\\Delta V_{\\%}', label: 'Queda de tensão admissível em %' },
               ]}
             >
               {currentInputs.phase === 'trifasico'
-                ? `S \\approx \\frac{100 \\sqrt{3} \\cdot \\rho \\cdot L \\cdot I_b \\cdot \\cos\\varphi}{\\Delta V_{\\%} \\cdot V}`
-                : `S \\approx \\frac{200 \\cdot \\rho \\cdot L \\cdot I_b \\cdot \\cos\\varphi}{\\Delta V_{\\%} \\cdot V}`}
+                ? `S_{\\Delta V} = \\frac{100 \\sqrt{3} \\cdot \\rho \\cdot L \\cdot I_b \\cdot \\cos\\varphi}{\\Delta V_{\\%} \\cdot V} = ${(currentResults.voltageDropRequiredSectionTheoretical ?? 0).toFixed(2)}\\,mm^2`
+                : `S_{\\Delta V} = \\frac{200 \\cdot \\rho \\cdot L \\cdot I_b \\cdot \\cos\\varphi}{\\Delta V_{\\%} \\cdot V} = ${(currentResults.voltageDropRequiredSectionTheoretical ?? 0).toFixed(2)}\\,mm^2`}
             </MathFormula>
+            <div className="rounded-xl border bg-muted/20 p-4 text-sm text-slate-700">
+              <p><strong>Seção teórica:</strong> {(currentResults.voltageDropRequiredSectionTheoretical ?? 0).toFixed(2)} mm²</p>
+              <p><strong>Primeira seção comercial:</strong> {currentResults.voltageDropPreliminaryCommercialSection ?? currentResults.cableByVoltageDrop} mm²</p>
+            </div>
             <MathFormula
-              title="Queda de tensão em corrente alternada"
+              title="2. Verificação da queda de tensão da seção comercial"
               legend={[
                 { symbol: 'R', label: 'Resistência elétrica em CA do condutor (Ω/km)' },
                 { symbol: 'X_L', label: 'Reatância indutiva da linha (Ω/km)' },
@@ -168,9 +172,15 @@ export const EducationalFlow = () => {
               </div>
             </div>
             <div className="bg-white p-5 rounded-xl border">
-              <p className="text-sm text-muted-foreground">Seção comercial selecionada por queda de tensão</p>
+              <p className="text-sm text-muted-foreground">Seção final após verificação da queda de tensão</p>
               <p className="text-3xl font-bold text-primary mt-1">{currentResults.cableByVoltageDrop} mm²</p>
-              <p className="text-sm text-slate-600 mt-2">Queda calculada: {currentResults.voltageDropCalculated.toFixed(2)}% (limite informado: {currentInputs.maxVoltageDrop}%).</p>
+              <p className="text-sm text-slate-600 mt-2">
+                Queda calculada: {currentResults.voltageDropCalculated.toFixed(2)}% (limite informado: {currentInputs.maxVoltageDrop}%).
+                {currentResults.voltageDropPreliminaryCommercialSection !== undefined &&
+                 currentResults.voltageDropPreliminaryCommercialSection !== currentResults.cableByVoltageDrop
+                  ? ` A seção comercial inicial de ${currentResults.voltageDropPreliminaryCommercialSection} mm² não atendeu à verificação R+X, por isso o sistema avançou para ${currentResults.cableByVoltageDrop} mm².`
+                  : ' A primeira seção comercial calculada atendeu à verificação R+X.'}
+              </p>
             </div>
           </div>
         );
