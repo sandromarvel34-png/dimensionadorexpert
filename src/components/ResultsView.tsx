@@ -73,6 +73,14 @@ export const ResultsView = () => {
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-1">Seção por ΔV</p>
               <p className="text-xl font-semibold">{currentResults.cableByVoltageDrop} mm²</p>
+              {currentResults.voltageDropRequiredSectionTheoretical !== undefined && (
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Teórica: {currentResults.voltageDropRequiredSectionTheoretical.toFixed(2)} mm²
+                  {currentResults.voltageDropPreliminaryCommercialSection !== undefined
+                    ? ` • Comercial inicial: ${currentResults.voltageDropPreliminaryCommercialSection} mm²`
+                    : ''}
+                </p>
+              )}
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-1">Queda calculada</p>
