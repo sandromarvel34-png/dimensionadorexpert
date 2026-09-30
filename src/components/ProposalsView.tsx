@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { generateCommercialProposalPdf, generateDescriptiveMemorialPdf } from '@/lib/pdf/generateProposalPdf';
-import { Copy, FileDown, FileText, Pencil, Printer, Search, Trash2 } from 'lucide-react';
+import { Copy, FileText, Pencil, Printer, Search, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import type { ProposalStatus, SavedProposal } from '@/types';
 
@@ -69,16 +69,16 @@ export const ProposalsView = () => {
     currentResults: proposal.currentResults,
   });
 
-  const handlePdf = async (proposal: SavedProposal, type: 'proposal' | 'memorial', action: 'save' | 'print') => {
+  const handlePrint = async (proposal: SavedProposal, type: 'proposal' | 'memorial') => {
     try {
       if (type === 'proposal') {
-        await generateCommercialProposalPdf({ data: pdfData(proposal), action });
+        await generateCommercialProposalPdf({ data: pdfData(proposal), action: 'print' });
       } else {
-        await generateDescriptiveMemorialPdf({ data: pdfData(proposal), action });
+        await generateDescriptiveMemorialPdf({ data: pdfData(proposal), action: 'print' });
       }
     } catch (error) {
       console.error(error);
-      toast.error('Não foi possível gerar o documento.');
+      toast.error('Não foi possível abrir o documento para impressão.');
     }
   };
 
@@ -211,10 +211,7 @@ export const ProposalsView = () => {
                     <button onClick={() => duplicateProposal(proposal.id)} className="btn-secondary h-9 px-3 text-sm" title="Duplicar">
                       <Copy className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handlePdf(proposal, 'proposal', 'save')} className="btn-secondary h-9 px-3 text-sm" title="Salvar proposta em PDF">
-                      <FileDown className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => handlePdf(proposal, 'proposal', 'print')} className="btn-secondary h-9 px-3 text-sm" title="Imprimir proposta">
+                    <button onClick={() => handlePrint(proposal, 'proposal')} className="btn-secondary h-9 px-3 text-sm" title="Imprimir proposta ou salvar como PDF">
                       <Printer className="w-4 h-4" />
                     </button>
                     <button onClick={() => handleDelete(proposal)} className="h-9 px-3 rounded-[10px] border border-red-200 bg-white text-red-600 hover:bg-red-50 transition-colors" title="Excluir">
@@ -224,13 +221,10 @@ export const ProposalsView = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">
-                  <button onClick={() => handlePdf(proposal, 'memorial', 'save')} className="text-xs font-semibold text-slate-600 hover:text-primary">
-                    Salvar memorial PDF
+                  <button onClick={() => handlePrint(proposal, 'memorial')} className="text-xs font-semibold text-slate-600 hover:text-primary inline-flex items-center gap-1.5">
+                    <Printer className="w-3.5 h-3.5" /> Imprimir memorial
                   </button>
-                  <span className="text-slate-300">•</span>
-                  <button onClick={() => handlePdf(proposal, 'memorial', 'print')} className="text-xs font-semibold text-slate-600 hover:text-primary">
-                    Imprimir memorial
-                  </button>
+                  <span className="text-xs text-slate-400">ou salvar como PDF pela janela de impressão</span>
                 </div>
               </article>
             ))}
