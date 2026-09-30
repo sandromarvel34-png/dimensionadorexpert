@@ -26,7 +26,6 @@ export const AppLayout = () => {
     { label: 'Dashboard', target: 'dashboard', visible: true, icon: LayoutDashboard },
     { label: 'Propostas', target: 'proposals', visible: true, icon: FolderKanban },
     { label: 'Resultado', target: 'results', visible: !!currentResults, icon: FileText },
-    { label: 'Proposta', target: 'proposal', visible: !!currentResults, icon: FileText },
   ];
 
   return (
