@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, Building2, ImagePlus, Plus, Printer, Trash2, Save } from 'lucide-react';
+import { ArrowLeft, Building2, CheckCircle2, ImagePlus, Plus, Printer, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { generateCommercialProposalPdf, generateDescriptiveMemorialPdf } from '@/lib/pdf/generateProposalPdf';
 
@@ -22,7 +22,6 @@ export const ProposalFlow = () => {
     currentInputs,
     selectedManufacturer,
     setSelectedManufacturer,
-    markProposalSaved,
     companyProfile,
     setCompanyProfile,
     proposals,
@@ -31,6 +30,8 @@ export const ProposalFlow = () => {
   } = useAppStore();
 
   const savedProposal = proposals.find(item => item.id === currentProposalId) || null;
+  const proposalIdRef = useRef(currentProposalId || Math.random().toString(36).slice(2, 11));
+  const createdAtRef = useRef(savedProposal?.createdAt || new Date().toISOString());
   const [clientData, setClientData] = useState(savedProposal?.clientData || {
     name: '',
     doc: '',
@@ -133,41 +134,51 @@ export const ProposalFlow = () => {
     setItems(items.map(i => i.id === id ? { ...i, [field]: value } : i));
   };
 
-  const handleSave = () => {
-    if (!currentInputs || !currentResults) {
-      toast.error('Não há dimensionamento vinculado a esta proposta.');
-      return;
-    }
 
-    const now = new Date().toISOString();
-    const id = currentProposalId || Math.random().toString(36).slice(2, 11);
+  useEffect(() => {
+    if (!currentInputs || !currentResults) return;
 
-    saveProposal({
-      id,
-      calculationHistoryId: useAppStore.getState().currentHistoryId,
-      createdAt: savedProposal?.createdAt || now,
-      updatedAt: now,
-      status: savedProposal?.status || 'rascunho',
-      clientData: { ...clientData },
-      commercialData: {
-        ...commercialData,
-        technicianName: companyProfile.responsibleName || commercialData.technicianName,
-        executingCompany: companyProfile.companyName || commercialData.executingCompany,
-      },
-      observations,
-      items: items.map(item => ({ ...item })),
-      labor: { ...labor },
-      costs: { ...costs },
-      selectedManufacturer,
-      companyProfile: { ...companyProfile },
-      currentInputs: { ...currentInputs },
-      currentResults,
-      total: grandTotal,
-    });
+    const timer = window.setTimeout(() => {
+      saveProposal({
+        id: proposalIdRef.current,
+        calculationHistoryId: useAppStore.getState().currentHistoryId,
+        createdAt: createdAtRef.current,
+        updatedAt: new Date().toISOString(),
+        status: savedProposal?.status || 'rascunho',
+        clientData: { ...clientData },
+        commercialData: {
+          ...commercialData,
+          technicianName: companyProfile.responsibleName || commercialData.technicianName,
+          executingCompany: companyProfile.companyName || commercialData.executingCompany,
+        },
+        observations,
+        items: items.map(item => ({ ...item })),
+        labor: { ...labor },
+        costs: { ...costs },
+        selectedManufacturer,
+        companyProfile: { ...companyProfile },
+        currentInputs: { ...currentInputs },
+        currentResults,
+        total: grandTotal,
+      });
+    }, 450);
 
-    markProposalSaved();
-    toast.success(currentProposalId ? 'Proposta atualizada com sucesso!' : 'Proposta salva com sucesso!');
-  };
+    return () => window.clearTimeout(timer);
+  }, [
+    clientData,
+    commercialData,
+    observations,
+    items,
+    labor,
+    costs,
+    selectedManufacturer,
+    companyProfile,
+    currentInputs,
+    currentResults,
+    grandTotal,
+    saveProposal,
+    savedProposal?.status,
+  ]);
 
   const getPdfData = () => {
     if (!currentInputs || !currentResults) return null;
@@ -253,7 +264,12 @@ export const ProposalFlow = () => {
           >
             <ArrowLeft className="w-4 h-4" /> Voltar aos resultados
           </button>
-          <span className="eyebrow block mt-5">{savedProposal ? 'Editando proposta salva' : 'Documentação comercial'}</span>
+          <div className="flex flex-wrap items-center gap-2 mt-5">
+            <span className="eyebrow">{savedProposal ? 'Editando proposta' : 'Nova proposta'}</span>
+            <span className="status-pill border-emerald-200 bg-emerald-50 text-emerald-700">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Salva automaticamente
+            </span>
+          </div>
           <h2 className="page-heading mt-2">{savedProposal ? (savedProposal.clientData.name || 'Proposta comercial') : 'Proposta comercial'}</h2>
           <p className="text-slate-600 text-base md:text-lg mt-2">Complete os dados do cliente, revise os materiais e prepare o documento para apresentação.</p>
         </div>
@@ -333,9 +349,6 @@ export const ProposalFlow = () => {
           </button>
           <button onClick={handlePrintMemorial} className="btn-secondary">
             <Printer className="w-5 h-5" /> Imprimir memorial
-          </button>
-          <button onClick={handleSave} className="btn-primary">
-            <Save className="w-5 h-5" /> Salvar proposta
           </button>
         </div>
       </div>
@@ -762,9 +775,13 @@ export const ProposalFlow = () => {
             </div>
 
             <div className="grid gap-3">
-              <button onClick={handleSave} className="btn-primary w-full h-11">
-                <Save className="w-4 h-4" /> Salvar proposta
-              </button>
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-emerald-900">Salvamento automático</p>
+                  <p className="text-[11px] text-emerald-800 mt-0.5">As alterações desta proposta são gravadas automaticamente.</p>
+                </div>
+              </div>
 
               <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 space-y-2">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600">Documentos</p>
