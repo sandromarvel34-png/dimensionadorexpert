@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { CalculationInputs, CalculationResults } from '@/types';
+import { CalculationInputs, CalculationResults, CompanyProfile } from '@/types';
 
 interface AppState {
   view: 'dashboard' | 'wizard' | 'results' | 'proposal' | 'educational';
@@ -11,6 +11,7 @@ interface AppState {
   selectedProducts: Record<string, any>;
   selectedManufacturer: 'WEG' | 'Siemens' | 'Schneider';
   history: any[];
+  companyProfile: CompanyProfile;
 
   setView: (view: AppState['view']) => void;
   setStep: (step: number) => void;
@@ -20,6 +21,7 @@ interface AppState {
   addToHistory: (item: any) => void;
   openHistoryItem: (item: any) => void;
   markProposalSaved: () => void;
+  setCompanyProfile: (profile: Partial<CompanyProfile>) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -33,6 +35,19 @@ export const useAppStore = create<AppState>()(
       selectedProducts: {},
       selectedManufacturer: 'WEG',
       history: [],
+      companyProfile: {
+        companyName: '',
+        document: '',
+        responsibleName: '',
+        professionalRegistration: '',
+        phone: '',
+        email: '',
+        address: '',
+        cityState: '',
+        website: '',
+        logoDataUrl: '',
+        brandColor: '#2563EB',
+      },
 
       setView: (view) => set({ view }),
       setStep: (step) => set({ step }),
@@ -68,6 +83,9 @@ export const useAppStore = create<AppState>()(
           view: item.nominalCurrent ? 'results' : 'wizard',
         });
       },
+      setCompanyProfile: (profile) => set((state) => ({
+        companyProfile: { ...state.companyProfile, ...profile },
+      })),
       markProposalSaved: () => set((state) => ({
         history: state.history.map(item => item.id === state.currentHistoryId ? { ...item, hasProposal: true } : item),
       })),
