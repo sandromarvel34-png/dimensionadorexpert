@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { FileText, LayoutDashboard, Menu, Plus, X } from 'lucide-react';
+import { FileText, FolderKanban, LayoutDashboard, Menu, Plus, X } from 'lucide-react';
 import logoAeAsset from '@/assets/logo-ae.png.asset.json';
 import { cn } from '@/lib/utils';
 import { Dashboard } from './Dashboard';
 import { CalculatorWizard } from './CalculatorWizard';
 import { ResultsView } from './ResultsView';
 import { ProposalFlow } from './ProposalFlow';
+import { ProposalsView } from './ProposalsView';
 import { Toaster } from '@/components/ui/sonner';
 import { EducationalFlow } from './educational/EducationalFlow';
 
-type MainView = 'dashboard' | 'wizard' | 'results' | 'proposal';
+type MainView = 'dashboard' | 'wizard' | 'results' | 'proposal' | 'proposals';
 
 export const AppLayout = () => {
   const { view, setView, currentResults } = useAppStore();
@@ -23,6 +24,7 @@ export const AppLayout = () => {
 
   const navItems: Array<{ label: string; target: MainView; visible: boolean; icon: typeof LayoutDashboard }> = [
     { label: 'Dashboard', target: 'dashboard', visible: true, icon: LayoutDashboard },
+    { label: 'Propostas', target: 'proposals', visible: true, icon: FolderKanban },
     { label: 'Resultado', target: 'results', visible: !!currentResults, icon: FileText },
     { label: 'Proposta', target: 'proposal', visible: !!currentResults, icon: FileText },
   ];
@@ -106,6 +108,7 @@ export const AppLayout = () => {
         {view === 'wizard' && <CalculatorWizard />}
         {view === 'results' && <ResultsView />}
         {view === 'proposal' && currentResults && <ProposalFlow />}
+        {view === 'proposals' && <ProposalsView />}
         {view === 'educational' && <EducationalFlow />}
       </main>
 
