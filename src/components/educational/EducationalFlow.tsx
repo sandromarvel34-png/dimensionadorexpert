@@ -28,7 +28,6 @@ export const EducationalFlow = () => {
   const combinedFactor = currentResults.correctionFactors?.combined ?? 1;
   const correctedCurrent = ib / combinedFactor;
   const phaseFactor = currentInputs.phase === 'trifasico' ? '\\sqrt{3}' : '1';
-  const dropFactor = currentInputs.phase === 'trifasico' ? '\\sqrt{3}' : '2';
   const limitingLabel = currentResults.limitingCriterion === 'ampacity'
     ? 'ampacidade'
     : currentResults.limitingCriterion === 'voltageDrop'
@@ -116,17 +115,34 @@ export const EducationalFlow = () => {
       case 4:
         return (
           <div className="space-y-6 text-left">
-            <p className="text-slate-600">Nesta versão, a queda de tensão é calculada por um modelo resistivo simplificado com resistividade do cobre a 70 °C. A reatância do cabo não é considerada.</p>
+            <p className="text-slate-600">A queda de tensão é calculada em corrente alternada considerando a resistência elétrica em CA (Rca), a reatância indutiva (XL) e o fator de potência. Os valores de Rca/XL usados são de referência para cabo de cobre/PVC 70 °C a 60 Hz.</p>
             <MathFormula
-              title="Queda de tensão — modelo resistivo simplificado"
+              title="Queda de tensão em corrente alternada"
               legend={[
-                { symbol: '\\rho', label: 'Resistividade do cobre a 70 °C' },
-                { symbol: 'L', label: 'Comprimento' },
+                { symbol: 'R', label: 'Resistência elétrica em CA do condutor (Ω/km)' },
+                { symbol: 'X_L', label: 'Reatância indutiva da linha (Ω/km)' },
+                { symbol: 'L', label: 'Comprimento do circuito (km)' },
                 { symbol: 'I_b', label: 'Corrente de projeto' },
               ]}
             >
-              {`S \\approx \\frac{100 \\cdot ${dropFactor} \\cdot 0{,}0213 \\cdot ${currentInputs.distance} \\cdot ${ib.toFixed(2)} \\cdot ${pf.toFixed(2)}}{${currentInputs.maxVoltageDrop} \\cdot ${currentInputs.voltage}}`}
+              {currentInputs.phase === 'trifasico'
+                ? `\\Delta V = \\sqrt{3} \\cdot (R\\cos\\varphi + X_L\\sin\\varphi) \\cdot I_b \\cdot L`
+                : `\\Delta V = 2 \\cdot (R\\cos\\varphi + X_L\\sin\\varphi) \\cdot I_b \\cdot L`}
             </MathFormula>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white p-4 rounded-xl border">
+                <p className="text-xs text-muted-foreground">Rca utilizado</p>
+                <p className="text-xl font-semibold">{currentResults.voltageDropResistanceOhmKm?.toFixed(2)} Ω/km</p>
+              </div>
+              <div className="bg-white p-4 rounded-xl border">
+                <p className="text-xs text-muted-foreground">XL utilizado</p>
+                <p className="text-xl font-semibold">{currentResults.voltageDropReactanceOhmKm?.toFixed(2)} Ω/km</p>
+              </div>
+              <div className="bg-white p-4 rounded-xl border">
+                <p className="text-xs text-muted-foreground">Arranjo</p>
+                <p className="text-sm font-semibold">{currentResults.voltageDropArrangementUsed || '—'}</p>
+              </div>
+            </div>
             <div className="bg-white p-5 rounded-xl border">
               <p className="text-sm text-muted-foreground">Seção comercial selecionada por queda de tensão</p>
               <p className="text-3xl font-bold text-primary mt-1">{currentResults.cableByVoltageDrop} mm²</p>
