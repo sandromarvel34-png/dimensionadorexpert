@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, FileDown, Plus, Trash2, Save, Zap } from 'lucide-react';
+import { ArrowLeft, Building2, FileDown, ImagePlus, Plus, Trash2, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { generateCommercialProposalPdf, generateDescriptiveMemorialPdf } from '@/lib/pdf/generateProposalPdf';
 
@@ -16,7 +16,7 @@ const getProtectiveConductorSection = (phaseSection: number) => {
 };
 
 export const ProposalFlow = () => {
-  const { setView, currentResults, currentInputs, selectedManufacturer, setSelectedManufacturer, markProposalSaved } = useAppStore();
+  const { setView, currentResults, currentInputs, selectedManufacturer, setSelectedManufacturer, markProposalSaved, companyProfile, setCompanyProfile } = useAppStore();
   const [clientData, setClientData] = useState({
     name: '',
     doc: '',
@@ -26,8 +26,8 @@ export const ProposalFlow = () => {
   
   const [commercialData, setCommercialData] = useState({
     serviceDescription: '',
-    technicianName: '',
-    executingCompany: ''
+    technicianName: companyProfile.responsibleName,
+    executingCompany: companyProfile.companyName
   });
 
   const [observations, setObservations] = useState('');
@@ -128,6 +128,7 @@ export const ProposalFlow = () => {
       costs,
       observations,
       selectedManufacturer,
+      companyProfile,
       date: new Date().toISOString()
     };
     localStorage.setItem('last_proposal', JSON.stringify(proposalData));
@@ -139,8 +140,13 @@ export const ProposalFlow = () => {
     if (!currentInputs || !currentResults) return null;
 
     return {
+      companyProfile,
       clientData,
-      commercialData,
+      commercialData: {
+        ...commercialData,
+        technicianName: companyProfile.responsibleName || commercialData.technicianName,
+        executingCompany: companyProfile.companyName || commercialData.executingCompany,
+      },
       observations,
       items,
       labor,
@@ -182,6 +188,25 @@ export const ProposalFlow = () => {
       console.error('Erro ao gerar memorial descritivo:', error);
       toast.error('Não foi possível gerar o memorial descritivo.');
     }
+  };
+
+  const handleLogoUpload = (file?: File) => {
+    if (!file) return;
+    if (!['image/png', 'image/jpeg'].includes(file.type)) {
+      toast.error('Use uma logomarca em PNG ou JPG.');
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      toast.error('A logomarca deve ter no máximo 1 MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCompanyProfile({ logoDataUrl: String(reader.result || '') });
+      toast.success('Logomarca salva para os próximos documentos.');
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -283,10 +308,106 @@ export const ProposalFlow = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-6 lg:gap-8">
         <div className="space-y-6 print:col-span-3">
+          <div className="section-card print:hidden">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+              <div className="section-heading mb-0">
+                <div className="section-index">1</div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-lg font-bold text-slate-950">Identidade profissional</h3>
+                    <span className="status-pill border-emerald-200 bg-emerald-50 text-emerald-700">Salva automaticamente</span>
+                  </div>
+                  <p className="text-sm text-slate-500 mt-0.5">Sua marca será aplicada em todas as propostas e memoriais gerados.</p>
+                </div>
+              </div>
+              <label className="btn-secondary h-10 px-4 text-sm cursor-pointer">
+                <ImagePlus className="w-4 h-4" />
+                {companyProfile.logoDataUrl ? 'Trocar logomarca' : 'Adicionar logomarca'}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  className="hidden"
+                  onChange={e => handleLogoUpload(e.target.files?.[0])}
+                />
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-[160px_1fr] gap-6">
+              <div className="rounded-[14px] border border-dashed border-slate-300 bg-slate-50 min-h-[140px] flex items-center justify-center p-4">
+                {companyProfile.logoDataUrl ? (
+                  <div className="w-full text-center">
+                    <img src={companyProfile.logoDataUrl} alt="Logomarca da empresa" className="max-w-full max-h-20 object-contain mx-auto" />
+                    <button type="button" onClick={() => setCompanyProfile({ logoDataUrl: '' })} className="text-xs font-semibold text-slate-500 hover:text-red-600 mt-3">
+                      Remover logo
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center text-slate-400">
+                    <Building2 className="w-8 h-8 mx-auto" />
+                    <p className="text-xs font-semibold mt-2">Sua marca aqui</p>
+                    <p className="text-[11px] mt-1">PNG ou JPG • até 1 MB</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">Nome da empresa / profissional</Label>
+                  <Input value={companyProfile.companyName} onChange={e => setCompanyProfile({ companyName: e.target.value })} placeholder="Ex: Silva Automação Industrial" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">CPF / CNPJ</Label>
+                  <Input value={companyProfile.document} onChange={e => setCompanyProfile({ document: e.target.value })} placeholder="00.000.000/0001-00" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">Responsável</Label>
+                  <Input value={companyProfile.responsibleName} onChange={e => setCompanyProfile({ responsibleName: e.target.value })} placeholder="Nome do profissional responsável" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">CREA / CFT / Registro</Label>
+                  <Input value={companyProfile.professionalRegistration} onChange={e => setCompanyProfile({ professionalRegistration: e.target.value })} placeholder="Ex: CFT-BR 0000000000" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">Telefone</Label>
+                  <Input value={companyProfile.phone} onChange={e => setCompanyProfile({ phone: e.target.value })} placeholder="(00) 00000-0000" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">E-mail</Label>
+                  <Input value={companyProfile.email} onChange={e => setCompanyProfile({ email: e.target.value })} placeholder="contato@empresa.com.br" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">Endereço</Label>
+                  <Input value={companyProfile.address} onChange={e => setCompanyProfile({ address: e.target.value })} placeholder="Rua, número, bairro" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">Cidade / UF</Label>
+                  <Input value={companyProfile.cityState} onChange={e => setCompanyProfile({ cityState: e.target.value })} placeholder="São Paulo / SP" />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">Site / Instagram</Label>
+                  <Input value={companyProfile.website} onChange={e => setCompanyProfile({ website: e.target.value })} placeholder="www.suaempresa.com.br" />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-label uppercase tracking-widest text-[10px]">Cor da marca</Label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={companyProfile.brandColor}
+                      onChange={e => setCompanyProfile({ brandColor: e.target.value })}
+                      className="h-11 w-16 rounded-lg border border-slate-300 bg-white p-1 cursor-pointer"
+                      aria-label="Cor da marca"
+                    />
+                    <Input value={companyProfile.brandColor} onChange={e => setCompanyProfile({ brandColor: e.target.value })} className="max-w-40 uppercase" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Client Data Form - Hidden in Print if Empty */}
           <div className="section-card print:hidden">
             <div className="section-heading">
-              <div className="section-index">1</div>
+              <div className="section-index">2</div>
               <div>
                 <h3 className="text-lg font-bold text-slate-950">Cliente e serviço</h3>
                 <p className="text-sm text-slate-500 mt-0.5">Informações que aparecerão na proposta comercial.</p>
@@ -327,11 +448,22 @@ export const ProposalFlow = () => {
             <div className="p-4 md:p-10 print:p-0 print:block">
               {/* PDF Header */}
               <div className="flex flex-col sm:flex-row justify-between items-start mb-10 border-b pb-8 border-slate-100 gap-4">
-                <div className="flex items-center gap-3 text-primary">
-                  <Zap className="w-8 h-8 md:w-10 md:h-10 fill-current" />
+                <div className="flex items-center gap-4">
+                  {companyProfile.logoDataUrl ? (
+                    <img src={companyProfile.logoDataUrl} alt="" className="max-h-14 max-w-36 object-contain" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center">
+                      <Building2 className="w-6 h-6" />
+                    </div>
+                  )}
                   <div>
-                    <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter">Dimensionador Expert</h1>
-                    <p className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Proposta Comercial</p>
+                    <h1 className="text-lg md:text-2xl font-black tracking-tight">{companyProfile.companyName || 'Sua empresa'}</h1>
+                    <p className="text-[9px] md:text-[10px] uppercase tracking-[0.16em] font-bold text-muted-foreground">
+                      {[companyProfile.document, companyProfile.professionalRegistration].filter(Boolean).join(' • ') || 'Documento profissional personalizado'}
+                    </p>
+                    {(companyProfile.phone || companyProfile.email) && (
+                      <p className="text-[10px] text-slate-500 mt-1">{[companyProfile.phone, companyProfile.email].filter(Boolean).join(' • ')}</p>
+                    )}
                   </div>
                 </div>
                 <div className="text-left sm:text-right">
@@ -532,26 +664,11 @@ export const ProposalFlow = () => {
             <div>
               <span className="eyebrow">Configuração</span>
               <h3 className="text-lg font-bold text-slate-950 mt-1">Dados comerciais</h3>
-              <p className="text-sm text-slate-500 mt-1">Defina responsável, validade e valor da hora técnica.</p>
+              <p className="text-sm text-slate-500 mt-1">Defina os parâmetros comerciais. A identidade profissional vem do perfil salvo acima.</p>
             </div>
             
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-label uppercase tracking-widest text-[10px]">Técnico Responsável</Label>
-                <Input 
-                  value={commercialData.technicianName} 
-                  onChange={e => setCommercialData({...commercialData, technicianName: e.target.value})} 
-                  placeholder="Nome completo do técnico" 
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-label uppercase tracking-widest text-[10px]">Empresa Executora (Opcional)</Label>
-                <Input 
-                  value={commercialData.executingCompany} 
-                  onChange={e => setCommercialData({...commercialData, executingCompany: e.target.value})} 
-                  placeholder="Nome da empresa" 
-                />
-              </div>
+
               <div className="space-y-2">
                 <Label className="text-label uppercase tracking-widest text-[10px]">Validade da Proposta (Dias)</Label>
                 <Input type="number" value={costs.validity} onChange={e => setCosts({...costs, validity: parseInt(e.target.value) || 30})} />
@@ -563,9 +680,16 @@ export const ProposalFlow = () => {
             </div>
 
             <div className="pt-5 border-t border-border">
-              <p className="text-metadata leading-relaxed">
-                As informações técnicas do memorial são extraídas automaticamente do seu cálculo mais recente.
-              </p>
+              <div className="space-y-3">
+                <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-3">
+                  <p className="text-xs font-semibold text-slate-900">Proposta comercial</p>
+                  <p className="text-[11px] text-slate-600 mt-1">Escopo, materiais, preços, investimento, validade e aceite do cliente.</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-xs font-semibold text-slate-900">Memorial descritivo</p>
+                  <p className="text-[11px] text-slate-600 mt-1">Documento técnico narrativo com sistema, instalação, execução e comissionamento — sem preços.</p>
+                </div>
+              </div>
             </div>
 
             <div className="grid gap-2">
