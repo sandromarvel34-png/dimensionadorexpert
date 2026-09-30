@@ -374,6 +374,7 @@ function auditProduct(product: ManufacturerProduct): ManufacturerProduct {
   if (BLOCKED_PRODUCT_IDS.has(product.id) || /^100000\d*$/.test(product.commercialCode)) {
     return {
       ...product,
+      commercialCode: '',
       verificationStatus: 'blocked',
       selectionNote: 'Registro bloqueado pela auditoria: referência comercial não confirmada ou tecnicamente inadequada.',
     };
@@ -391,6 +392,7 @@ function auditProduct(product: ManufacturerProduct): ManufacturerProduct {
 
   return {
     ...product,
+    commercialCode: '',
     verificationStatus: 'verified-family',
     lifecycle: PHASE_OUT_PRODUCT_IDS.has(product.id) ? 'phase-out' : 'active',
     selectionNote: product.category === 'contator'
