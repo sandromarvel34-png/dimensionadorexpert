@@ -88,12 +88,17 @@ const responsibleName = (data: ProposalPdfData) =>
 const companyContactLine = (profile: CompanyProfile) =>
   [profile.phone, profile.email, profile.website].filter(Boolean).join(' | ');
 
-const drawLogo = (doc: any, profile: CompanyProfile) => {
+const drawLogo = (
+  doc: any,
+  profile: CompanyProfile,
+  x: number,
+  y: number,
+  maxW: number,
+  maxH: number,
+) => {
   if (!profile.logoDataUrl) return false;
   try {
     const props = doc.getImageProperties(profile.logoDataUrl);
-    const maxW = 38;
-    const maxH = 15;
     const ratio = props.width / props.height;
     let width = maxW;
     let height = width / ratio;
@@ -102,7 +107,16 @@ const drawLogo = (doc: any, profile: CompanyProfile) => {
       width = height * ratio;
     }
     const format = profile.logoDataUrl.startsWith('data:image/png') ? 'PNG' : 'JPEG';
-    doc.addImage(profile.logoDataUrl, format, 14, 8.5, width, height, undefined, 'FAST');
+    doc.addImage(
+      profile.logoDataUrl,
+      format,
+      x + (maxW - width) / 2,
+      y + (maxH - height) / 2,
+      width,
+      height,
+      undefined,
+      'FAST',
+    );
     return true;
   } catch {
     return false;
@@ -117,19 +131,36 @@ const addBrandedHeader = (
   rightLines: string[],
 ) => {
   const brand = hexToRgb(data.companyProfile.brandColor);
+  const logoBackground = data.companyProfile.logoBackground || 'light';
+  const logoFill: [number, number, number] =
+    logoBackground === 'dark'
+      ? NAVY
+      : logoBackground === 'brand'
+        ? brand
+        : LIGHT;
 
-  doc.setFillColor(...NAVY);
-  doc.rect(0, 0, 210, 37, 'F');
+  // Clean, neutral header that works with light, dark or colored logos.
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, 210, 42, 'F');
   doc.setFillColor(...brand);
-  doc.rect(0, 35, 210, 2, 'F');
+  doc.rect(0, 0, 210, 2.2, 'F');
 
-  const hasLogo = drawLogo(doc, data.companyProfile);
-  const textX = hasLogo ? 57 : 14;
+  doc.setFillColor(...logoFill);
+  doc.setDrawColor(...BORDER);
+  doc.roundedRect(14, 7, 38, 22, 2.5, 2.5, 'FD');
 
-  doc.setTextColor(255, 255, 255);
+  const hasLogo = drawLogo(doc, data.companyProfile, 16, 9, 34, 18);
+  if (!hasLogo) {
+    doc.setTextColor(...brand);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.text('LOGO', 33, 20, { align: 'center' });
+  }
+
+  doc.setTextColor(...NAVY);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(hasLogo ? 13 : 18);
-  doc.text(companyName(data.companyProfile).toUpperCase(), textX, 14);
+  doc.setFontSize(13);
+  doc.text(companyName(data.companyProfile), 58, 12);
 
   const identityLine = [
     data.companyProfile.document,
@@ -137,24 +168,31 @@ const addBrandedHeader = (
   ].filter(Boolean).join(' | ');
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.2);
-  doc.setTextColor(203, 213, 225);
-  if (identityLine) doc.text(identityLine, textX, 19);
+  doc.setFontSize(7);
+  doc.setTextColor(...SLATE);
+  if (identityLine) doc.text(identityLine, 58, 17);
   const contact = companyContactLine(data.companyProfile);
-  if (contact) doc.text(contact, textX, 24);
+  if (contact) doc.text(contact, 58, 22);
   const location = [data.companyProfile.address, data.companyProfile.cityState].filter(Boolean).join(' - ');
-  if (location) doc.text(location, textX, 29);
+  if (location) doc.text(location, 58, 27);
 
+  doc.setTextColor(...NAVY);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(10);
-  doc.text(title, 196, 13, { align: 'right' });
+  doc.setFontSize(11);
+  doc.text(title, 196, 12, { align: 'right' });
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.3);
-  doc.setTextColor(203, 213, 225);
-  doc.text(subtitle, 196, 18, { align: 'right' });
-  rightLines.forEach((line, index) => doc.text(line, 196, 24 + index * 5, { align: 'right' }));
+  doc.setFontSize(7);
+  doc.setTextColor(...SLATE);
+  doc.text(subtitle, 196, 17, { align: 'right' });
+  rightLines.forEach((line, index) => doc.text(line, 196, 23 + index * 5, { align: 'right' }));
+
+  doc.setDrawColor(...BORDER);
+  doc.line(14, 36, 196, 36);
+  doc.setDrawColor(...brand);
+  doc.setLineWidth(0.7);
+  doc.line(14, 39, 42, 39);
+  doc.setLineWidth(0.2);
 };
 
 const addContinuationHeader = (doc: any, data: ProposalPdfData, title: string) => {
@@ -337,20 +375,121 @@ export const generateCommercialProposalPdf = createClientOnlyFn(async (data: Pro
   const totalLabor = safeNumber(data.labor.hours) * safeNumber(data.labor.rate);
   const grandTotal =
     totalMaterials + totalLabor + safeNumber(data.costs.travel) + safeNumber(data.costs.others) - safeNumber(data.costs.discount);
+  const hasCommercialValues =
+    totalMaterials > 0 ||
+    totalLabor > 0 ||
+    safeNumber(data.costs.travel) > 0 ||
+    safeNumber(data.costs.others) > 0 ||
+    safeNumber(data.costs.discount) > 0;
 
-  addBrandedHeader(doc, data, 'PROPOSTA COMERCIAL', 'SERVICOS E MATERIAIS', [date, `Validade: ${data.costs.validity || 30} dias`]);
+  addBrandedHeader(
+    doc,
+    data,
+    'PROPOSTA COMERCIAL',
+    'SOLUCAO, ESCOPO E INVESTIMENTO',
+    [date, `Validade: ${data.costs.validity || 30} dias`],
+  );
 
-  let y = 46;
+  let y = 47;
   y = addClientBlock(doc, autoTable, data, y);
-  y = addServiceDescription(doc, data, y);
 
-  y = sectionLabel(doc, data.companyProfile, 'Materiais e servicos', y, 'Itens previstos para execucao do escopo apresentado.');
+  // Executive presentation of the service.
+  y = sectionLabel(doc, data.companyProfile, 'Solucao proposta', y);
+  const proposalText = data.commercialData.serviceDescription.trim() ||
+    'Fornecimento de materiais e execucao dos servicos conforme levantamento e escopo acordado com o cliente.';
+  const proposalLines = doc.splitTextToSize(proposalText, 174);
+  const proposalHeight = Math.max(25, proposalLines.length * 4.4 + 12);
+  doc.setFillColor(...LIGHT);
+  doc.setDrawColor(...BORDER);
+  doc.roundedRect(14, y, 182, proposalHeight, 3, 3, 'FD');
+  doc.setFillColor(...brand);
+  doc.roundedRect(14, y, 3.2, proposalHeight, 1.5, 1.5, 'F');
+  doc.setTextColor(...NAVY);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(proposalLines, 21, y + 8);
+  y += proposalHeight + 9;
+
+  // Investment becomes the main commercial focal point.
+  y = sectionLabel(doc, data.companyProfile, 'Investimento', y);
+  doc.setFillColor(...brand);
+  doc.roundedRect(14, y, 72, 34, 3, 3, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.text('INVESTIMENTO TOTAL', 20, y + 9);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(hasCommercialValues ? 18 : 15);
+  doc.text(hasCommercialValues ? money(grandTotal) : 'A DEFINIR', 20, y + 22);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(6.5);
+  doc.text(`Proposta valida por ${data.costs.validity || 30} dias`, 20, y + 29);
+
+  autoTable(doc, {
+    startY: y,
+    body: [
+      ['Materiais', totalMaterials > 0 ? money(totalMaterials) : '-'],
+      ['Mao de obra e servicos', totalLabor > 0 ? money(totalLabor) : '-'],
+      ['Deslocamento', safeNumber(data.costs.travel) > 0 ? money(safeNumber(data.costs.travel)) : '-'],
+      ['Outros custos', safeNumber(data.costs.others) > 0 ? money(safeNumber(data.costs.others)) : '-'],
+      ['Desconto', safeNumber(data.costs.discount) > 0 ? `- ${money(safeNumber(data.costs.discount))}` : '-'],
+    ],
+    theme: 'plain',
+    margin: { left: 96, right: 14 },
+    styles: { font: 'helvetica', fontSize: 7.6, cellPadding: 2.1, textColor: NAVY },
+    columnStyles: {
+      0: { fontStyle: 'bold', textColor: SLATE, cellWidth: 56 },
+      1: { halign: 'right', cellWidth: 44 },
+    },
+    alternateRowStyles: { fillColor: LIGHT },
+  });
+  y = Math.max(y + 34, (doc as any).lastAutoTable.finalY) + 10;
+
+  // Commercial conditions stay on page 1.
+  y = sectionLabel(doc, data.companyProfile, 'Condicoes comerciais', y);
+  const conditions = [
+    `Validade da proposta: ${data.costs.validity || 30} dias.`,
+    'Materiais e servicos adicionais nao previstos no escopo serao submetidos a aprovacao antes da execucao.',
+  ];
+  if (data.observations.trim()) conditions.push(data.observations.trim());
+
+  doc.setTextColor(...SLATE);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  conditions.forEach((condition, index) => {
+    const lines = doc.splitTextToSize(`${index + 1}. ${condition}`, 178);
+    doc.text(lines, 16, y);
+    y += lines.length * 4.1 + 2;
+  });
+
+  y += 5;
+  addSignatureBlock(doc, data, y, true);
+
+  // Appendix with the detailed material/service list.
+  doc.addPage();
+  addContinuationHeader(doc, data, 'PROPOSTA COMERCIAL');
+  y = 22;
+  y = sectionLabel(
+    doc,
+    data.companyProfile,
+    'Anexo 1 - Relacao de materiais e servicos',
+    y,
+    'Detalhamento dos itens considerados na composicao desta proposta.',
+  );
+
   autoTable(doc, {
     startY: y,
     head: [['Descricao', 'Qtd.', 'Un.', 'Valor unit.', 'Total']],
     body: data.items.map(item => {
       const price = safeNumber(item.price);
-      return [item.desc || '-', safeNumber(item.qtd).toLocaleString('pt-BR'), item.unit || 'un', money(price), money(safeNumber(item.qtd) * price)];
+      const rowTotal = safeNumber(item.qtd) * price;
+      return [
+        item.desc || '-',
+        safeNumber(item.qtd).toLocaleString('pt-BR'),
+        item.unit || 'un',
+        price > 0 ? money(price) : '-',
+        rowTotal > 0 ? money(rowTotal) : '-',
+      ];
     }),
     theme: 'grid',
     margin: { left: 14, right: 14, top: 20, bottom: 17 },
@@ -369,62 +508,6 @@ export const generateCommercialProposalPdf = createClientOnlyFn(async (data: Pro
     },
   });
 
-  y = (doc as any).lastAutoTable.finalY + 8;
-  if (y > 225) {
-    doc.addPage();
-    addContinuationHeader(doc, data, 'PROPOSTA COMERCIAL');
-    y = 21;
-  }
-
-  y = sectionLabel(doc, data.companyProfile, 'Investimento', y);
-  autoTable(doc, {
-    startY: y,
-    body: [
-      ['Materiais', money(totalMaterials)],
-      ['Mao de obra e servicos', money(totalLabor)],
-      ['Deslocamento', money(safeNumber(data.costs.travel))],
-      ['Outros custos', money(safeNumber(data.costs.others))],
-      ['Desconto', `- ${money(safeNumber(data.costs.discount))}`],
-      ['TOTAL', money(grandTotal)],
-    ],
-    theme: 'grid',
-    margin: { left: 98, right: 14 },
-    styles: { font: 'helvetica', fontSize: 8.5, cellPadding: 2.8, lineColor: BORDER, lineWidth: 0.2, textColor: NAVY },
-    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 55 }, 1: { halign: 'right', cellWidth: 43 } },
-    didParseCell: (hook: any) => {
-      if (hook.row.index === 5) {
-        hook.cell.styles.fillColor = brand;
-        hook.cell.styles.textColor = [255, 255, 255];
-        hook.cell.styles.fontStyle = 'bold';
-        hook.cell.styles.fontSize = 10;
-      }
-    },
-  });
-
-  y = (doc as any).lastAutoTable.finalY + 8;
-  if (data.observations.trim()) {
-    if (y > 244) {
-      doc.addPage();
-      addContinuationHeader(doc, data, 'PROPOSTA COMERCIAL');
-      y = 21;
-    }
-    y = sectionLabel(doc, data.companyProfile, 'Condicoes comerciais e observacoes', y);
-    doc.setTextColor(...NAVY);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    const lines = doc.splitTextToSize(data.observations.trim(), 182);
-    doc.text(lines, 14, y);
-    y += lines.length * 4 + 7;
-  }
-
-  doc.setTextColor(...SLATE);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
-  const note =
-    'Esta proposta refere-se ao escopo descrito. Alteracoes solicitadas, servicos adicionais ou condicoes de campo nao previstas poderao resultar em revisao de valores e prazos.';
-  doc.text(doc.splitTextToSize(note, 182), 14, y);
-
-  addSignatureBlock(doc, data, y + 13, true);
   addFooters(doc, data, 'Proposta Comercial');
 
   const clientPart = filenamePart(data.clientData.name || 'cliente');
