@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, Building2, FileDown, ImagePlus, Plus, Printer, Trash2, Save } from 'lucide-react';
+import { ArrowLeft, Building2, ImagePlus, Plus, Printer, Trash2, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { generateCommercialProposalPdf, generateDescriptiveMemorialPdf } from '@/lib/pdf/generateProposalPdf';
 
@@ -190,38 +190,7 @@ export const ProposalFlow = () => {
     };
   };
 
-  const handleGenerateProposalPdf = async () => {
-    const data = getPdfData();
-    if (!data) {
-      toast.error('Não há dimensionamento disponível para gerar a proposta.');
-      return;
-    }
 
-    try {
-      await generateCommercialProposalPdf({ data, action: 'save' });
-      markProposalSaved();
-      toast.success('Proposta comercial gerada com sucesso.');
-    } catch (error) {
-      console.error('Erro ao gerar proposta comercial:', error);
-      toast.error('Não foi possível gerar a proposta comercial.');
-    }
-  };
-
-  const handleGenerateMemorialPdf = async () => {
-    const data = getPdfData();
-    if (!data) {
-      toast.error('Não há dimensionamento disponível para gerar o memorial.');
-      return;
-    }
-
-    try {
-      await generateDescriptiveMemorialPdf({ data, action: 'save' });
-      toast.success('Memorial descritivo gerado com sucesso.');
-    } catch (error) {
-      console.error('Erro ao gerar memorial descritivo:', error);
-      toast.error('Não foi possível gerar o memorial descritivo.');
-    }
-  };
 
   const handlePrintProposal = async () => {
     const data = getPdfData();
@@ -359,20 +328,14 @@ export const ProposalFlow = () => {
               </button>
             ))}
           </div>
-          <button onClick={handleGenerateProposalPdf} className="btn-secondary">
-            <FileDown className="w-5 h-5" /> Salvar proposta
-          </button>
           <button onClick={handlePrintProposal} className="btn-secondary">
             <Printer className="w-5 h-5" /> Imprimir proposta
-          </button>
-          <button onClick={handleGenerateMemorialPdf} className="btn-secondary">
-            <FileDown className="w-5 h-5" /> Salvar memorial
           </button>
           <button onClick={handlePrintMemorial} className="btn-secondary">
             <Printer className="w-5 h-5" /> Imprimir memorial
           </button>
           <button onClick={handleSave} className="btn-primary">
-            <Save className="w-5 h-5" /> Salvar Proposta
+            <Save className="w-5 h-5" /> Salvar proposta
           </button>
         </div>
       </div>
@@ -799,32 +762,21 @@ export const ProposalFlow = () => {
             </div>
 
             <div className="grid gap-3">
-              <button onClick={handleSave} className="btn-secondary w-full h-11">
-                <Save className="w-4 h-4" /> Salvar dados da proposta
+              <button onClick={handleSave} className="btn-primary w-full h-11">
+                <Save className="w-4 h-4" /> Salvar proposta
               </button>
 
               <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3 space-y-2">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600">Proposta comercial</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <button onClick={handleGenerateProposalPdf} className="btn-primary h-10 px-3 text-sm">
-                    <FileDown className="w-4 h-4" /> Salvar PDF
-                  </button>
-                  <button onClick={handlePrintProposal} className="btn-secondary h-10 px-3 text-sm">
-                    <Printer className="w-4 h-4" /> Imprimir
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600">Memorial descritivo</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <button onClick={handleGenerateMemorialPdf} className="btn-secondary h-10 px-3 text-sm">
-                    <FileDown className="w-4 h-4" /> Salvar PDF
-                  </button>
-                  <button onClick={handlePrintMemorial} className="btn-secondary h-10 px-3 text-sm">
-                    <Printer className="w-4 h-4" /> Imprimir
-                  </button>
-                </div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-600">Documentos</p>
+                <button onClick={handlePrintProposal} className="btn-secondary w-full h-10 px-3 text-sm">
+                  <Printer className="w-4 h-4" /> Imprimir proposta
+                </button>
+                <button onClick={handlePrintMemorial} className="btn-secondary w-full h-10 px-3 text-sm">
+                  <Printer className="w-4 h-4" /> Imprimir memorial
+                </button>
+                <p className="text-[11px] leading-relaxed text-slate-500">
+                  Na janela de impressão, o usuário também pode escolher “Salvar como PDF”.
+                </p>
               </div>
             </div>
           </div>
