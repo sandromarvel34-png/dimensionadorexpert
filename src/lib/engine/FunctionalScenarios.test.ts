@@ -177,9 +177,12 @@ describe('Dimensionador Expert — matriz funcional', () => {
     expect(fuses.every(product => !/^100000\d*$/.test(product.commercialCode))).toBe(true);
   });
 
-  test('CWM9 com referência comprovadamente inconsistente não é oferecido', () => {
+  test('CWM9 pode ser usado como família, mas não expõe o antigo código comercial incorreto', () => {
     const products = findCompatibleProducts('contator', 1, 'WEG', 380);
-    expect(products.some(product => product.id === 'weg-cwm9')).toBe(false);
+    const cwm9 = products.find(product => product.id === 'weg-cwm9');
+    expect(cwm9).toBeDefined();
+    expect(cwm9?.verificationStatus).toBe('verified-family');
+    expect(cwm9?.commercialCode).toBe('');
   });
 
   test('G com múltiplos circuitos é bloqueado em vez de aplicar fator indevido', () => {
