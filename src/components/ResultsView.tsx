@@ -210,8 +210,16 @@ export const ResultsView = () => {
                         <>
                           <p className="text-lg font-semibold text-foreground leading-tight">{product.model}</p>
                           <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{product.description}</p>
-                          <div className="pt-4 mt-4 border-t border-slate-100">
-                            <p className="text-xs font-medium text-amber-700">Confirmar referência e aplicação no catálogo do fabricante.</p>
+                          <div className="pt-4 mt-4 border-t border-slate-100 space-y-1">
+                            {product.verificationStatus === 'verified-exact' ? (
+                              <>
+                                <p className="text-xs font-semibold text-green-700">SKU conferido em fonte oficial</p>
+                                <p className="text-xs text-slate-500">Código: {product.commercialCode}</p>
+                              </>
+                            ) : (
+                              <p className="text-xs font-medium text-amber-700">Família técnica validada. O código comercial exato depende da configuração.</p>
+                            )}
+                            {product.selectionNote && <p className="text-[11px] text-slate-500">{product.selectionNote}</p>}
                           </div>
                         </>
                       ) : (
