@@ -3,10 +3,10 @@ import { useAppStore } from '@/lib/store';
 import { ArrowRight, Cable, CheckCircle2, Clock3, FileText, Plus, ShieldCheck, Zap } from 'lucide-react';
 
 export const Dashboard = () => {
-  const { setView, history, openHistoryItem } = useAppStore();
+  const { setView, history, openHistoryItem, proposals } = useAppStore();
   const [showAll, setShowAll] = useState(false);
 
-  const proposalCount = history.filter(h => h.hasProposal).length;
+  const proposalCount = proposals.length;
   const latestDate = history.length > 0 ? new Date(history[0].date).toLocaleDateString('pt-BR') : '—';
   const visibleHistory = showAll ? history : history.slice(0, 5);
 
@@ -29,6 +29,11 @@ export const Dashboard = () => {
               {history.length > 0 && (
                 <button onClick={() => openHistoryItem(history[0])} className="btn-secondary sm:w-auto">
                   Abrir último cálculo <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+              {proposals.length > 0 && (
+                <button onClick={() => setView('proposals')} className="btn-secondary sm:w-auto">
+                  Ver propostas <FileText className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -62,13 +67,13 @@ export const Dashboard = () => {
             </div>
             <div className="w-11 h-11 rounded-xl bg-blue-50 text-primary flex items-center justify-center"><Zap className="w-5 h-5" /></div>
           </div>
-          <div className="metric-card flex items-center justify-between">
+          <button onClick={() => setView('proposals')} className="metric-card flex items-center justify-between text-left hover:border-slate-300 transition-colors">
             <div>
               <p className="text-xs font-medium text-slate-500">Propostas salvas</p>
               <p className="text-3xl font-bold tracking-tight mt-1">{proposalCount}</p>
             </div>
             <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center"><FileText className="w-5 h-5" /></div>
-          </div>
+          </button>
           <div className="metric-card flex items-center justify-between">
             <div>
               <p className="text-xs font-medium text-slate-500">Última atividade</p>
