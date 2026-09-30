@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import katex from 'katex';
 
 export const ResultsView = () => {
-  const { currentResults, currentInputs, setView } = useAppStore();
+  const { currentResults, currentInputs, setView, startNewProposal } = useAppStore();
 
   if (!currentResults || !currentInputs) return null;
 
@@ -249,7 +249,7 @@ export const ResultsView = () => {
             A ferramenta apoia o dimensionamento, mas não substitui a verificação de curto-circuito, coordenação de proteção e responsabilidade técnica do profissional.
           </p>
         </div>
-        <Button onClick={() => setView('proposal')} className="h-12 px-7 font-semibold shrink-0">
+        <Button onClick={startNewProposal} className="h-12 px-7 font-semibold shrink-0">
           Criar proposta comercial →
         </Button>
       </div>
