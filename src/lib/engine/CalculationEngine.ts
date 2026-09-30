@@ -15,6 +15,7 @@ import {
 import { getCableImpedance, inferVoltageDropArrangement, STANDARD_CABLE_SECTIONS, VoltageDropArrangement } from './voltage-drop-data';
 
 export class CalculationEngine {
+  private static readonly RHO_COPPER_70 = 0.0213;
   private static readonly COS_PHI_DEFAULT = 0.85;
   private static readonly EFFICIENCY_DEFAULT = 0.90;
   private static readonly SECAO_MINIMA_FORCA = 2.5;
@@ -186,10 +187,39 @@ export class CalculationEngine {
     pf: number = 0.85,
     phase: 'monofasico' | 'trifasico' = 'trifasico',
     arrangement: VoltageDropArrangement = 'adjacent',
-  ): { selectedSection: number; actualDrop: number; resistance: number; reactance: number } {
+  ): {
+    requiredSectionTheoretical: number;
+    preliminaryCommercialSection: number;
+    selectedSection: number;
+    actualDrop: number;
+    resistance: number;
+    reactance: number;
+  } {
+    const sectionFactor = phase === 'trifasico' ? Math.sqrt(3) : 2;
+
+    // 1) Estimativa da seção transversal pelo modelo resistivo:
+    // trifásico: S = 100√3·ρ·L·I·cosφ / (ΔV%·V)
+    // monofásico: S = 200·ρ·L·I·cosφ / (ΔV%·V)
+    const requiredSectionTheoretical =
+      (100 * sectionFactor * this.RHO_COPPER_70 * distance * current * pf) /
+      (maxDropPercent * voltage);
+
+    const preliminaryCommercialSection = STANDARD_CABLE_SECTIONS.find(
+      section => section >= requiredSectionTheoretical,
+    );
+
+    if (!preliminaryCommercialSection) {
+      throw new Error(
+        `A seção teórica por queda de tensão (${requiredSectionTheoretical.toFixed(2)} mm²) excede 500 mm².`,
+      );
+    }
+
+    // 2) Verificação da queda real da seção comercial usando Rca + XL.
+    // Se não atender, sobe para a próxima seção comercial disponível.
+    const startIndex = STANDARD_CABLE_SECTIONS.indexOf(preliminaryCommercialSection);
     let lastSupportedSection = 0;
 
-    for (const section of STANDARD_CABLE_SECTIONS) {
+    for (const section of STANDARD_CABLE_SECTIONS.slice(startIndex)) {
       const impedance = getCableImpedance(phase, arrangement, section);
       if (!impedance) continue;
       lastSupportedSection = section;
@@ -206,6 +236,8 @@ export class CalculationEngine {
 
       if (result.percent <= maxDropPercent) {
         return {
+          requiredSectionTheoretical,
+          preliminaryCommercialSection,
           selectedSection: section,
           actualDrop: result.percent,
           resistance: result.resistance,
@@ -215,7 +247,7 @@ export class CalculationEngine {
     }
 
     throw new Error(
-      `A queda de tensão excede ${maxDropPercent}% para todas as seções disponíveis no arranjo ${arrangement} (até ${lastSupportedSection || 'nenhuma'} mm²).`,
+      `A queda de tensão excede ${maxDropPercent}% mesmo após verificar as seções comerciais disponíveis no arranjo ${arrangement} (até ${lastSupportedSection || 'nenhuma'} mm²).`,
     );
   }
 
@@ -358,6 +390,8 @@ export class CalculationEngine {
         combined: combinedCorrectionFactor,
       },
       voltageDropModel: 'acImpedanceRX',
+      voltageDropRequiredSectionTheoretical: dropResult.requiredSectionTheoretical,
+      voltageDropPreliminaryCommercialSection: dropResult.preliminaryCommercialSection,
       voltageDropArrangementUsed: voltageDropArrangement,
       voltageDropResistanceOhmKm: dropResult.resistance,
       voltageDropReactanceOhmKm: dropResult.reactance,
