@@ -136,6 +136,7 @@ export const CalculatorWizard = () => {
         ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
         soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
         buriedCableConfiguration: (formData.get('buriedCableConfiguration') as 'unipolarDuct' | 'multipolarDuct') || 'unipolarDuct',
+        voltageDropArrangement: (formData.get('voltageDropArrangement') as CalculationInputs['voltageDropArrangement']) || 'auto',
         shortCircuitCurrentKA,
         shortCircuitDurationSeconds,
         powerFactor: selectedMotor.power_factor,
@@ -172,6 +173,7 @@ export const CalculatorWizard = () => {
         ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
         soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
         buriedCableConfiguration: (formData.get('buriedCableConfiguration') as 'unipolarDuct' | 'multipolarDuct') || 'unipolarDuct',
+        voltageDropArrangement: (formData.get('voltageDropArrangement') as CalculationInputs['voltageDropArrangement']) || 'auto',
         shortCircuitCurrentKA,
         shortCircuitDurationSeconds,
         powerFactor: pf,
@@ -665,6 +667,22 @@ export const CalculatorWizard = () => {
                 {installationMethod === 'D' && (
                   <p className="text-xs text-muted-foreground">Para o método D, use a temperatura do solo.</p>
                 )}
+              </div>
+              <div className="space-y-3">
+                <Label className="text-foreground font-semibold">Arranjo para queda de tensão</Label>
+                <Select name="voltageDropArrangement" defaultValue={currentInputs?.voltageDropArrangement || "auto"}>
+                  <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="auto">Automático pelo método de instalação</SelectItem>
+                    <SelectItem value="adjacent">Condutores unipolares justapostos</SelectItem>
+                    <SelectItem value="multipolar">Cabo multipolar</SelectItem>
+                    <SelectItem value="spaced2D">Condutores espaçados — s = 2D</SelectItem>
+                    <SelectItem value="spaced13cm">Condutores espaçados — 13 cm</SelectItem>
+                    <SelectItem value="spaced20cm">Condutores espaçados — 20 cm</SelectItem>
+                    <SelectItem value="trefoil">Trifólio (apenas trifásico)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Usado no cálculo Rca + XL. Se não souber, mantenha automático.</p>
               </div>
               {installationMethod === 'D' && (
                 <>
