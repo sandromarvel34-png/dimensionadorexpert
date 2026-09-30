@@ -1,104 +1,143 @@
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { Zap, ArrowRight, FileText, CheckCircle2, Plus } from 'lucide-react';
+import { ArrowRight, Cable, CheckCircle2, Clock3, FileText, Plus, ShieldCheck, Zap } from 'lucide-react';
 
 export const Dashboard = () => {
   const { setView, history, openHistoryItem } = useAppStore();
   const [showAll, setShowAll] = useState(false);
 
-  const metrics = [
-    { label: 'Dimensionamentos', value: history.length, icon: Zap },
-    { label: 'Propostas salvas', value: history.filter(h => h.hasProposal).length, icon: FileText },
-    { label: 'Último dimensionamento', value: history.length > 0 ? new Date(history[0].date).toLocaleDateString('pt-BR') : '—', icon: CheckCircle2 },
-  ];
-
+  const proposalCount = history.filter(h => h.hasProposal).length;
+  const latestDate = history.length > 0 ? new Date(history[0].date).toLocaleDateString('pt-BR') : '—';
   const visibleHistory = showAll ? history : history.slice(0, 5);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10">
-      <div className="mb-10">
-        <p className="text-xs font-semibold text-primary mb-3 tracking-wide">Dimensionador Expert</p>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight leading-tight">Dimensione comandos elétricos com mais agilidade</h1>
-            <p className="text-muted-foreground text-base md:text-lg leading-relaxed">Informe os dados do motor e da instalação para dimensionar condutores e componentes e organizar os resultados.</p>
-          </div>
-          <button onClick={() => setView('wizard')} className="btn-primary whitespace-nowrap"><Plus className="w-5 h-5" /> Novo dimensionamento</button>
-        </div>
-      </div>
+    <div className="page-shell">
+      <section className="grid grid-cols-1 xl:grid-cols-[1.45fr_0.55fr] gap-6 mb-8">
+        <div className="relative overflow-hidden rounded-[20px] border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
+          <div className="absolute -right-20 -top-24 w-72 h-72 rounded-full bg-blue-50" />
+          <div className="relative max-w-3xl">
+            <span className="eyebrow">Dimensionamento de comandos elétricos</span>
+            <h1 className="page-heading mt-3 max-w-2xl">Dimensione com clareza técnica e gere a documentação do serviço.</h1>
+            <p className="mt-4 text-base md:text-lg text-slate-600 leading-relaxed max-w-2xl">
+              Calcule condutores, verifique queda de tensão, organize componentes e transforme o resultado em uma proposta técnica.
+            </p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-        <div className="lg:col-span-2 card-panel border-primary/20 bg-white hover:border-primary/40 transition-all group flex flex-col justify-between min-h-[250px]">
-          <div>
-            <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-5"><Zap className="w-5 h-5" /></div>
-            <h2 className="text-2xl font-semibold text-foreground mb-3">Novo dimensionamento</h2>
-            <p className="text-muted-foreground mb-5 leading-relaxed">Calcule corrente, condutor, queda de tensão e referências de componentes a partir dos dados informados.</p>
-            <div className="flex flex-wrap gap-x-6 gap-y-3 mb-6">
-              {['Condutor', 'Queda de tensão', 'Comando', 'Documentação'].map(benefit => (
-                <div key={benefit} className="flex items-center gap-2 text-sm text-foreground font-medium"><CheckCircle2 className="w-4 h-4 text-primary" /><span>{benefit}</span></div>
+            <div className="flex flex-col sm:flex-row gap-3 mt-7">
+              <button onClick={() => setView('wizard')} className="btn-primary sm:w-auto">
+                <Plus className="w-5 h-5" /> Novo dimensionamento
+              </button>
+              {history.length > 0 && (
+                <button onClick={() => openHistoryItem(history[0])} className="btn-secondary sm:w-auto">
+                  Abrir último cálculo <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 pt-7 border-t border-slate-100">
+              {[
+                ['Condutores', 'Ampacidade + ΔV', Cable],
+                ['Correções', 'Temperatura e agrupamento', ShieldCheck],
+                ['Componentes', 'Catálogo auditado', CheckCircle2],
+                ['Proposta', 'Materiais e serviços', FileText],
+              ].map(([title, desc, Icon]) => (
+                <div key={String(title)} className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center shrink-0">
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-900">{String(title)}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">{String(desc)}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
-          <button onClick={() => setView('wizard')} className="btn-primary w-fit group/btn">Começar <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" /></button>
         </div>
 
-        <div className="flex flex-col gap-4">
-          {metrics.map(m => (
-            <div key={m.label} className="card-panel flex items-center gap-5 py-6">
-              <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center text-muted-foreground"><m.icon className="w-5 h-5" /></div>
-              <div><p className="text-xs font-medium text-muted-foreground mb-1">{m.label}</p><p className="text-2xl font-bold text-foreground tracking-tight">{m.value}</p></div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-4">
+          <div className="metric-card flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-slate-500">Dimensionamentos</p>
+              <p className="text-3xl font-bold tracking-tight mt-1">{history.length}</p>
             </div>
-          ))}
+            <div className="w-11 h-11 rounded-xl bg-blue-50 text-primary flex items-center justify-center"><Zap className="w-5 h-5" /></div>
+          </div>
+          <div className="metric-card flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-slate-500">Propostas salvas</p>
+              <p className="text-3xl font-bold tracking-tight mt-1">{proposalCount}</p>
+            </div>
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center"><FileText className="w-5 h-5" /></div>
+          </div>
+          <div className="metric-card flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-slate-500">Última atividade</p>
+              <p className="text-xl font-bold tracking-tight mt-1">{latestDate}</p>
+            </div>
+            <div className="w-11 h-11 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center"><Clock3 className="w-5 h-5" /></div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="mb-12">
-        <h2 className="text-lg font-semibold text-foreground mb-5">Recursos principais</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {[
-            { title: 'Condutor', desc: 'Ampacidade, fatores de correção e seção mínima' },
-            { title: 'Queda de tensão', desc: 'Verificação pelo modelo disponível na ferramenta' },
-            { title: 'Comando', desc: 'Referências de contatores e relés' },
-            { title: 'Fabricantes', desc: 'Base interna para consulta preliminar' },
-            { title: 'Proposta', desc: 'Materiais, mão de obra e valor total' },
-          ].map(cap => <div key={cap.title} className="card-panel p-5 bg-muted/30 border-none shadow-none"><p className="font-semibold text-foreground text-sm mb-1">{cap.title}</p><p className="text-xs text-muted-foreground leading-relaxed">{cap.desc}</p></div>)}
-        </div>
-      </div>
-
-      <div className="space-y-5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Últimos dimensionamentos</h2>
-          {history.length > 5 && <button onClick={() => setShowAll(v => !v)} className="text-sm font-semibold text-primary hover:underline">{showAll ? 'Mostrar recentes' : 'Ver tudo'}</button>}
+      <section className="section-card">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div>
+            <span className="eyebrow">Histórico</span>
+            <h2 className="text-xl md:text-2xl font-bold tracking-tight mt-1">Últimos dimensionamentos</h2>
+          </div>
+          {history.length > 5 && (
+            <button onClick={() => setShowAll(v => !v)} className="btn-secondary h-10 px-4 text-sm">
+              {showAll ? 'Mostrar recentes' : 'Ver histórico completo'}
+            </button>
+          )}
         </div>
 
         {history.length === 0 ? (
-          <div className="card-panel py-16 flex flex-col items-center text-center space-y-5 border-dashed">
-            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground"><Zap className="w-8 h-8 opacity-20" /></div>
-            <div><p className="text-foreground font-semibold">Você ainda não realizou nenhum dimensionamento.</p><p className="text-muted-foreground text-sm mt-1">Comece criando seu primeiro dimensionamento.</p></div>
-            <button onClick={() => setView('wizard')} className="btn-primary"><Plus className="w-4 h-4" /> Novo dimensionamento</button>
+          <div className="rounded-[16px] border border-dashed border-slate-300 bg-slate-50/60 py-14 px-6 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-400 mx-auto">
+              <Zap className="w-6 h-6" />
+            </div>
+            <h3 className="font-semibold text-slate-900 mt-5">Nenhum dimensionamento salvo</h3>
+            <p className="text-sm text-slate-500 mt-1">Crie o primeiro cálculo para iniciar seu histórico.</p>
+            <button onClick={() => setView('wizard')} className="btn-primary h-11 mt-5 mx-auto">
+              <Plus className="w-4 h-4" /> Criar primeiro cálculo
+            </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {visibleHistory.map(item => (
-              <div key={item.id} className="card-panel p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:border-primary/30 transition-colors group">
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors"><Zap className="w-5 h-5" /></div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-1 flex-1">
-                    <div><p className="text-xs text-muted-foreground font-medium">Potência</p><p className="text-sm font-semibold text-foreground">{item.power || item.potencia} {item.powerUnit || item.unidade}</p></div>
-                    <div><p className="text-xs text-muted-foreground font-medium">Tensão / sistema</p><p className="text-sm font-semibold text-foreground">{item.voltage || item.tensao} V • {item.phase || item.sistema}</p></div>
-                    <div><p className="text-xs text-muted-foreground font-medium">Partida</p><p className="text-sm font-semibold text-foreground">{item.starterType || item.partida}</p></div>
-                    <div><p className="text-xs text-muted-foreground font-medium">Data</p><p className="text-sm font-semibold text-foreground">{new Date(item.date).toLocaleDateString('pt-BR')}</p></div>
+          <div className="overflow-hidden rounded-[14px] border border-slate-200">
+            <div className="hidden md:grid grid-cols-[1.1fr_1fr_1fr_0.8fr_0.6fr_auto] gap-4 bg-slate-50 px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              <span>Motor</span><span>Sistema</span><span>Partida</span><span>Data</span><span>Seção</span><span></span>
+            </div>
+            <div className="divide-y divide-slate-200 bg-white">
+              {visibleHistory.map(item => (
+                <div key={item.id} className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr_1fr_0.8fr_0.6fr_auto] gap-3 md:gap-4 px-5 py-4 items-center hover:bg-slate-50/70 transition-colors">
+                  <div>
+                    <p className="text-xs text-slate-400 md:hidden">Motor</p>
+                    <p className="text-sm font-semibold text-slate-900">{item.power || item.potencia} {item.powerUnit || item.unidade}</p>
                   </div>
+                  <div>
+                    <p className="text-xs text-slate-400 md:hidden">Sistema</p>
+                    <p className="text-sm font-medium text-slate-700">{item.voltage || item.tensao} V • {item.phase || item.sistema}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 md:hidden">Partida</p>
+                    <p className="text-sm font-medium text-slate-700">{item.starterType || item.partida}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 md:hidden">Data</p>
+                    <p className="text-sm text-slate-600">{new Date(item.date).toLocaleDateString('pt-BR')}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 md:hidden">Seção</p>
+                    <span className="status-pill border-blue-100 bg-blue-50 text-blue-700">{item.finalCableSection || item.section} mm²</span>
+                  </div>
+                  <button onClick={() => openHistoryItem(item)} className="btn-secondary h-9 px-4 text-sm w-full md:w-auto">Abrir</button>
                 </div>
-                <div className="flex items-center gap-6 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
-                  <div className="text-left md:text-right"><p className="text-xs text-muted-foreground font-medium">Seção final</p><p className="text-lg font-bold text-primary">{item.finalCableSection || item.section} mm²</p></div>
-                  <button onClick={() => openHistoryItem(item)} className="btn-secondary h-10 px-4 ml-auto">Abrir</button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 };
