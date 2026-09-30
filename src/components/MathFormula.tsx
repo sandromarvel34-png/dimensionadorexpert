@@ -33,7 +33,7 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
 
   return (
     <div className={cn(
-      "w-full bg-slate-900 text-white rounded-xl p-6 md:p-8 space-y-6 overflow-hidden border border-slate-800 shadow-2xl relative",
+      "w-full bg-slate-950 text-white rounded-[16px] p-5 md:p-7 space-y-5 overflow-hidden border border-slate-800 shadow-sm relative",
       className
     )}>
       {/* Background decoration */}
@@ -42,12 +42,12 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
       </div>
 
       {title && (
-        <h4 className="text-xs font-semibold text-primary tracking-wide mb-4">
+        <h4 className="text-[11px] font-semibold uppercase text-blue-300 tracking-[0.14em] mb-3">
           {title}
         </h4>
       )}
 
-      <div className="w-full overflow-x-auto overflow-y-hidden custom-scrollbar py-4 flex justify-center items-center min-h-[100px]">
+      <div className="w-full overflow-x-auto overflow-y-hidden custom-scrollbar py-3 flex justify-center items-center min-h-[88px]">
         <div 
           className="katex-formula text-base md:text-xl lg:text-2xl"
           dangerouslySetInnerHTML={{ __html: html }} 
