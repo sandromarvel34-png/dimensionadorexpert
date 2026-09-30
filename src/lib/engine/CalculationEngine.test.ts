@@ -66,6 +66,25 @@ describe('CalculationEngine — regressão técnica', () => {
     expect(result.limitingCriterion).toBe('minimumSection');
   });
 
+  test('separa cálculo da seção teórica da verificação R+X', () => {
+    const result = CalculationEngine.getSectionByVoltageDrop(
+      100,
+      50,
+      380,
+      2,
+      0.85,
+      'trifasico',
+      'adjacent',
+    );
+
+    expect(result.requiredSectionTheoretical).toBeCloseTo(20.63, 2);
+    expect(result.preliminaryCommercialSection).toBe(25);
+    // 25 mm² é a primeira seção comercial acima da teórica,
+    // mas a verificação R+X ainda supera 2%; portanto sobe para 35 mm².
+    expect(result.selectedSection).toBe(35);
+    expect(result.actualDrop).toBeLessThanOrEqual(2);
+  });
+
   test('calcula queda de tensão CA com Rca + XL', () => {
     const result = CalculationEngine.calculateVoltageDropForSection(
       14.6075,
