@@ -92,6 +92,8 @@ export interface CalculationResults {
     combined: number;
   };
   voltageDropModel?: 'resistiveApproximation' | 'acImpedanceRX';
+  voltageDropRequiredSectionTheoretical?: number;
+  voltageDropPreliminaryCommercialSection?: number;
   voltageDropArrangementUsed?: 'adjacent' | 'multipolar' | 'spaced2D' | 'spaced13cm' | 'spaced20cm' | 'trefoil';
   voltageDropResistanceOhmKm?: number;
   voltageDropReactanceOhmKm?: number;
