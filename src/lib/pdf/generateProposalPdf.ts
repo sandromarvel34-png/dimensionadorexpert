@@ -1,5 +1,4 @@
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { createClientOnlyFn } from '@tanstack/react-start';
 import type { CalculationInputs, CalculationResults } from '@/types';
 
 export interface ProposalPdfItem {
@@ -54,7 +53,7 @@ const safeNumber = (value: number | string | undefined) => {
 };
 
 const sectionLabel = (
-  doc: jsPDF,
+  doc: any,
   title: string,
   y: number,
   subtitle?: string,
@@ -75,7 +74,7 @@ const sectionLabel = (
   return y + 4;
 };
 
-const addContinuationHeader = (doc: jsPDF) => {
+const addContinuationHeader = (doc: any) => {
   doc.setTextColor(...SLATE);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
@@ -108,7 +107,12 @@ const filenamePart = (value: string) =>
     .replace(/\s+/g, '-')
     .toLowerCase();
 
-export const generateProposalPdf = (data: ProposalPdfData) => {
+export const generateProposalPdf = createClientOnlyFn(async (data: ProposalPdfData) => {
+  const [{ jsPDF }, autoTableModule] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable'),
+  ]);
+  const autoTable = autoTableModule.default;
   const {
     clientData,
     commercialData,
@@ -458,4 +462,4 @@ export const generateProposalPdf = (data: ProposalPdfData) => {
   const clientPart = filenamePart(clientData.name || 'cliente');
   const datePart = new Date().toISOString().slice(0, 10);
   doc.save(`proposta-dimensionador-expert-${clientPart}-${datePart}.pdf`);
-};
+});
