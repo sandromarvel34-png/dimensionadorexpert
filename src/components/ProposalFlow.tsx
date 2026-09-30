@@ -16,23 +16,38 @@ const getProtectiveConductorSection = (phaseSection: number) => {
 };
 
 export const ProposalFlow = () => {
-  const { setView, currentResults, currentInputs, selectedManufacturer, setSelectedManufacturer, markProposalSaved, companyProfile, setCompanyProfile } = useAppStore();
-  const [clientData, setClientData] = useState({
+  const {
+    setView,
+    currentResults,
+    currentInputs,
+    selectedManufacturer,
+    setSelectedManufacturer,
+    markProposalSaved,
+    companyProfile,
+    setCompanyProfile,
+    proposals,
+    currentProposalId,
+    saveProposal,
+  } = useAppStore();
+
+  const savedProposal = proposals.find(item => item.id === currentProposalId) || null;
+  const [clientData, setClientData] = useState(savedProposal?.clientData || {
     name: '',
     doc: '',
     phone: '',
     email: ''
   });
   
-  const [commercialData, setCommercialData] = useState({
+  const [commercialData, setCommercialData] = useState(savedProposal?.commercialData || {
     serviceDescription: '',
     technicianName: companyProfile.responsibleName,
     executingCompany: companyProfile.companyName
   });
 
-  const [observations, setObservations] = useState('');
+  const [observations, setObservations] = useState(savedProposal?.observations || '');
   
   const [items, setItems] = useState<any[]>(() => {
+    if (savedProposal?.items?.length) return savedProposal.items.map(item => ({ ...item }));
     if (!currentResults || !currentInputs) return [];
     
     // Regra: se trifásico 3x, se monofásico 2x a distância
@@ -90,12 +105,12 @@ export const ProposalFlow = () => {
     return initialItems;
   });
 
-  const [labor, setLabor] = useState({
+  const [labor, setLabor] = useState(savedProposal?.labor || {
     hours: 0,
     rate: 150
   });
 
-  const [costs, setCosts] = useState({
+  const [costs, setCosts] = useState(savedProposal?.costs || {
     travel: 0,
     others: 0,
     discount: 0,
@@ -119,21 +134,39 @@ export const ProposalFlow = () => {
   };
 
   const handleSave = () => {
-    // Save to local storage
-    const proposalData = {
-      clientData,
-      commercialData,
-      items,
-      labor,
-      costs,
+    if (!currentInputs || !currentResults) {
+      toast.error('Não há dimensionamento vinculado a esta proposta.');
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const id = currentProposalId || Math.random().toString(36).slice(2, 11);
+
+    saveProposal({
+      id,
+      calculationHistoryId: useAppStore.getState().currentHistoryId,
+      createdAt: savedProposal?.createdAt || now,
+      updatedAt: now,
+      status: savedProposal?.status || 'rascunho',
+      clientData: { ...clientData },
+      commercialData: {
+        ...commercialData,
+        technicianName: companyProfile.responsibleName || commercialData.technicianName,
+        executingCompany: companyProfile.companyName || commercialData.executingCompany,
+      },
       observations,
+      items: items.map(item => ({ ...item })),
+      labor: { ...labor },
+      costs: { ...costs },
       selectedManufacturer,
-      companyProfile,
-      date: new Date().toISOString()
-    };
-    localStorage.setItem('last_proposal', JSON.stringify(proposalData));
+      companyProfile: { ...companyProfile },
+      currentInputs: { ...currentInputs },
+      currentResults,
+      total: grandTotal,
+    });
+
     markProposalSaved();
-    toast.success('Proposta salva com sucesso!');
+    toast.success(currentProposalId ? 'Proposta atualizada com sucesso!' : 'Proposta salva com sucesso!');
   };
 
   const getPdfData = () => {
@@ -251,8 +284,8 @@ export const ProposalFlow = () => {
           >
             <ArrowLeft className="w-4 h-4" /> Voltar aos resultados
           </button>
-          <span className="eyebrow block mt-5">Documentação comercial</span>
-          <h2 className="page-heading mt-2">Proposta comercial</h2>
+          <span className="eyebrow block mt-5">{savedProposal ? 'Editando proposta salva' : 'Documentação comercial'}</span>
+          <h2 className="page-heading mt-2">{savedProposal ? (savedProposal.clientData.name || 'Proposta comercial') : 'Proposta comercial'}</h2>
           <p className="text-slate-600 text-base md:text-lg mt-2">Complete os dados do cliente, revise os materiais e prepare o documento para apresentação.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
