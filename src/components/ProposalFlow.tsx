@@ -134,14 +134,14 @@ export const ProposalFlow = () => {
     toast.success('Proposta salva com sucesso!');
   };
 
-  const handleGeneratePdf = () => {
+  const handleGeneratePdf = async () => {
     if (!currentInputs || !currentResults) {
       toast.error('Não há dimensionamento disponível para gerar o PDF.');
       return;
     }
 
     try {
-      generateProposalPdf({
+      await generateProposalPdf({
         clientData,
         commercialData,
         observations,
