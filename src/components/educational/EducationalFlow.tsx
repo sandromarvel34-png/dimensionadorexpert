@@ -91,10 +91,12 @@ export const EducationalFlow = () => {
             <MathFormula
               title="Corrente corrigida para a tabela de ampacidade"
               legend={[
-                { symbol: 'f_c', label: 'Produto dos fatores de temperatura, agrupamento e solo' },
+                { symbol: 'F_{temp}', label: 'Fator de correção de temperatura' },
+                { symbol: 'F_{agrup}', label: 'Fator de correção de agrupamento' },
+                { symbol: 'F_{solo}', label: 'Fator de resistividade térmica do solo (quando aplicável)' },
               ]}
             >
-              {`I_{corr} = \\frac{I_b}{f_c} = \\frac{${ib.toFixed(2)}}{${combinedFactor.toFixed(3)}} = ${correctedCurrent.toFixed(2)}\\,A`}
+              {`I_{corr} = \\frac{I_b}{F_{temp} \\cdot F_{agrup} \\cdot F_{solo}} = \\frac{${ib.toFixed(2)}}{${(currentResults.correctionFactors?.temperature ?? 1).toFixed(2)} \\cdot ${(currentResults.correctionFactors?.grouping ?? 1).toFixed(2)} \\cdot ${(currentResults.correctionFactors?.soilResistivity ?? 1).toFixed(2)}} = ${correctedCurrent.toFixed(2)}\\,A`}
             </MathFormula>
           </div>
         );
@@ -102,7 +104,16 @@ export const EducationalFlow = () => {
       case 3:
         return (
           <div className="space-y-6 text-left">
-            <p className="text-slate-600">O sistema consulta a tabela de ampacidade correspondente ao método e ao número de condutores carregados. Os fatores ambientais são aplicados antes da consulta.</p>
+            <p className="text-slate-600">Depois de obter a corrente corrigida, o sistema consulta a tabela de capacidade de condução correspondente ao método de instalação e ao número de condutores carregados. A seção escolhida precisa ter capacidade de condução igual ou superior à corrente corrigida.</p>
+            <MathFormula
+              title="Critério da seção por ampacidade"
+              legend={[
+                { symbol: 'I_z', label: 'Capacidade de condução de corrente da seção escolhida' },
+                { symbol: 'I_{corr}', label: 'Corrente de projeto corrigida pelos fatores aplicáveis' },
+              ]}
+            >
+              {`I_z \\geq I_{corr} = ${correctedCurrent.toFixed(2)}\\,A \\quad \\Rightarrow \\quad S_{amp} = ${currentResults.cableByAmpacity}\\,mm^2`}
+            </MathFormula>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Temperatura</p><p className="font-semibold">{currentResults.correctionFactors?.temperature.toFixed(2) ?? '1,00'}</p></div>
               <div className="bg-white p-4 rounded-lg border"><p className="text-xs text-muted-foreground">Agrupamento</p><p className="font-semibold">{currentResults.correctionFactors?.grouping.toFixed(2) ?? '1,00'}</p></div>
@@ -115,7 +126,20 @@ export const EducationalFlow = () => {
       case 4:
         return (
           <div className="space-y-6 text-left">
-            <p className="text-slate-600">A queda de tensão é calculada em corrente alternada considerando a resistência elétrica em CA (Rca), a reatância indutiva (XL) e o fator de potência. Os valores de Rca/XL usados são de referência para cabo de cobre/PVC 70 °C a 60 Hz.</p>
+            <p className="text-slate-600">Em cálculos manuais simplificados, a seção transversal pode ser estimada diretamente pela resistividade do cobre. No motor atual do aplicativo, porém, a verificação final de queda de tensão é mais completa: cada seção comercial é testada usando resistência em CA (Rca), reatância indutiva (XL) e fator de potência.</p>
+            <MathFormula
+              title="Seção transversal — aproximação resistiva didática"
+              legend={[
+                { symbol: 'S', label: 'Seção transversal estimada' },
+                { symbol: '\\rho', label: 'Resistividade do condutor' },
+                { symbol: 'L', label: 'Comprimento do circuito' },
+                { symbol: '\\Delta V_{\\%}', label: 'Queda de tensão admissível em %' },
+              ]}
+            >
+              {currentInputs.phase === 'trifasico'
+                ? `S \\approx \\frac{100 \\sqrt{3} \\cdot \\rho \\cdot L \\cdot I_b \\cdot \\cos\\varphi}{\\Delta V_{\\%} \\cdot V}`
+                : `S \\approx \\frac{200 \\cdot \\rho \\cdot L \\cdot I_b \\cdot \\cos\\varphi}{\\Delta V_{\\%} \\cdot V}`}
+            </MathFormula>
             <MathFormula
               title="Queda de tensão em corrente alternada"
               legend={[
