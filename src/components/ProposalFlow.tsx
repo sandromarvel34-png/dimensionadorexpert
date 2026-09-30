@@ -32,6 +32,7 @@ export const ProposalFlow = () => {
   const savedProposal = proposals.find(item => item.id === currentProposalId) || null;
   const proposalIdRef = useRef(currentProposalId || Math.random().toString(36).slice(2, 11));
   const createdAtRef = useRef(savedProposal?.createdAt || new Date().toISOString());
+  const hasAutoSavedRef = useRef(false);
   const [clientData, setClientData] = useState(savedProposal?.clientData || {
     name: '',
     doc: '',
@@ -138,6 +139,7 @@ export const ProposalFlow = () => {
   useEffect(() => {
     if (!currentInputs || !currentResults) return;
 
+    const delay = hasAutoSavedRef.current ? 450 : 0;
     const timer = window.setTimeout(() => {
       saveProposal({
         id: proposalIdRef.current,
@@ -161,7 +163,8 @@ export const ProposalFlow = () => {
         currentResults,
         total: grandTotal,
       });
-    }, 450);
+      hasAutoSavedRef.current = true;
+    }, delay);
 
     return () => window.clearTimeout(timer);
   }, [
