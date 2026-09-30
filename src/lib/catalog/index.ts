@@ -150,9 +150,6 @@ const RAW_MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'siemens-3ru-100', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2146-4LB0', commercialCode: '3RU2146-4LB0', description: 'Relé Sirius, 70-90A', nominalCurrent: 90, adjustmentRange: { min: 70, max: 90 }, price: 580.00 },
   { id: 'siemens-3ru-125', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2146-4MB0', commercialCode: '3RU2146-4MB0', description: 'Relé Sirius, 80-100A', nominalCurrent: 100, adjustmentRange: { min: 80, max: 100 }, price: 650.00 },
   // Itens adicionais para motores de até 100cv (Correntes nominais até ~300A em 220V)
-  { id: 'weg-mdw-c125-fixed', manufacturer: 'WEG', category: 'disjuntor', model: 'MDW-C125', commercialCode: '10076453', description: 'Mini disjuntor MDW Curva C, 125A', nominalCurrent: 125, voltage: 440, price: 155.00 },
-  { id: 'schneider-acti9-c125-fixed', manufacturer: 'Schneider', category: 'disjuntor', model: 'iC60N-C125', commercialCode: 'A9F74192', description: 'Mini disjuntor Acti9 iC60N Curva C, 125A', nominalCurrent: 125, voltage: 440, price: 260.00 },
-  { id: 'siemens-5sy-c125-fixed', manufacturer: 'Siemens', category: 'disjuntor', model: '5SY6125-7', commercialCode: '5SY6125-7', description: 'Mini disjuntor 5SY6 Curva C, 125A', nominalCurrent: 125, voltage: 440, price: 235.00 },
   
   // Contatores de Alta Potência (Linha CWM / TeSys / Sirius)
   { id: 'weg-cwm300', manufacturer: 'WEG', category: 'contator', model: 'CWM300', commercialCode: '10045424', description: 'Contator de potência CWM, 300A, AC-3', nominalCurrent: 300, voltage: 690, price: 1850.00 },
@@ -279,7 +276,6 @@ const RAW_MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   { id: 'schneider-lr9f-330', manufacturer: 'Schneider', category: 'releTermico', model: 'LR9F7375', commercialCode: 'LR9F7375', description: 'Relé Eletrônico TeSys F, 200-330A', nominalCurrent: 330, adjustmentRange: { min: 200, max: 330 }, price: 1450.00 },
 
   // Relés Térmicos Siemens Sirius 3RU/3RB de Alta Potência
-  { id: 'siemens-3ru-100-fixed', manufacturer: 'Siemens', category: 'releTermico', model: '3RU2146-4LB0', commercialCode: '3RU2146-4LB0', description: 'Relé Sirius, 70-90A', nominalCurrent: 90, adjustmentRange: { min: 70, max: 90 }, price: 620.00 },
   { id: 'siemens-3rb-160', manufacturer: 'Siemens', category: 'releTermico', model: '3RB3046-1XB0', commercialCode: '3RB3046-1XB0', description: 'Relé Eletrônico Sirius, 32-115A', nominalCurrent: 115, adjustmentRange: { min: 32, max: 115 }, price: 780.00 },
   { id: 'siemens-3rb-200', manufacturer: 'Siemens', category: 'releTermico', model: '3RB2056-1FC2', commercialCode: '3RB2056-1FC2', description: 'Relé Eletrônico Sirius, 50-200A', nominalCurrent: 200, adjustmentRange: { min: 50, max: 200 }, price: 1050.00 },
   { id: 'siemens-3rb-300', manufacturer: 'Siemens', category: 'releTermico', model: '3RB2066-1MC2', commercialCode: '3RB2066-1MC2', description: 'Relé Eletrônico Sirius, 160-630A', nominalCurrent: 630, adjustmentRange: { min: 160, max: 630 }, price: 1650.00 },
