@@ -49,6 +49,7 @@ export interface CalculationInputs {
   buriedCableConfiguration?: 'unipolarDuct' | 'multipolarDuct';
   shortCircuitCurrentKA?: number; // corrente de falta presumida no ponto (kA)
   shortCircuitDurationSeconds?: number; // tempo de eliminação da falta (s), até 5 s
+  voltageDropArrangement?: 'auto' | 'adjacent' | 'multipolar' | 'spaced2D' | 'spaced13cm' | 'spaced20cm' | 'trefoil';
   powerFactor?: number;
   serviceFactor?: number;
   efficiency?: number;
@@ -90,7 +91,10 @@ export interface CalculationResults {
     soilResistivity: number;
     combined: number;
   };
-  voltageDropModel?: 'resistiveApproximation';
+  voltageDropModel?: 'resistiveApproximation' | 'acImpedanceRX';
+  voltageDropArrangementUsed?: 'adjacent' | 'multipolar' | 'spaced2D' | 'spaced13cm' | 'spaced20cm' | 'trefoil';
+  voltageDropResistanceOhmKm?: number;
+  voltageDropReactanceOhmKm?: number;
   cableByShortCircuit?: number;
   shortCircuitWithstandCurrentKA?: number;
   shortCircuitCheckPerformed?: boolean;
