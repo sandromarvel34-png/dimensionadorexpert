@@ -107,10 +107,16 @@ export const ResultsView = () => {
               <span className="text-xl font-semibold">{(currentResults.nominalCurrent * (currentInputs.serviceFactor || 1)).toFixed(1)} A</span>
             </div>
             {currentResults.correctionFactors && (
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-slate-400 font-semibold">Fator combinado</span>
-                <span className="text-xl font-semibold">{currentResults.correctionFactors.combined.toFixed(3)}</span>
-              </div>
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-slate-400 font-semibold">Icorr</span>
+                  <span className="text-xl font-semibold">{((currentResults.nominalCurrent * (currentInputs.serviceFactor || 1)) / currentResults.correctionFactors.combined).toFixed(1)} A</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-slate-400 font-semibold">Ftemp × Fagrup × Fsolo</span>
+                  <span className="text-sm font-semibold">{currentResults.correctionFactors.temperature.toFixed(2)} × {currentResults.correctionFactors.grouping.toFixed(2)} × {currentResults.correctionFactors.soilResistivity.toFixed(2)}</span>
+                </div>
+              </>
             )}
             {currentResults.shortCircuitCheckPerformed && currentInputs.shortCircuitCurrentKA !== undefined && (
               <div className="flex justify-between items-center">
