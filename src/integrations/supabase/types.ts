@@ -136,23 +136,32 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_path: string | null
+          city_state: string | null
           created_at: string
           full_name: string | null
           phone: string | null
+          profession: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          avatar_path?: string | null
+          city_state?: string | null
           created_at?: string
           full_name?: string | null
           phone?: string | null
+          profession?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          avatar_path?: string | null
+          city_state?: string | null
           created_at?: string
           full_name?: string | null
           phone?: string | null
+          profession?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -235,6 +244,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_access: {
+        Row: {
+          access_expires_at: string | null
+          access_started_at: string
+          created_at: string
+          plan: string
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_expires_at?: string | null
+          access_started_at?: string
+          created_at?: string
+          plan?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_expires_at?: string | null
+          access_started_at?: string
+          created_at?: string
+          plan?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
