@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/lib/workspace/**/*.ts",
+    "src/lib/store.ts",
+    "src/components/auth/*.tsx"
+  ],
+  "exclude": [],
+  "compilerOptions": {
+    "types": [
+      "vite/client",
+      "node"
+    ]
+  }
+}

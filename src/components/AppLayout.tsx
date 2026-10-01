@@ -35,8 +35,8 @@ export const AppLayout = () => {
   ];
 
   const displayName =
-    typeof session.user.user_metadata?.full_name === 'string' && session.user.user_metadata.full_name.trim()
-      ? session.user.user_metadata.full_name.trim()
+    typeof session.user.user_metadata?.['full_name'] === 'string' && session.user.user_metadata['full_name'].trim()
+      ? session.user.user_metadata['full_name'].trim()
       : 'Minha conta';
 
   const initials = displayName === 'Minha conta'
@@ -309,3 +309,4 @@ export const AppLayout = () => {
     </div>
   );
 };
+

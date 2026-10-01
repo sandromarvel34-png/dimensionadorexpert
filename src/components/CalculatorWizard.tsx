@@ -221,8 +221,7 @@ export const CalculatorWizard = () => {
 
     try {
       const results = CalculationEngine.performFullCalculation(inputs);
-      setCalculation(inputs, results);
-      setView('results');
+      await setCalculation(inputs, results);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Não foi possível concluir o dimensionamento.';
       toast.error('Erro no dimensionamento', { description: message });

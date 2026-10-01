@@ -79,9 +79,22 @@ export function MyAccount() {
     clearCalculations,
     clearProposals,
     resetWorkspace,
+    importLegacy,
   } = useAppStore();
 
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
+  const legacyKey = 'calculadora-eletrica-pro-storage';
+  const legacyOwner = typeof window === 'undefined' ? null : window.localStorage.getItem(`${legacyKey}:import-owner`);
+  const hasLegacy = typeof window !== 'undefined' && !!window.localStorage.getItem(legacyKey) && (!legacyOwner || legacyOwner === session.user.id) && !window.localStorage.getItem(`dimensionador-workspace-v2:${session.user.id}:legacy-imported`);
+  const recoverLegacy = async () => {
+    const confirmation = window.prompt(`Os dados antigos deste navegador não têm identificação de usuário. Confirme que pertencem à conta ${session.user.email}. Digite IMPORTAR para vinculá-los a esta conta.`);
+    if (confirmation !== 'IMPORTAR') return;
+    setImporting(true);
+    try { await importLegacy(); toast.success('Dados antigos importados para sua conta.'); }
+    catch (error) { toast.error(error instanceof Error ? error.message : 'Falha ao importar. Tente novamente.'); }
+    finally { setImporting(false); }
+  };
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingCompany, setSavingCompany] = useState(false);
   const [avatarBusy, setAvatarBusy] = useState(false);
@@ -227,44 +240,14 @@ export function MyAccount() {
     event?.preventDefault();
     setSavingCompany(true);
 
-    const { error } = await supabase.from('company_profiles').upsert(
-      {
-        user_id: session.user.id,
-        company_name: company.companyName.trim() || null,
-        document: company.document.trim() || null,
-        responsible_name: company.responsibleName.trim() || null,
-        professional_registration: company.professionalRegistration.trim() || null,
-        phone: company.phone.trim() || null,
-        email: company.email.trim() || null,
-        address: company.address.trim() || null,
-        city_state: company.cityState.trim() || null,
-        website: company.website.trim() || null,
-        brand_color: companyProfile.brandColor,
-        logo_background: companyProfile.logoBackground,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id' },
-    );
+    try {
+      setCompanyProfile({ ...company });
+      await useAppStore.getState().retrySync();
+      if (useAppStore.getState().pending.company) throw new Error('Salvamento pendente.');
+      toast.success('Dados profissionais atualizados.');
+    } catch { toast.error('Não foi possível salvar os dados profissionais na conta.'); }
+    finally { setSavingCompany(false); }
 
-    setSavingCompany(false);
-
-    if (error) {
-      toast.error('Não foi possível salvar os dados profissionais.');
-      return;
-    }
-
-    setCompanyProfile({
-      companyName: company.companyName,
-      document: company.document,
-      responsibleName: company.responsibleName,
-      professionalRegistration: company.professionalRegistration,
-      phone: company.phone,
-      email: company.email,
-      address: company.address,
-      cityState: company.cityState,
-      website: company.website,
-    });
-    toast.success('Dados profissionais atualizados.');
   };
 
   const uploadAvatar = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -351,13 +334,8 @@ export function MyAccount() {
     );
     if (typed !== 'ZERAR') return;
 
-    const { error } = await supabase.from('calculations').delete().eq('user_id', session.user.id);
-    if (error) {
-      toast.error('Não foi possível limpar os dimensionamentos.');
-      return;
-    }
+    try { await clearCalculations(); } catch { toast.error('Não foi possível limpar os dimensionamentos.'); return; }
 
-    clearCalculations();
     toast.success('Histórico de dimensionamentos zerado.');
   };
 
@@ -367,13 +345,8 @@ export function MyAccount() {
     );
     if (typed !== 'EXCLUIR') return;
 
-    const { error } = await supabase.from('proposals').delete().eq('user_id', session.user.id);
-    if (error) {
-      toast.error('Não foi possível excluir as propostas.');
-      return;
-    }
+    try { await clearProposals(); } catch { toast.error('Não foi possível excluir as propostas.'); return; }
 
-    clearProposals();
     toast.success('Propostas excluídas.');
   };
 
@@ -383,16 +356,8 @@ export function MyAccount() {
     );
     if (typed !== 'ZERAR TUDO') return;
 
-    const proposalResult = await supabase.from('proposals').delete().eq('user_id', session.user.id);
-    if (proposalResult.error) return void toast.error('Não foi possível excluir as propostas.');
+    try { await resetWorkspace(); } catch { toast.error('Não foi possível zerar todos os dados. Tente novamente.'); return; }
 
-    const calculationResult = await supabase.from('calculations').delete().eq('user_id', session.user.id);
-    if (calculationResult.error) return void toast.error('Não foi possível excluir os dimensionamentos.');
-
-    const clientResult = await supabase.from('clients').delete().eq('user_id', session.user.id);
-    if (clientResult.error) return void toast.error('Não foi possível excluir os clientes.');
-
-    resetWorkspace();
     toast.success('Dados de trabalho zerados.');
   };
 
@@ -533,6 +498,7 @@ export function MyAccount() {
         </div>
       </section>
 
+      {hasLegacy && <section className="mt-6 section-card p-6"><h2 className="font-bold">Recuperar trabalho anterior</h2><p className="text-sm text-slate-500 mt-2">Existem dados antigos neste navegador. Importe apenas se pertencem a você.</p><Button className="mt-4" disabled={importing} onClick={() => void recoverLegacy()}>{importing ? 'Importando...' : 'Importar meus dados antigos'}</Button></section>}
       <section className="mt-6 section-card p-6">
         <div className="flex items-center gap-2">
           <Wrench className="w-5 h-5 text-primary" />
@@ -763,3 +729,4 @@ function Field({
     </div>
   );
 }
+

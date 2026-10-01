@@ -82,11 +82,11 @@ export const ProposalsView = () => {
     }
   };
 
-  const handleDelete = (proposal: SavedProposal) => {
+  const handleDelete = async (proposal: SavedProposal) => {
     const label = proposal.clientData.name || 'esta proposta';
     if (!window.confirm(`Excluir a proposta de ${label}? Esta ação não pode ser desfeita.`)) return;
-    deleteProposal(proposal.id);
-    toast.success('Proposta excluída.');
+    try { await deleteProposal(proposal.id); toast.success('Proposta excluída.'); }
+    catch { toast.error('Não foi possível excluir a proposta da conta.'); }
   };
 
   return (
@@ -234,3 +234,4 @@ export const ProposalsView = () => {
     </div>
   );
 };
+
