@@ -13,7 +13,7 @@ import type { Session } from "@supabase/supabase-js";
 import { Eye, EyeOff, Loader2, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
-import logoAeAsset from "@/assets/logo-ae.png.asset.json";
+import { BrandLogo } from "@/components/BrandLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -156,11 +156,7 @@ function AuthScreen() {
       <section className="hidden lg:flex lg:w-[46%] bg-slate-950 text-white p-12 xl:p-16 flex-col justify-between">
         <div>
           <div className="inline-flex items-center gap-3">
-            <img
-              src={logoAeAsset.url}
-              alt="Academia do Eletricista"
-              className="h-9 w-auto object-contain brightness-0 invert"
-            />
+            <BrandLogo className="h-9 w-auto object-contain brightness-0 invert" />
             <div>
               <p className="font-bold text-lg">Dimensionador Expert</p>
               <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
@@ -201,11 +197,7 @@ function AuthScreen() {
       <section className="flex-1 flex items-center justify-center px-4 sm:px-8 py-10">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <img
-              src={logoAeAsset.url}
-              alt="Academia do Eletricista"
-              className="h-8 w-auto object-contain"
-            />
+            <BrandLogo className="h-8 w-auto object-contain" />
             <div>
               <p className="font-bold text-slate-950">Dimensionador Expert</p>
               <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">
@@ -395,11 +387,7 @@ function UpdatePasswordScreen({ onDone }: { onDone: () => void }) {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md rounded-[20px] border border-slate-200 bg-white p-7 sm:p-8 shadow-sm">
-        <img
-          src={logoAeAsset.url}
-          alt="Academia do Eletricista"
-          className="h-8 w-auto object-contain"
-        />
+        <BrandLogo className="h-8 w-auto object-contain" />
         <span className="eyebrow block mt-7">Segurança</span>
         <h1 className="text-2xl font-black tracking-tight text-slate-950 mt-2">
           Defina sua nova senha

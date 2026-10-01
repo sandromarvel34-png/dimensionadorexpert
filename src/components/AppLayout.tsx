@@ -12,7 +12,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import logoAeAsset from "@/assets/logo-ae.png.asset.json";
+import { BrandLogo } from "@/components/BrandLogo";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Dashboard } from "./Dashboard";
@@ -119,11 +119,7 @@ export const AppLayout = () => {
               onClick={() => navigate("dashboard")}
             >
               <div className="h-9 flex items-center">
-                <img
-                  src={logoAeAsset.url}
-                  alt="Academia do Eletricista"
-                  className="h-8 w-auto object-contain"
-                />
+                <BrandLogo className="h-8 w-auto object-contain" />
               </div>
               <div className="hidden sm:block leading-tight">
                 <span className="block font-bold text-base tracking-tight text-slate-950">
