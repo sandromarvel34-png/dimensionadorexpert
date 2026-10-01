@@ -3,6 +3,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type FormEvent,
   type ReactNode,
@@ -16,6 +17,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAppStore } from '@/lib/store';
+import { WorkspaceGate } from './WorkspaceGate';
 
 export type UserAccess = {
   role: 'user' | 'admin';
@@ -434,6 +437,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [accessLoading, setAccessLoading] = useState(false);
   const [recovering, setRecovering] = useState(false);
+  const activeUserId = useRef<string | null>(null);
+  const [accessOwnerId, setAccessOwnerId] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -441,21 +446,32 @@ export function AuthGate({ children }: { children: ReactNode }) {
       setRecovering(params.get('recovery') === '1' || window.location.hash.includes('type=recovery'));
     }
 
+    let receivedAuthEvent = false;
+    let alive = true;
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      receivedAuthEvent = true;
       if (event === 'PASSWORD_RECOVERY') setRecovering(true);
+      if (activeUserId.current !== (nextSession?.user.id || null)) {
+        useAppStore.getState().detach();
+        setAccess(null);
+        setAccessOwnerId(null);
+      }
+      activeUserId.current = nextSession?.user.id || null;
       setSession(nextSession);
       if (!nextSession) setAccess(null);
       setLoading(false);
     });
 
     void supabase.auth.getSession().then(({ data }) => {
+      if (!alive || receivedAuthEvent) return;
+      activeUserId.current = data.session?.user.id || null;
       setSession(data.session);
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => { alive = false; subscription.unsubscribe(); };
   }, []);
 
   const refreshAccess = async () => {
@@ -464,18 +480,22 @@ export function AuthGate({ children }: { children: ReactNode }) {
       return;
     }
 
+    const userId = session.user.id;
     setAccessLoading(true);
     const { data, error } = await supabase
       .from('user_access')
       .select('role,status,plan,access_started_at,access_expires_at')
-      .eq('user_id', session.user.id)
+      .eq('user_id', userId)
       .maybeSingle();
+
+    if (activeUserId.current !== userId) return;
 
     if (error) {
       console.error('[Auth] Não foi possível carregar o acesso do usuário.', error);
       setAccess(null);
     } else {
       setAccess(data as UserAccess | null);
+      setAccessOwnerId(userId);
     }
     setAccessLoading(false);
   };
@@ -484,8 +504,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
     if (!session?.user) return;
 
     const user = session.user;
-    const fullName = typeof user.user_metadata?.full_name === 'string'
-      ? user.user_metadata.full_name
+    const fullName = typeof user.user_metadata?.['full_name'] === 'string'
+      ? user.user_metadata['full_name']
       : null;
 
     void supabase
@@ -508,7 +528,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo<AuthContextValue | null>(() => {
-    if (!session || !access) return null;
+    if (!session || !access || accessOwnerId !== session.user.id) return null;
     return {
       session,
       access,
@@ -516,9 +536,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
       refreshAccess,
       signOut,
     };
-  }, [session, access]);
+  }, [session, access, accessOwnerId]);
 
-  if (loading || (session && accessLoading)) {
+  if (loading || (session && (accessLoading && accessOwnerId !== session.user.id))) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
@@ -535,7 +555,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   if (!session) return <AuthScreen />;
 
-  if (!access) return <AccessBlockedScreen reason="missing" signOut={signOut} />;
+  if (!access || accessOwnerId !== session.user.id) return <AccessBlockedScreen reason="missing" signOut={signOut} />;
   if (access.status === 'suspended') return <AccessBlockedScreen reason="suspended" signOut={signOut} />;
 
   const expired = access.access_expires_at
@@ -545,5 +565,6 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (expired) return <AccessBlockedScreen reason="expired" signOut={signOut} />;
   if (!value) return <AccessBlockedScreen reason="missing" signOut={signOut} />;
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}><WorkspaceGate key={session.user.id}>{children}</WorkspaceGate></AuthContext.Provider>;
 }
+

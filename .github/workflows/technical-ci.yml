@@ -3,6 +3,7 @@ name: Technical CI
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -27,5 +28,12 @@ jobs:
       - name: Run regression tests
         run: pnpm test
 
+      - name: Typecheck account workspace
+        run: pnpm exec tsc --noEmit --project tsconfig.workspace.json
+
+      - name: Lint account workspace
+        run: pnpm exec eslint src/lib/workspace src/lib/store.ts src/components/auth/WorkspaceGate.tsx
+
       - name: Build application
         run: pnpm run build
+

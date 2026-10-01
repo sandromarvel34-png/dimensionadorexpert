@@ -7,7 +7,7 @@ export const Dashboard = () => {
   const [showAll, setShowAll] = useState(false);
 
   const proposalCount = proposals.length;
-  const latestDate = history.length > 0 ? new Date(history[0].date).toLocaleDateString('pt-BR') : '—';
+  const latestDate = history.length > 0 ? new Date(history[0]!.date).toLocaleDateString('pt-BR') : '—';
   const visibleHistory = showAll ? history : history.slice(0, 5);
 
   return (
@@ -27,7 +27,7 @@ export const Dashboard = () => {
                 <Plus className="w-5 h-5" /> Novo dimensionamento
               </button>
               {history.length > 0 && (
-                <button onClick={() => openHistoryItem(history[0])} className="btn-secondary sm:w-auto">
+                <button onClick={() => openHistoryItem(history[0]!)} className="btn-secondary sm:w-auto">
                   Abrir último cálculo <ArrowRight className="w-4 h-4" />
                 </button>
               )}
@@ -39,12 +39,12 @@ export const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 pt-7 border-t border-slate-100">
-              {[
+              {([
                 ['Condutores', 'Ampacidade + ΔV', Cable],
                 ['Correções', 'Temperatura e agrupamento', ShieldCheck],
                 ['Componentes', 'Catálogo auditado', CheckCircle2],
                 ['Proposta', 'Materiais e serviços', FileText],
-              ].map(([title, desc, Icon]) => (
+              ] as const).map(([title, desc, Icon]) => (
                 <div key={String(title)} className="flex items-start gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-blue-50 text-primary flex items-center justify-center shrink-0">
                     <Icon className="w-4 h-4" />
@@ -118,15 +118,15 @@ export const Dashboard = () => {
                 <div key={item.id} className="grid grid-cols-1 md:grid-cols-[1.1fr_1fr_1fr_0.8fr_0.6fr_auto] gap-3 md:gap-4 px-5 py-4 items-center hover:bg-slate-50/70 transition-colors">
                   <div>
                     <p className="text-xs text-slate-400 md:hidden">Motor</p>
-                    <p className="text-sm font-semibold text-slate-900">{item.power || item.potencia} {item.powerUnit || item.unidade}</p>
+                    <p className="text-sm font-semibold text-slate-900">{item.power} {item.powerUnit}</p>
                   </div>
                   <div>
                     <p className="text-xs text-slate-400 md:hidden">Sistema</p>
-                    <p className="text-sm font-medium text-slate-700">{item.voltage || item.tensao} V • {item.phase || item.sistema}</p>
+                    <p className="text-sm font-medium text-slate-700">{item.voltage} V • {item.phase}</p>
                   </div>
                   <div>
                     <p className="text-xs text-slate-400 md:hidden">Partida</p>
-                    <p className="text-sm font-medium text-slate-700">{item.starterType || item.partida}</p>
+                    <p className="text-sm font-medium text-slate-700">{item.starterType}</p>
                   </div>
                   <div>
                     <p className="text-xs text-slate-400 md:hidden">Data</p>
@@ -134,7 +134,7 @@ export const Dashboard = () => {
                   </div>
                   <div>
                     <p className="text-xs text-slate-400 md:hidden">Seção</p>
-                    <span className="status-pill border-blue-100 bg-blue-50 text-blue-700">{item.finalCableSection || item.section} mm²</span>
+                    <span className="status-pill border-blue-100 bg-blue-50 text-blue-700">{item.finalCableSection} mm²</span>
                   </div>
                   <button onClick={() => openHistoryItem(item)} className="btn-secondary h-9 px-4 text-sm w-full md:w-auto">Abrir</button>
                 </div>
@@ -146,3 +146,4 @@ export const Dashboard = () => {
     </div>
   );
 };
+

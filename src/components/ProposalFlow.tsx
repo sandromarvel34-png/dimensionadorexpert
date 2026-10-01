@@ -30,9 +30,9 @@ export const ProposalFlow = () => {
   } = useAppStore();
 
   const savedProposal = proposals.find(item => item.id === currentProposalId) || null;
-  const proposalIdRef = useRef(currentProposalId || Math.random().toString(36).slice(2, 11));
+  const proposalIdRef = useRef(currentProposalId || crypto.randomUUID());
   const createdAtRef = useRef(savedProposal?.createdAt || new Date().toISOString());
-  const hasAutoSavedRef = useRef(false);
+  const { syncing, syncError, pending } = useAppStore();
   const [clientData, setClientData] = useState(savedProposal?.clientData || {
     name: '',
     doc: '',
@@ -139,9 +139,7 @@ export const ProposalFlow = () => {
   useEffect(() => {
     if (!currentInputs || !currentResults) return;
 
-    const delay = hasAutoSavedRef.current ? 450 : 0;
-    const timer = window.setTimeout(() => {
-      saveProposal({
+    saveProposal({
         id: proposalIdRef.current,
         calculationHistoryId: useAppStore.getState().currentHistoryId,
         createdAt: createdAtRef.current,
@@ -163,10 +161,6 @@ export const ProposalFlow = () => {
         currentResults,
         total: grandTotal,
       });
-      hasAutoSavedRef.current = true;
-    }, delay);
-
-    return () => window.clearTimeout(timer);
   }, [
     clientData,
     commercialData,
@@ -270,7 +264,7 @@ export const ProposalFlow = () => {
           <div className="flex flex-wrap items-center gap-2 mt-5">
             <span className="eyebrow">{savedProposal ? 'Editando proposta' : 'Nova proposta'}</span>
             <span className="status-pill border-emerald-200 bg-emerald-50 text-emerald-700">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Salva automaticamente
+              <CheckCircle2 className="w-3.5 h-3.5" /> {pending.proposals[proposalIdRef.current] ? (syncError ? 'Salvamento pendente' : 'Salvando na conta...') : syncing ? 'Salvando...' : 'Salva na conta'}
             </span>
           </div>
           <h2 className="page-heading mt-2">{savedProposal ? (savedProposal.clientData.name || 'Proposta comercial') : 'Proposta comercial'}</h2>
