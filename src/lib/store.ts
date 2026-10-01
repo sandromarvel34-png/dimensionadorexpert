@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { CalculationInputs, CalculationResults, CompanyProfile, ProposalStatus, SavedProposal } from '@/types';
 
 interface AppState {
-  view: 'dashboard' | 'wizard' | 'results' | 'proposal' | 'proposals' | 'educational';
+  view: 'dashboard' | 'wizard' | 'results' | 'proposal' | 'proposals' | 'educational' | 'account' | 'admin';
   step: number;
   currentInputs: CalculationInputs | null;
   currentResults: CalculationResults | null;
@@ -30,6 +30,9 @@ interface AppState {
   duplicateProposal: (id: string) => void;
   deleteProposal: (id: string) => void;
   setProposalStatus: (id: string, status: ProposalStatus) => void;
+  clearCalculations: () => void;
+  clearProposals: () => void;
+  resetWorkspace: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -157,6 +160,32 @@ export const useAppStore = create<AppState>()(
       addToHistory: (item) => set((state) => ({
         history: [item, ...state.history].slice(0, 50),
       })),
+      clearCalculations: () => set({
+        currentInputs: null,
+        currentResults: null,
+        currentHistoryId: null,
+        selectedProducts: {},
+        currentProposalId: null,
+        history: [],
+        view: 'dashboard',
+        step: 1,
+      }),
+      clearProposals: () => set({
+        proposals: [],
+        currentProposalId: null,
+      }),
+      resetWorkspace: () => set({
+        view: 'dashboard',
+        step: 1,
+        currentInputs: null,
+        currentResults: null,
+        currentHistoryId: null,
+        selectedProducts: {},
+        selectedManufacturer: 'WEG',
+        history: [],
+        proposals: [],
+        currentProposalId: null,
+      }),
     }),
     { name: 'calculadora-eletrica-pro-storage' },
   ),
