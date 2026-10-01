@@ -313,6 +313,7 @@ export function MyAccount() {
 
     setProfile((current) => ({ ...current, avatarPath: path }));
     await loadAvatar(path);
+    window.dispatchEvent(new Event('dimensionador-profile-updated'));
     toast.success('Foto atualizada.');
   };
 
