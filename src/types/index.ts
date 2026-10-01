@@ -94,6 +94,8 @@ export interface CalculationInputs {
   power: number;
   powerUnit: PowerUnit;
   voltage: number;
+  /** Corrente nominal da placa, opcional na entrada manual. */
+  plateNominalCurrent?: number;
   phase: MotorPhase;
   distance: number;
   starterType: StarterType;
@@ -161,6 +163,7 @@ export interface TechnicalRequirement {
 
 export interface CalculationResults {
   nominalCurrent: number;
+  nominalCurrentSource?: "plate" | "catalog" | "estimated";
   cableByAmpacity: number; // mm²
   cableByVoltageDrop: number; // mm²
   finalCableSection: number; // mm²

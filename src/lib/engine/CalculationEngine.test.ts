@@ -63,6 +63,103 @@ describe("CalculationEngine — regressão técnica", () => {
       "um motor",
     );
   });
+  test.each(["softStarter", "inversor"] as const)(
+    "recusa %s para motor monofásico",
+    (starterType) => {
+      expect(() =>
+        CalculationEngine.performFullCalculation({
+          ...baseInputs,
+          phase: "monofasico",
+          voltage: 220,
+          starterType,
+        }),
+      ).toThrow(/apenas para motores trifásicos/);
+    },
+  );
+
+  test("usa a corrente da placa em todos os critérios e conserva a origem", () => {
+    const inputs = { ...baseInputs, plateNominalCurrent: 80, distance: 80, serviceFactor: 1.15 };
+    const result = CalculationEngine.performFullCalculation(inputs);
+    const expectedCurrent = 80 * 1.15;
+    expect(result.nominalCurrent).toBe(80);
+    expect(result.nominalCurrentSource).toBe("plate");
+    expect(result.cableByAmpacity).toBe(
+      CalculationEngine.getSectionByAmpacity(expectedCurrent, expectedCurrent, "B1", 3),
+    );
+    const drop = CalculationEngine.calculateVoltageDropForSection(
+      expectedCurrent,
+      80,
+      380,
+      0.85,
+      "trifasico",
+      result.finalCableSection,
+      result.voltageDropArrangementUsed!,
+    );
+    expect(result.voltageDropCalculated).toBeCloseTo(drop.percent, 10);
+    expect(result.technicalRequirements.find((r) => r.category === "contator")?.current).toBe(
+      expectedCurrent,
+    );
+    expect(
+      CalculationEngine.performFullCalculation({ ...inputs, power: 1 }).finalCableSection,
+    ).toBe(result.finalCableSection);
+  });
+
+  test.each([0, -1, NaN, Infinity])(
+    "recusa corrente da placa inválida %s",
+    (plateNominalCurrent) => {
+      expect(() =>
+        CalculationEngine.performFullCalculation({ ...baseInputs, plateNominalCurrent }),
+      ).toThrow(/Corrente nominal da placa/);
+    },
+  );
+
+  test("catálogo mantém a corrente própria e sua origem", () => {
+    const result = CalculationEngine.performFullCalculation({
+      ...baseInputs,
+      dataSource: "catalog",
+      plateNominalCurrent: 80,
+      motorCatalogData: {
+        id: "motor",
+        manufacturer: "WEG",
+        line: "W22",
+        speedType: "SINGLE",
+        poles: "4",
+        model: "Motor",
+        nominalCurrent: 18.5,
+        powerFactor: 0.85,
+        efficiency: 0.9,
+        power: 10,
+        powerUnit: "cv",
+        voltage: 380,
+      },
+    });
+    expect(result.nominalCurrent).toBe(18.5);
+    expect(result.nominalCurrentSource).toBe("catalog");
+  });
+
+  test("mantém estimativa quando a corrente da placa está ausente", () => {
+    const result = CalculationEngine.performFullCalculation(baseInputs);
+    expect(result.nominalCurrent).toBeCloseTo(14.6075, 3);
+    expect(result.nominalCurrentSource).toBe("estimated");
+  });
+
+  test.each(["softStarter", "inversor"] as const)(
+    "mantém %s no circuito trifásico",
+    (starterType) => {
+      const result = CalculationEngine.performFullCalculation({
+        ...baseInputs,
+        power: 1,
+        starterType,
+      });
+      expect(result.nominalCurrent).toBeGreaterThan(0);
+      expect(
+        result.technicalRequirements.some(
+          (r) => r.category === (starterType === "inversor" ? "inverter" : "softStarter"),
+        ),
+      ).toBe(true);
+    },
+  );
+
   test("corrente nominal trifásica usa potência, tensão, FP e rendimento", () => {
     const current = CalculationEngine.calculateNominalCurrent(
       10,

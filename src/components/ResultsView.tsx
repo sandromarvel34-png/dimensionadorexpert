@@ -145,6 +145,14 @@ export const ResultsView = () => {
                 {currentResults.nominalCurrent.toFixed(1)} A
               </span>
             </div>
+            <p className="text-xs text-slate-400">
+              Corrente nominal:{" "}
+              {currentResults.nominalCurrentSource === "plate"
+                ? "informada da placa"
+                : currentInputs.dataSource === "catalog"
+                  ? "informada pelo catálogo"
+                  : "estimada por potência"}
+            </p>
             <div className="flex justify-between items-center">
               <span className="text-sm text-slate-400 font-semibold">Freq. / sistema</span>
               <span className="text-xl font-semibold">60 Hz / {phaseLabel}</span>

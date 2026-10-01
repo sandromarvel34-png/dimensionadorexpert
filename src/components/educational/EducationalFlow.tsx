@@ -88,9 +88,12 @@ export const EducationalFlow = () => {
                 { symbol: "\\eta", label: "Rendimento" },
               ]}
             >
-              {currentInputs.phase === "trifasico"
-                ? `I_n = \\frac{P}{${phaseFactor} \\cdot V \\cdot \\cos\\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)}\\,A`
-                : `I_n = \\frac{P}{V \\cdot \\cos\\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)}\\,A`}
+              {currentResults.nominalCurrentSource === "plate" ||
+              currentInputs.dataSource === "catalog"
+                ? `I_n = ${currentResults.nominalCurrent.toFixed(2)}\\,A\\quad\\text{(${currentResults.nominalCurrentSource === "plate" ? "placa informada" : "catálogo"})}`
+                : currentInputs.phase === "trifasico"
+                  ? `I_n = \\frac{P}{${phaseFactor} \\cdot V \\cdot \\cos\\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)}\\,A`
+                  : `I_n = \\frac{P}{V \\cdot \\cos\\varphi \\cdot \\eta} = ${currentResults.nominalCurrent.toFixed(2)}\\,A`}
             </MathFormula>
             <MathFormula
               title="Corrente de projeto"

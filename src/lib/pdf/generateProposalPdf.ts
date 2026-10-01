@@ -644,7 +644,8 @@ const memorialPdf = createClientOnlyFn(
     const systemText =
       `O servico considera carga de ${data.currentInputs.power} ${data.currentInputs.powerUnit}, alimentada em ${data.currentInputs.voltage} V, ` +
       `sistema ${data.currentInputs.phase === "trifasico" ? "trifasico" : "monofasico"}, com ${starterLabel(data.currentInputs.starterType).toLowerCase()}. ` +
-      `A distancia aproximada entre alimentacao e carga informada para o projeto e de ${data.currentInputs.distance} m.`;
+      `A distancia aproximada entre alimentacao e carga informada para o projeto e de ${data.currentInputs.distance} m. ` +
+      `Corrente nominal utilizada: ${data.currentResults.nominalCurrent.toFixed(2)} A (${data.currentResults.nominalCurrentSource === "plate" ? "informada da placa" : data.currentInputs.dataSource === "catalog" ? "informada pelo catalogo" : "estimada por potencia"}).`;
     y = addNumberedSection(doc, data, 2, "Caracterizacao do sistema", systemText, y);
 
     const conductorText =
