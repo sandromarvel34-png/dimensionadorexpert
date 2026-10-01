@@ -1,15 +1,16 @@
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
 import {
   Building2,
-  CalendarDays,
   Camera,
-  Database,
+  FileText,
+  HelpCircle,
   KeyRound,
   Loader2,
   Save,
   ShieldCheck,
   Trash2,
   UserRound,
+  Wrench,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -19,8 +20,6 @@ import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-type Tab = 'profile' | 'company' | 'access' | 'data';
 
 type ProfileForm = {
   fullName: string;
@@ -50,9 +49,22 @@ const emptyProfile: ProfileForm = {
   avatarPath: '',
 };
 
-const formatDate = (value: string | null) => {
+const formatDate = (value: string | null | undefined) => {
   if (!value) return 'Sem vencimento definido';
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'long' }).format(new Date(value));
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(new Date(value));
+};
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
+
+const statusLabel: Record<string, string> = {
+  rascunho: 'Rascunho',
+  enviada: 'Enviada',
+  aprovada: 'Aprovada',
+  recusada: 'Recusada',
 };
 
 export function MyAccount() {
@@ -60,12 +72,15 @@ export function MyAccount() {
   const {
     companyProfile,
     setCompanyProfile,
+    history,
+    proposals,
+    openProposal,
+    setView,
     clearCalculations,
     clearProposals,
     resetWorkspace,
   } = useAppStore();
 
-  const [tab, setTab] = useState<Tab>('profile');
   const [loading, setLoading] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingCompany, setSavingCompany] = useState(false);
@@ -83,6 +98,10 @@ export function MyAccount() {
     website: companyProfile.website,
   });
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState('');
 
   const loadAvatar = async (path: string) => {
     if (!path) {
@@ -143,8 +162,41 @@ export function MyAccount() {
     void load();
   }, [session.user.id]);
 
-  const saveProfile = async () => {
+  const daysRemaining = useMemo(() => {
+    if (!access.access_expires_at) return null;
+    const diff = new Date(access.access_expires_at).getTime() - Date.now();
+    return Math.max(0, Math.ceil(diff / 86_400_000));
+  }, [access.access_expires_at]);
+
+  const approvedProposals = useMemo(
+    () => proposals.filter((proposal) => proposal.status === 'aprovada'),
+    [proposals],
+  );
+
+  const approvedValue = useMemo(
+    () => approvedProposals.reduce((sum, proposal) => sum + Number(proposal.total || 0), 0),
+    [approvedProposals],
+  );
+
+  const recentProposals = useMemo(
+    () =>
+      [...proposals]
+        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+        .slice(0, 5),
+    [proposals],
+  );
+
+  const initials = (profile.fullName || session.user.email || 'U')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
+
+  const saveProfile = async (event?: FormEvent) => {
+    event?.preventDefault();
     setSavingProfile(true);
+
     const { error } = await supabase.from('profiles').upsert(
       {
         user_id: session.user.id,
@@ -157,6 +209,7 @@ export function MyAccount() {
       },
       { onConflict: 'user_id' },
     );
+
     setSavingProfile(false);
 
     if (error) {
@@ -170,8 +223,10 @@ export function MyAccount() {
     toast.success('Perfil atualizado.');
   };
 
-  const saveCompany = async () => {
+  const saveCompany = async (event?: FormEvent) => {
+    event?.preventDefault();
     setSavingCompany(true);
+
     const { error } = await supabase.from('company_profiles').upsert(
       {
         user_id: session.user.id,
@@ -190,6 +245,7 @@ export function MyAccount() {
       },
       { onConflict: 'user_id' },
     );
+
     setSavingCompany(false);
 
     if (error) {
@@ -229,7 +285,7 @@ export function MyAccount() {
     const path = `${session.user.id}/avatar`;
     const { error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(path, file, { upsert: true, contentType: file.type });
+      .upload(path, file, { upsert: true, contentType: file.type, cacheControl: '3600' });
 
     if (uploadError) {
       setAvatarBusy(false);
@@ -249,6 +305,7 @@ export function MyAccount() {
       );
 
     setAvatarBusy(false);
+
     if (profileError) {
       toast.error('A foto foi enviada, mas não foi vinculada ao perfil.');
       return;
@@ -259,57 +316,71 @@ export function MyAccount() {
     toast.success('Foto atualizada.');
   };
 
-  const removeAvatar = async () => {
-    if (!profile.avatarPath) return;
-    setAvatarBusy(true);
-    const { error: storageError } = await supabase.storage.from('avatars').remove([profile.avatarPath]);
-    if (!storageError) {
-      await supabase
-        .from('profiles')
-        .update({ avatar_path: null, updated_at: new Date().toISOString() })
-        .eq('user_id', session.user.id);
-      setProfile((current) => ({ ...current, avatarPath: '' }));
-      setAvatarUrl('');
-      toast.success('Foto removida.');
-    } else {
-      toast.error('Não foi possível remover a foto.');
-    }
-    setAvatarBusy(false);
-  };
+  const changePassword = async (event: FormEvent) => {
+    event.preventDefault();
+    setPasswordMessage('');
 
-  const sendPasswordReset = async () => {
-    if (!session.user.email) return;
-    const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
-      redirectTo: 'https://dimensionadorexpert.lovable.app/?recovery=1',
-    });
-    if (error) toast.error('Não foi possível enviar o e-mail de redefinição.');
-    else toast.success('Enviamos o link de redefinição para seu e-mail.');
+    if (password.length < 6) {
+      setPasswordMessage('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      setPasswordMessage('As senhas não coincidem.');
+      return;
+    }
+
+    setPasswordSaving(true);
+    const { error } = await supabase.auth.updateUser({ password });
+    setPasswordSaving(false);
+
+    if (error) {
+      setPasswordMessage('Não foi possível alterar a senha.');
+      return;
+    }
+
+    setPassword('');
+    setPasswordConfirm('');
+    setPasswordMessage('Senha alterada com sucesso.');
   };
 
   const clearCloudCalculations = async () => {
-    if (!window.confirm('Excluir todo o histórico de dimensionamentos desta conta?')) return;
+    const typed = window.prompt(
+      'Esta ação apagará todo o histórico de dimensionamentos. Digite ZERAR para confirmar.',
+    );
+    if (typed !== 'ZERAR') return;
+
     const { error } = await supabase.from('calculations').delete().eq('user_id', session.user.id);
     if (error) {
       toast.error('Não foi possível limpar os dimensionamentos.');
       return;
     }
+
     clearCalculations();
     toast.success('Histórico de dimensionamentos zerado.');
   };
 
   const clearCloudProposals = async () => {
-    if (!window.confirm('Excluir todas as propostas desta conta? Esta ação não pode ser desfeita.')) return;
+    const typed = window.prompt(
+      'Esta ação apagará todas as propostas. Digite EXCLUIR para confirmar.',
+    );
+    if (typed !== 'EXCLUIR') return;
+
     const { error } = await supabase.from('proposals').delete().eq('user_id', session.user.id);
     if (error) {
       toast.error('Não foi possível excluir as propostas.');
       return;
     }
+
     clearProposals();
     toast.success('Propostas excluídas.');
   };
 
   const clearEverything = async () => {
-    if (!window.confirm('Zerar todos os dados de trabalho? Dimensionamentos, propostas e clientes serão excluídos. Seu perfil e dados da empresa serão mantidos.')) return;
+    const typed = window.prompt(
+      'Esta ação apagará dimensionamentos, propostas e clientes. Digite ZERAR TUDO para confirmar.',
+    );
+    if (typed !== 'ZERAR TUDO') return;
 
     const proposalResult = await supabase.from('proposals').delete().eq('user_id', session.user.id);
     if (proposalResult.error) return void toast.error('Não foi possível excluir as propostas.');
@@ -324,13 +395,6 @@ export function MyAccount() {
     toast.success('Dados de trabalho zerados.');
   };
 
-  const tabs: Array<{ id: Tab; label: string; icon: typeof UserRound }> = [
-    { id: 'profile', label: 'Perfil', icon: UserRound },
-    { id: 'company', label: 'Empresa', icon: Building2 },
-    { id: 'access', label: 'Acesso e segurança', icon: ShieldCheck },
-    { id: 'data', label: 'Dados e privacidade', icon: Database },
-  ];
-
   if (loading) {
     return (
       <div className="page-shell py-20 text-center">
@@ -342,279 +406,359 @@ export function MyAccount() {
 
   return (
     <div className="page-shell py-8 sm:py-10">
-      <div className="page-heading">
-        <span className="eyebrow">Conta</span>
-        <h1>Minha Conta</h1>
-        <p>Gerencie seu perfil, dados profissionais, acesso e informações salvas.</p>
-      </div>
+      <section>
+        <p className="eyebrow">Minha conta</p>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">Perfil e acesso</h1>
+        <p className="mt-2 text-sm text-slate-500">
+          Gerencie seus dados, acompanhe seu uso e configure sua conta no Dimensionador Expert.
+        </p>
+      </section>
 
-      <div className="grid lg:grid-cols-[230px_1fr] gap-6 mt-8">
-        <aside className="section-card p-3 h-fit">
-          <div className="flex items-center gap-3 p-3 mb-2">
-            <div className="w-11 h-11 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
+      <section className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="section-card p-6">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <div className="relative w-24 h-24 shrink-0">
               {avatarUrl ? (
-                <img src={avatarUrl} alt="Foto do usuário" className="w-full h-full object-cover" />
+                <img
+                  src={avatarUrl}
+                  alt="Foto do usuário"
+                  className="w-24 h-24 rounded-full border border-slate-200 object-cover"
+                />
               ) : (
-                <UserRound className="w-5 h-5 text-slate-400" />
+                <div className="flex w-24 h-24 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-2xl font-semibold text-slate-600">
+                  {initials || <UserRound className="w-8 h-8" />}
+                </div>
               )}
+              <label
+                className="absolute bottom-0 right-0 flex w-9 h-9 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm hover:bg-slate-50"
+                aria-label="Alterar foto"
+              >
+                {avatarBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={uploadAvatar}
+                  disabled={avatarBusy}
+                />
+              </label>
             </div>
+
             <div className="min-w-0">
-              <p className="font-semibold text-sm text-slate-900 truncate">{profile.fullName || 'Usuário'}</p>
-              <p className="text-xs text-slate-500 truncate">{session.user.email}</p>
+              <h2 className="truncate text-xl font-bold text-slate-950">
+                {profile.fullName || 'Complete seu perfil'}
+              </h2>
+              <p className="mt-1 truncate text-sm text-slate-500">{session.user.email}</p>
+              <p className="mt-2 text-sm font-semibold text-primary">
+                {profile.profession || 'Profissão não informada'}
+              </p>
+              <p className="mt-1 text-xs text-slate-400">
+                {avatarBusy ? 'Enviando foto...' : 'JPG, PNG ou WebP • máximo 2 MB'}
+              </p>
             </div>
           </div>
-          <nav className="space-y-1">
-            {tabs.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => setTab(id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-left transition-colors ${
-                  tab === id ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-50'
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {label}
-              </button>
+
+          <form onSubmit={saveProfile} className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Nome completo</Label>
+              <Input
+                value={profile.fullName}
+                onChange={(event) => setProfile({ ...profile, fullName: event.target.value })}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Atuação profissional</Label>
+              <Input
+                value={profile.profession}
+                onChange={(event) => setProfile({ ...profile, profession: event.target.value })}
+                placeholder="Ex.: Eletricista industrial"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>E-mail</Label>
+              <Input value={session.user.email || ''} disabled />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Telefone</Label>
+              <Input
+                value={profile.phone}
+                onChange={(event) => setProfile({ ...profile, phone: event.target.value })}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Cidade / UF</Label>
+              <Input
+                value={profile.cityState}
+                onChange={(event) => setProfile({ ...profile, cityState: event.target.value })}
+                placeholder="Ex.: São Paulo / SP"
+              />
+            </div>
+
+            <div className="sm:col-span-2 flex items-center gap-3">
+              <Button type="submit" disabled={savingProfile}>
+                {savingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {savingProfile ? 'Salvando...' : 'Salvar perfil'}
+              </Button>
+            </div>
+          </form>
+        </div>
+
+        <div className="section-card p-6">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-bold text-slate-950">Meu acesso</h2>
+          </div>
+
+          <dl className="mt-5 space-y-4 text-sm">
+            <InfoRow label="Produto" value="Dimensionador Expert" />
+            <InfoRow label="Status" value={access.status === 'active' ? 'Ativo' : 'Suspenso'} strong />
+            <InfoRow label="Plano" value={access.plan} />
+            <InfoRow label="Início do acesso" value={formatDate(access.access_started_at)} />
+            <InfoRow label="Vencimento" value={formatDate(access.access_expires_at)} />
+          </dl>
+
+          {daysRemaining !== null && (
+            <div className="mt-6 rounded-xl bg-blue-50 p-4">
+              <span className="text-xs uppercase tracking-wide text-primary">Tempo restante</span>
+              <div className="mt-1 text-2xl font-bold text-slate-950">
+                {daysRemaining} dia{daysRemaining === 1 ? '' : 's'}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="mt-6 section-card p-6">
+        <div className="flex items-center gap-2">
+          <Wrench className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-bold text-slate-950">Meu trabalho</h2>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Metric label="Dimensionamentos" value={String(history.length)} />
+          <Metric label="Propostas" value={String(proposals.length)} />
+          <Metric label="Aprovadas" value={String(approvedProposals.length)} />
+          <Metric label="Valor aprovado" value={formatCurrency(approvedValue)} />
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Button variant="outline" onClick={() => setView('dashboard')}>Ver dimensionamentos</Button>
+          <Button variant="outline" onClick={() => setView('proposals')}>Ver propostas</Button>
+        </div>
+      </section>
+
+      <section className="mt-6 section-card p-6">
+        <div className="flex items-center gap-2">
+          <Building2 className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-bold text-slate-950">Dados profissionais e empresa</h2>
+        </div>
+        <p className="mt-2 text-sm text-slate-500">
+          Essas informações são usadas nas propostas comerciais e documentos gerados.
+        </p>
+
+        <form onSubmit={saveCompany} className="mt-5 grid gap-4 sm:grid-cols-2">
+          <Field label="Empresa / nome profissional">
+            <Input value={company.companyName} onChange={(e) => setCompany({ ...company, companyName: e.target.value })} />
+          </Field>
+          <Field label="CPF / CNPJ">
+            <Input value={company.document} onChange={(e) => setCompany({ ...company, document: e.target.value })} />
+          </Field>
+          <Field label="Responsável">
+            <Input value={company.responsibleName} onChange={(e) => setCompany({ ...company, responsibleName: e.target.value })} />
+          </Field>
+          <Field label="Registro profissional">
+            <Input
+              value={company.professionalRegistration}
+              onChange={(e) => setCompany({ ...company, professionalRegistration: e.target.value })}
+              placeholder="CREA, CFT..."
+            />
+          </Field>
+          <Field label="Telefone">
+            <Input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} />
+          </Field>
+          <Field label="E-mail profissional">
+            <Input type="email" value={company.email} onChange={(e) => setCompany({ ...company, email: e.target.value })} />
+          </Field>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label>Endereço</Label>
+            <Input value={company.address} onChange={(e) => setCompany({ ...company, address: e.target.value })} />
+          </div>
+          <Field label="Cidade / UF">
+            <Input value={company.cityState} onChange={(e) => setCompany({ ...company, cityState: e.target.value })} />
+          </Field>
+          <Field label="Site / Instagram">
+            <Input value={company.website} onChange={(e) => setCompany({ ...company, website: e.target.value })} />
+          </Field>
+
+          <div className="sm:col-span-2">
+            <Button type="submit" disabled={savingCompany}>
+              {savingCompany ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {savingCompany ? 'Salvando...' : 'Salvar dados profissionais'}
+            </Button>
+          </div>
+        </form>
+      </section>
+
+      <section className="mt-6 section-card p-6">
+        <div className="flex items-center gap-2">
+          <FileText className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-bold text-slate-950">Propostas recentes</h2>
+        </div>
+
+        {recentProposals.length === 0 ? (
+          <p className="mt-4 text-sm text-slate-500">
+            Crie uma proposta a partir de um dimensionamento para vê-la aqui.
+          </p>
+        ) : (
+          <div className="mt-4 divide-y divide-slate-100">
+            {recentProposals.map((proposal) => (
+              <div key={proposal.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
+                <div className="min-w-0">
+                  <div className="text-xs font-bold uppercase tracking-wide text-primary">
+                    {statusLabel[proposal.status] || proposal.status}
+                  </div>
+                  <div className="mt-1 truncate text-sm font-semibold text-slate-900">
+                    {proposal.clientData.name || proposal.commercialData.serviceDescription || 'Proposta sem identificação'}
+                  </div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    {formatDate(proposal.updatedAt)} • {formatCurrency(Number(proposal.total || 0))}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openProposal(proposal.id)}
+                  className="text-sm font-semibold text-primary hover:underline"
+                >
+                  Abrir proposta
+                </button>
+              </div>
             ))}
-          </nav>
-        </aside>
+          </div>
+        )}
+      </section>
 
-        <section className="section-card p-5 sm:p-7">
-          {tab === 'profile' && (
-            <div>
-              <div className="section-heading">
-                <div>
-                  <h2>Perfil do usuário</h2>
-                  <p>Informações pessoais vinculadas à sua conta.</p>
-                </div>
-              </div>
+      <section className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="section-card p-6">
+          <div className="flex items-center gap-2">
+            <KeyRound className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-bold text-slate-950">Conta e segurança</h2>
+          </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center gap-5 py-6 border-b border-slate-100">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="Foto do usuário" className="w-full h-full object-cover" />
-                  ) : (
-                    <UserRound className="w-10 h-10 text-slate-400" />
-                  )}
-                </div>
-                <div>
-                  <div className="flex flex-wrap gap-2">
-                    <label className="btn-primary h-10 px-4 text-sm cursor-pointer">
-                      {avatarBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
-                      Alterar foto
-                      <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={uploadAvatar} disabled={avatarBusy} />
-                    </label>
-                    {avatarUrl && (
-                      <Button variant="outline" onClick={() => void removeAvatar()} disabled={avatarBusy}>
-                        Remover
-                      </Button>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-500 mt-2">JPG, PNG ou WebP. Máximo de 2 MB.</p>
-                </div>
-              </div>
+          <form onSubmit={changePassword} className="mt-5 space-y-4">
+            <Field label="Nova senha">
+              <Input
+                type="password"
+                minLength={6}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="new-password"
+              />
+            </Field>
+            <Field label="Confirmar nova senha">
+              <Input
+                type="password"
+                minLength={6}
+                value={passwordConfirm}
+                onChange={(event) => setPasswordConfirm(event.target.value)}
+                autoComplete="new-password"
+              />
+            </Field>
+            {passwordMessage && <p className="text-sm text-slate-500">{passwordMessage}</p>}
+            <Button type="submit" variant="outline" disabled={passwordSaving}>
+              {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+              {passwordSaving ? 'Alterando...' : 'Alterar senha'}
+            </Button>
+          </form>
+        </div>
 
-              <div className="grid sm:grid-cols-2 gap-4 mt-6">
-                <div className="space-y-2">
-                  <Label>Nome completo</Label>
-                  <Input value={profile.fullName} onChange={(e) => setProfile({ ...profile, fullName: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>E-mail de acesso</Label>
-                  <Input value={session.user.email || ''} disabled />
-                </div>
-                <div className="space-y-2">
-                  <Label>Telefone</Label>
-                  <Input value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Profissão</Label>
-                  <Input value={profile.profession} onChange={(e) => setProfile({ ...profile, profession: e.target.value })} placeholder="Eletricista, técnico, engenheiro..." />
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>Cidade / UF</Label>
-                  <Input value={profile.cityState} onChange={(e) => setProfile({ ...profile, cityState: e.target.value })} placeholder="Ex.: São Paulo / SP" />
-                </div>
-              </div>
+        <div className="section-card p-6">
+          <div className="flex items-center gap-2">
+            <HelpCircle className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-bold text-slate-950">Suporte</h2>
+          </div>
+          <p className="mt-4 text-sm leading-relaxed text-slate-500">
+            Precisa de ajuda com acesso, pagamento ou funcionamento do Dimensionador Expert?
+            Utilize o canal de atendimento informado no momento da compra.
+          </p>
+          <p className="mt-4 text-xs text-slate-400">
+            Ao solicitar suporte, informe o e-mail cadastrado nesta conta: {session.user.email}.
+          </p>
+        </div>
+      </section>
 
-              <div className="mt-6 flex justify-end">
-                <Button onClick={() => void saveProfile()} disabled={savingProfile}>
-                  {savingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  Salvar perfil
-                </Button>
-              </div>
-            </div>
-          )}
+      <section className="mt-6 rounded-2xl border border-red-200 bg-white p-6">
+        <div className="flex items-center gap-2 text-red-600">
+          <Trash2 className="w-5 h-5" />
+          <h2 className="text-lg font-bold">Área de risco</h2>
+        </div>
+        <p className="mt-3 max-w-3xl text-sm text-slate-500">
+          Use estas opções somente quando quiser reiniciar seus dados de trabalho. Seu acesso,
+          perfil e dados profissionais permanecem ativos.
+        </p>
 
-          {tab === 'company' && (
-            <div>
-              <div className="section-heading">
-                <div>
-                  <h2>Dados profissionais e empresa</h2>
-                  <p>Essas informações podem ser usadas nas propostas e documentos gerados.</p>
-                </div>
-              </div>
-
-              <div className="grid sm:grid-cols-2 gap-4 mt-6">
-                <div className="space-y-2">
-                  <Label>Empresa / nome profissional</Label>
-                  <Input value={company.companyName} onChange={(e) => setCompany({ ...company, companyName: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>CPF / CNPJ</Label>
-                  <Input value={company.document} onChange={(e) => setCompany({ ...company, document: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Responsável</Label>
-                  <Input value={company.responsibleName} onChange={(e) => setCompany({ ...company, responsibleName: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Registro profissional</Label>
-                  <Input value={company.professionalRegistration} onChange={(e) => setCompany({ ...company, professionalRegistration: e.target.value })} placeholder="CREA, CFT..." />
-                </div>
-                <div className="space-y-2">
-                  <Label>Telefone</Label>
-                  <Input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>E-mail profissional</Label>
-                  <Input type="email" value={company.email} onChange={(e) => setCompany({ ...company, email: e.target.value })} />
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>Endereço</Label>
-                  <Input value={company.address} onChange={(e) => setCompany({ ...company, address: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Cidade / UF</Label>
-                  <Input value={company.cityState} onChange={(e) => setCompany({ ...company, cityState: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Site / Instagram</Label>
-                  <Input value={company.website} onChange={(e) => setCompany({ ...company, website: e.target.value })} />
-                </div>
-              </div>
-
-              <div className="mt-6 flex justify-end">
-                <Button onClick={() => void saveCompany()} disabled={savingCompany}>
-                  {savingCompany ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  Salvar dados profissionais
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {tab === 'access' && (
-            <div>
-              <div className="section-heading">
-                <div>
-                  <h2>Acesso e segurança</h2>
-                  <p>Informações do seu plano e segurança da conta.</p>
-                </div>
-              </div>
-
-              <div className="grid sm:grid-cols-3 gap-4 mt-6">
-                <div className="metric-card">
-                  <p className="text-xs text-slate-500">Status</p>
-                  <p className="font-bold text-slate-950 mt-1">{access.status === 'active' ? 'Ativo' : 'Suspenso'}</p>
-                </div>
-                <div className="metric-card">
-                  <p className="text-xs text-slate-500">Plano</p>
-                  <p className="font-bold text-slate-950 mt-1">{access.plan}</p>
-                </div>
-                <div className="metric-card">
-                  <p className="text-xs text-slate-500">Validade</p>
-                  <p className="font-bold text-slate-950 mt-1 text-sm">{formatDate(access.access_expires_at)}</p>
-                </div>
-              </div>
-
-              <div className="soft-panel mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <KeyRound className="w-5 h-5 text-slate-500 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-slate-900">Alterar senha</p>
-                    <p className="text-sm text-slate-500 mt-1">Enviaremos um link seguro para {session.user.email}.</p>
-                  </div>
-                </div>
-                <Button variant="outline" onClick={() => void sendPasswordReset()}>
-                  Enviar link
-                </Button>
-              </div>
-
-              <div className="soft-panel mt-4 flex items-start gap-3">
-                <CalendarDays className="w-5 h-5 text-slate-500 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-slate-900">Conta criada em</p>
-                  <p className="text-sm text-slate-500 mt-1">{formatDate(session.user.created_at)}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {tab === 'data' && (
-            <div>
-              <div className="section-heading">
-                <div>
-                  <h2>Dados e privacidade</h2>
-                  <p>Controle os dados de trabalho armazenados na sua conta e neste dispositivo.</p>
-                </div>
-              </div>
-
-              <div className="mt-6 divide-y divide-slate-100 border border-slate-200 rounded-2xl overflow-hidden">
-                <DataAction
-                  title="Zerar histórico de dimensionamentos"
-                  description="Apaga os cálculos salvos e limpa o cálculo atual."
-                  actionLabel="Zerar dimensionamentos"
-                  onClick={clearCloudCalculations}
-                />
-                <DataAction
-                  title="Excluir todas as propostas"
-                  description="Remove todas as propostas comerciais salvas na conta."
-                  actionLabel="Excluir propostas"
-                  onClick={clearCloudProposals}
-                />
-                <DataAction
-                  title="Zerar todos os dados de trabalho"
-                  description="Apaga dimensionamentos, propostas e clientes. Seu perfil e dados profissionais permanecem."
-                  actionLabel="Zerar dados"
-                  onClick={clearEverything}
-                  danger
-                />
-              </div>
-            </div>
-          )}
-        </section>
-      </div>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => void clearCloudCalculations()}>
+            Zerar dimensionamentos
+          </Button>
+          <Button variant="outline" onClick={() => void clearCloudProposals()}>
+            Excluir propostas
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => void clearEverything()}
+            className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+          >
+            Zerar todos os dados de trabalho
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
 
-function DataAction({
-  title,
-  description,
-  actionLabel,
-  onClick,
-  danger = false,
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-slate-200 p-4">
+      <div className="text-xs text-slate-500">{label}</div>
+      <div className="mt-2 truncate text-lg font-bold text-slate-950">{value}</div>
+    </div>
+  );
+}
+
+function InfoRow({
+  label,
+  value,
+  strong = false,
 }: {
-  title: string;
-  description: string;
-  actionLabel: string;
-  onClick: () => void | Promise<void>;
-  danger?: boolean;
+  label: string;
+  value: string;
+  strong?: boolean;
 }) {
   return (
-    <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
-      <div>
-        <p className="font-semibold text-slate-900">{title}</p>
-        <p className="text-sm text-slate-500 mt-1">{description}</p>
-      </div>
-      <Button
-        variant="outline"
-        onClick={() => void onClick()}
-        className={danger ? 'text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700' : ''}
-      >
-        <Trash2 className="w-4 h-4" />
-        {actionLabel}
-      </Button>
+    <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
+      <dt className="text-slate-500">{label}</dt>
+      <dd className={`text-right ${strong ? 'font-bold text-primary' : 'font-semibold text-slate-800'}`}>
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      {children}
     </div>
   );
 }
