@@ -350,13 +350,15 @@ export const ProposalFlow = () => {
             <span className="eyebrow">{savedProposal ? "Editando proposta" : "Nova proposta"}</span>
             <span className="status-pill border-emerald-200 bg-emerald-50 text-emerald-700">
               <CheckCircle2 className="w-3.5 h-3.5" />{" "}
-              {pending.proposals[proposalIdRef.current]
-                ? syncError
-                  ? "Salvamento pendente"
-                  : "Salvando na conta..."
-                : syncing
-                  ? "Salvando..."
-                  : "Salva na conta"}
+              {validationError
+                ? "Revise os valores antes de salvar"
+                : pending.proposals[proposalIdRef.current]
+                  ? syncError
+                    ? "Salvamento pendente"
+                    : "Salvando na conta..."
+                  : syncing
+                    ? "Salvando..."
+                    : "Salva na conta"}
             </span>
           </div>
           <h2 className="page-heading mt-2">
