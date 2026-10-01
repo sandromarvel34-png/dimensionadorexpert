@@ -48,6 +48,12 @@ export class CalculationEngine {
   }
 
   private static validateInputs(inputs: CalculationInputs): void {
+    if (!['manual', 'catalog'].includes(inputs.dataSource)) throw new Error('Origem dos dados inválida.');
+    if (!['cv', 'hp', 'kW'].includes(inputs.powerUnit)) throw new Error('Unidade de potência inválida.');
+    if (!['monofasico', 'trifasico'].includes(inputs.phase)) throw new Error('Sistema elétrico inválido.');
+    if (!['direta', 'reversao', 'estrelaTriangulo', 'softStarter', 'inversor'].includes(inputs.starterType)) throw new Error('Tipo de partida inválido.');
+    if (inputs.quantity !== 1) throw new Error('Esta versão dimensiona um motor por circuito.');
+    if (inputs.dataSource === 'catalog' && !inputs.motorCatalogData) throw new Error('Dados do motor de catálogo não informados.');
     if (!Number.isFinite(inputs.power) || inputs.power <= 0) throw new Error('Potência do motor inválida.');
     if (!Number.isFinite(inputs.voltage) || inputs.voltage <= 0) throw new Error('Tensão de operação inválida.');
     if (!Number.isFinite(inputs.distance) || inputs.distance <= 0) throw new Error('Distância do circuito inválida.');
@@ -321,6 +327,7 @@ export class CalculationEngine {
 
     const shortCircuitSection = shortCircuitResult?.selectedSection ?? 0;
     const finalSection = Math.max(secAmp, dropResult.selectedSection, this.SECAO_MINIMA_FORCA, shortCircuitSection);
+    const finalDrop = this.calculateVoltageDropForSection(Ib, inputs.distance, inputs.voltage, pf, inputs.phase, finalSection, voltageDropArrangement);
     let limitingCriterion: CalculationResults['limitingCriterion'];
     if (shortCircuitResult && shortCircuitSection > secAmp && shortCircuitSection > dropResult.selectedSection && shortCircuitSection > this.SECAO_MINIMA_FORCA) {
       limitingCriterion = 'shortCircuit';
@@ -381,7 +388,7 @@ export class CalculationEngine {
       cableByAmpacity: secAmp,
       cableByVoltageDrop: dropResult.selectedSection,
       finalCableSection: finalSection,
-      voltageDropCalculated: dropResult.actualDrop,
+      voltageDropCalculated: finalDrop.percent,
       limitingCriterion,
       correctionFactors: {
         temperature: fTemp,
@@ -393,10 +400,12 @@ export class CalculationEngine {
       voltageDropRequiredSectionTheoretical: dropResult.requiredSectionTheoretical,
       voltageDropPreliminaryCommercialSection: dropResult.preliminaryCommercialSection,
       voltageDropArrangementUsed: voltageDropArrangement,
-      voltageDropResistanceOhmKm: dropResult.resistance,
-      voltageDropReactanceOhmKm: dropResult.reactance,
-      cableByShortCircuit: shortCircuitResult?.selectedSection,
-      shortCircuitWithstandCurrentKA: shortCircuitResult?.withstandCurrentKA,
+      voltageDropResistanceOhmKm: finalDrop.resistance,
+      voltageDropReactanceOhmKm: finalDrop.reactance,
+      ...(shortCircuitResult ? {
+        cableByShortCircuit: shortCircuitResult.selectedSection,
+        shortCircuitWithstandCurrentKA: shortCircuitResult.withstandCurrentKA,
+      } : {}),
       shortCircuitCheckPerformed: !!shortCircuitResult,
       technicalLimitations: [
         ...(!shortCircuitResult ? ['A verificação térmica de curto-circuito do condutor não foi realizada porque Icc e tempo de atuação não foram informados.'] : []),

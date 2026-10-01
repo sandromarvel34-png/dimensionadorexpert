@@ -14,6 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      // Schema contract from the checked-in motor_catalog migration.
+      // Its deployment must be verified separately; types do not create tables.
+      motor_catalog: {
+        Row: {
+          id: string
+          manufacturer: string
+          line: string
+          speed_type: 'SINGLE' | 'DAHLANDER' | 'DOUBLE_WINDING'
+          poles: string
+          power_cv: number
+          power_kw: number
+          voltage: number
+          frequency: number | null
+          nominal_current: number
+          power_factor: number
+          efficiency: number
+          service_factor: number | null
+          rpm: number | null
+          frame: string | null
+          model_code: string | null
+          catalog_reference: string | null
+          is_active: boolean | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: never
+        Update: never
+        Relationships: []
+      }
       calculations: {
         Row: {
           created_at: string
@@ -416,3 +445,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

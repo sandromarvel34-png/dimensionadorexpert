@@ -24,6 +24,7 @@ export const CalculatorWizard = () => {
   const [installationMethod, setInstallationMethod] = useState<string>(currentInputs?.installationMethod || 'B1');
   
   // Catalog selection state
+  const [catalogError, setCatalogError] = useState('');
   const [filters, setFilters] = useState<any[]>([]);
   const [selectedLine, setSelectedLine] = useState<string>(currentInputs?.motorCatalogData?.line || '');
   const [selectedType, setSelectedType] = useState<string>(currentInputs?.motorCatalogData?.speedType || '');
@@ -52,14 +53,18 @@ export const CalculatorWizard = () => {
       try {
         const data = await getMotorCatalogFilters();
         setFilters(data);
+        setCatalogError('');
       } catch (error) {
-        console.error('Error loading filters:', error);
+        setCatalogError(error instanceof Error ? error.message : 'Catálogo indisponível.');
       }
     };
     loadFilters();
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    setAvailableMotors([]);
+    setSelectedMotorId('');
     const loadMotors = async () => {
       if (selectedLine) {
         try {
@@ -72,15 +77,16 @@ export const CalculatorWizard = () => {
               voltage: (selectedVoltage && selectedVoltage !== '_all') ? parseFloat(selectedVoltage) : undefined
             }
           });
-          setAvailableMotors(motors);
+          if (!cancelled) setAvailableMotors(motors);
         } catch (error) {
-          console.error('Error loading motors:', error);
+          if (!cancelled) setCatalogError(error instanceof Error ? error.message : 'Catálogo indisponível.');
         }
       } else {
         setAvailableMotors([]);
       }
     };
     loadMotors();
+    return () => { cancelled = true; };
   }, [selectedLine, selectedType, selectedPoles, selectedPower, selectedVoltage]);
 
   const selectedMotor = availableMotors.find(m => m.id === selectedMotorId);
@@ -126,21 +132,21 @@ export const CalculatorWizard = () => {
         powerUnit: 'cv',
         voltage: selectedMotor.voltage,
         phase: 'trifasico',
-        distance: parseFloat(formData.get('distance') as string) || 5,
+        distance: parseFloat(formData.get('distance') as string),
         starterType: formData.get('starterType') as any,
-        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
+        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
         installationMethod: formData.get('groupingType') as string || 'B1',
         groupingType: formData.get('groupingType') as string || 'B1',
-        groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
-        ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
+        groupingCount: parseInt(formData.get('groupingCount') as string),
+        ambientTemperature: parseFloat(formData.get('ambientTemp') as string),
         soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
         buriedCableConfiguration: (formData.get('buriedCableConfiguration') as 'unipolarDuct' | 'multipolarDuct') || 'unipolarDuct',
         voltageDropArrangement: (formData.get('voltageDropArrangement') as CalculationInputs['voltageDropArrangement']) || 'auto',
-        shortCircuitCurrentKA,
-        shortCircuitDurationSeconds,
+        ...(shortCircuitCurrentKA !== undefined ? { shortCircuitCurrentKA } : {}),
+        ...(shortCircuitDurationSeconds !== undefined ? { shortCircuitDurationSeconds } : {}),
         powerFactor: selectedMotor.power_factor,
-        serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
+        serviceFactor: parseFloat(formData.get('serviceFactor') as string),
         efficiency: selectedMotor.efficiency,
         quantity: 1
       };
@@ -163,21 +169,21 @@ export const CalculatorWizard = () => {
         powerUnit: formData.get('powerUnit') as any,
         voltage: parseFloat(formData.get('voltage') as string),
         phase: formData.get('phase') as any,
-        distance: parseFloat(formData.get('distance') as string) || 5,
+        distance: parseFloat(formData.get('distance') as string),
         starterType: formData.get('starterType') as any,
-        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string) || 2,
+        maxVoltageDrop: parseFloat(formData.get('maxVoltageDrop') as string),
         preferredManufacturer: formData.get('manufacturer') as string || undefined,
         installationMethod: formData.get('groupingType') as string || 'B1',
         groupingType: formData.get('groupingType') as string || 'B1',
-        groupingCount: parseInt(formData.get('groupingCount') as string) || 1,
-        ambientTemperature: parseFloat(formData.get('ambientTemp') as string) || 30,
+        groupingCount: parseInt(formData.get('groupingCount') as string),
+        ambientTemperature: parseFloat(formData.get('ambientTemp') as string),
         soilThermalResistivity: parseFloat(formData.get('soilThermalResistivity') as string) || 2.5,
         buriedCableConfiguration: (formData.get('buriedCableConfiguration') as 'unipolarDuct' | 'multipolarDuct') || 'unipolarDuct',
         voltageDropArrangement: (formData.get('voltageDropArrangement') as CalculationInputs['voltageDropArrangement']) || 'auto',
-        shortCircuitCurrentKA,
-        shortCircuitDurationSeconds,
+        ...(shortCircuitCurrentKA !== undefined ? { shortCircuitCurrentKA } : {}),
+        ...(shortCircuitDurationSeconds !== undefined ? { shortCircuitDurationSeconds } : {}),
         powerFactor: pf,
-        serviceFactor: parseFloat(formData.get('serviceFactor') as string) || 1.0,
+        serviceFactor: parseFloat(formData.get('serviceFactor') as string),
         efficiency: eff,
         quantity: 1
       };
@@ -327,6 +333,7 @@ export const CalculatorWizard = () => {
               </div>
             </div>
             
+            {dataSource === 'catalog' && catalogError && <p role="alert" className="text-sm text-red-700 mb-4">{catalogError}</p>}
             {dataSource === 'manual' ? (
               <div className="space-y-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">

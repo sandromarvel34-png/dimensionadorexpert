@@ -23,6 +23,27 @@ const baseInputs: CalculationInputs = {
 };
 
 describe('CalculationEngine — regressão técnica', () => {
+  test.each([
+    { power: 100, distance: 1 },
+    { power: 1, distance: 1 },
+    { shortCircuitCurrentKA: 10, shortCircuitDurationSeconds: 1 },
+  ])('queda exibida e impedância correspondem ao cabo final: %j', (changes) => {
+    const inputs = { ...baseInputs, ...changes };
+    const result = CalculationEngine.performFullCalculation(inputs);
+    const final = CalculationEngine.calculateVoltageDropForSection(result.nominalCurrent * (inputs.serviceFactor ?? 1), inputs.distance, inputs.voltage, inputs.powerFactor!, inputs.phase, result.finalCableSection, result.voltageDropArrangementUsed!);
+    expect(result.voltageDropCalculated).toBeCloseTo(final.percent, 10);
+    expect(result.voltageDropResistanceOhmKm).toBe(final.resistance);
+    expect(result.voltageDropReactanceOhmKm).toBe(final.reactance);
+  });
+
+  test('recusa resultado sem impedância da seção final, em vez de usar a de outro cabo', () => {
+    expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, installationMethod: 'B2', shortCircuitCurrentKA: 40, shortCircuitDurationSeconds: 1 })).toThrow('R/X');
+  });
+
+  test('recusa catálogo sem motor e múltiplos motores não suportados', () => {
+    expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, dataSource: 'catalog' })).toThrow('catálogo');
+    expect(() => CalculationEngine.performFullCalculation({ ...baseInputs, quantity: 2 })).toThrow('um motor');
+  });
   test('corrente nominal trifásica usa potência, tensão, FP e rendimento', () => {
     const current = CalculationEngine.calculateNominalCurrent(10, 'cv', 380, 'trifasico', 0.85, 0.90);
     expect(current).toBeCloseTo(14.6075, 3);

@@ -71,8 +71,8 @@ describe('Auditoria do catálogo de fabricantes', () => {
     const siemens = findCompatibleProducts('contator', 20, 'Siemens', 380);
     for (const list of [weg, schneider, siemens]) {
       expect(list.length).toBeGreaterThan(0);
-      expect(list[0].verificationStatus).toBe('verified-family');
-      expect(list[0].commercialCode).toBe('');
+      expect(list[0]!.verificationStatus).toBe('verified-family');
+      expect(list[0]!.commercialCode).toBe('');
     }
   });
 
@@ -86,3 +86,4 @@ describe('Auditoria do catálogo de fabricantes', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 });
+

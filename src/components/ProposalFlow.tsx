@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Building2, CheckCircle2, ImagePlus, Plus, Printer, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { buildRequirementItems, replaceRequirementItems } from '@/lib/proposal/materials';
 import { generateCommercialProposalPdf, generateDescriptiveMemorialPdf } from '@/lib/pdf/generateProposalPdf';
 
 const getProtectiveConductorSection = (phaseSection: number) => {
@@ -22,14 +23,19 @@ export const ProposalFlow = () => {
     currentInputs,
     selectedManufacturer,
     setSelectedManufacturer,
-    companyProfile,
-    setCompanyProfile,
+    companyProfile: workspaceCompanyProfile,
+    setCompanyProfile: setWorkspaceCompanyProfile,
     proposals,
     currentProposalId,
     saveProposal,
   } = useAppStore();
 
   const savedProposal = proposals.find(item => item.id === currentProposalId) || null;
+  const [companyProfile, setProposalCompanyProfile] = useState(savedProposal?.companyProfile || workspaceCompanyProfile);
+  const setCompanyProfile = (changes: Partial<typeof companyProfile>) => {
+    setProposalCompanyProfile(previous => ({ ...previous, ...changes }));
+    setWorkspaceCompanyProfile(changes);
+  };
   const proposalIdRef = useRef(currentProposalId || crypto.randomUUID());
   const createdAtRef = useRef(savedProposal?.createdAt || new Date().toISOString());
   const { syncing, syncError, pending } = useAppStore();
@@ -49,13 +55,13 @@ export const ProposalFlow = () => {
   const [observations, setObservations] = useState(savedProposal?.observations || '');
   
   const [items, setItems] = useState<any[]>(() => {
-    if (savedProposal?.items?.length) return savedProposal.items.map(item => ({ ...item }));
+    if (savedProposal) return savedProposal.items.map(item => ({ ...item }));
     if (!currentResults || !currentInputs) return [];
     
     // Regra: se trifásico 3x, se monofásico 2x a distância
     const phaseMultiplier = currentInputs.phase === 'trifasico' ? 3 : 2;
-    const cableQty = Math.round((currentInputs.distance || 1) * phaseMultiplier);
-    const groundQty = Math.round(currentInputs.distance || 1);
+    const cableQty = Math.ceil(currentInputs.distance * phaseMultiplier);
+    const groundQty = Math.ceil(currentInputs.distance);
     const groundSection = getProtectiveConductorSection(currentResults.finalCableSection);
 
 
@@ -65,30 +71,7 @@ export const ProposalFlow = () => {
 
     ];
 
-    // Mapear produtos baseados no fabricante selecionado
-    // A ordem aqui seguirá a ordem do CalculationEngine, mas garantimos os principais primeiro
-    currentResults.technicalRequirements.forEach(req => {
-      const product = currentResults.compatibleProducts[req.label]?.[selectedManufacturer]?.[0];
-      if (product) {
-        let categoryPrefix = '';
-        if (req.category === 'contator') categoryPrefix = 'Contator ';
-        else if (req.category === 'disjuntorMotor') categoryPrefix = 'Disjuntor Motor ';
-        else if (req.category === 'releTermico') categoryPrefix = 'Relé Térmico ';
-        else if (req.category === 'releTempo') categoryPrefix = 'Relé de Tempo ';
-        else if (req.category === 'fusivel') categoryPrefix = 'Fusível ';
-        else if (req.category === 'disjuntor') categoryPrefix = 'Disjuntor ';
-
-        initialItems.push({
-          id: Math.random().toString(36).substr(2, 9),
-          desc: product.verificationStatus === 'verified-exact'
-            ? `${categoryPrefix}${selectedManufacturer} ${product.model}${product.commercialCode ? ` — Ref. ${product.commercialCode}` : ''}`
-            : `${categoryPrefix}${selectedManufacturer}${req.current !== undefined ? ` — mínimo ${req.current.toFixed(1)} A` : ''}`,
-          qtd: req.quantity || 1,
-          unit: 'un',
-          price: ''
-        });
-      }
-    });
+    initialItems.push(...buildRequirementItems(currentResults, selectedManufacturer));
 
     // Inclusão dinâmica de materiais auxiliares conforme tipo de partida/comando (Requisito #10)
     if (currentInputs.starterType === 'direta' || currentInputs.starterType === 'reversao' || currentInputs.starterType === 'estrelaTriangulo') {
@@ -276,59 +259,11 @@ export const ProposalFlow = () => {
               <button
                 key={mfr}
                 onClick={() => {
-                  setSelectedManufacturer(mfr as any);
-                  toast.info(`Fabricante alterado para ${mfr}`);
-                  
-                  // Atualizar a lista de itens baseada no novo fabricante
-                  if (currentResults && currentInputs) {
-                    const multiplier = currentInputs.phase === 'trifasico' ? 3 : 2;
-                    const cableQty = Math.round((currentInputs.distance || 1) * multiplier);
-                    const groundQty = Math.round(currentInputs.distance || 1);
-                    const groundSection = getProtectiveConductorSection(currentResults.finalCableSection);
-                    
-                    const newItems: any[] = [
-                      { id: 'cable', desc: `Cabo de potência flexível Cu/PVC 70°C 0,6/1 kV ${currentResults.finalCableSection}mm² (Fases)`, qtd: cableQty, unit: 'm', price: '' },
-                      { id: 'cable-ground', desc: `Cabo de potência flexível Cu/PVC 70°C 0,6/1 kV ${groundSection}mm² (PE/Terra)`, qtd: groundQty, unit: 'm', price: '' }
-                    ];
-
-                    currentResults.technicalRequirements.forEach(req => {
-                      const product = currentResults.compatibleProducts[req.label]?.[mfr as any]?.[0];
-                      if (product) {
-                        let categoryPrefix = '';
-                        if (req.category === 'contator') categoryPrefix = 'Contator ';
-                        else if (req.category === 'disjuntorMotor') categoryPrefix = 'Disjuntor Motor ';
-                        else if (req.category === 'releTermico') categoryPrefix = 'Relé Térmico ';
-                        else if (req.category === 'releTempo') categoryPrefix = 'Relé de Tempo ';
-                        else if (req.category === 'fusivel') categoryPrefix = 'Fusível ';
-                        else if (req.category === 'disjuntor') categoryPrefix = 'Disjuntor ';
-
-                        newItems.push({
-                          id: Math.random().toString(36).substr(2, 9),
-                          desc: product.verificationStatus === 'verified-exact'
-                            ? `${categoryPrefix}${mfr} ${product.model}${product.commercialCode ? ` — Ref. ${product.commercialCode}` : ''}`
-                            : `${categoryPrefix}${mfr}${req.current !== undefined ? ` — mínimo ${req.current.toFixed(1)} A` : ''}`,
-                          qtd: req.quantity || 1,
-                          unit: 'un',
-                          price: ''
-                        });
-                      }
-                    });
-
-                    // Auxiliares
-                    if (currentInputs.starterType === 'direta' || currentInputs.starterType === 'reversao' || currentInputs.starterType === 'estrelaTriangulo') {
-                      newItems.push({ id: 'panel', desc: 'Painel Metálico com Placa de Montagem', qtd: 1, unit: 'un', price: '' });
-                      newItems.push({ id: 'btn-on', desc: 'Botão de Comando Verde (NA)', qtd: currentInputs.starterType === 'reversao' ? 2 : 1, unit: 'un', price: '' });
-                      newItems.push({ id: 'btn-off', desc: 'Botão de Comando Vermelho (NF)', qtd: 1, unit: 'un', price: '' });
-                      newItems.push({ id: 'led-on', desc: 'Sinaleiro LED Verde (Em operação)', qtd: 1, unit: 'un', price: '' });
-                      newItems.push({ id: 'led-fail', desc: 'Sinaleiro LED Vermelho (Falha)', qtd: 1, unit: 'un', price: '' });
-                      newItems.push({ id: 'term-force', desc: 'Bornes de Passagem - Força', qtd: 6, unit: 'un', price: '' });
-                      newItems.push({ id: 'term-cmd', desc: 'Bornes de Passagem - Comando', qtd: 12, unit: 'un', price: '' });
-                      newItems.push({ id: 'din', desc: 'Trilho DIN Metálico', qtd: 1, unit: 'm', price: '' });
-                      newItems.push({ id: 'cable-cmd', desc: 'Cabo de Comando 1,0mm²', qtd: 15, unit: 'm', price: '' });
-                      newItems.push({ id: 'canaleta', desc: 'Canaleta Recortada 30x50mm', qtd: 2, unit: 'm', price: '' });
-                    }
-                    setItems(newItems);
-                  }
+                  if (!currentResults || mfr === selectedManufacturer) return;
+                  const nextManufacturer = mfr as 'WEG' | 'Siemens' | 'Schneider';
+                  setItems(previous => replaceRequirementItems(previous, currentResults, selectedManufacturer, nextManufacturer));
+                  setSelectedManufacturer(nextManufacturer);
+                  toast.info(`Fabricante alterado para ${mfr}. Revise os preços dos componentes substituídos.`);
                 }}
                 className={cn(
                   "px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",

@@ -128,21 +128,11 @@ export function MyAccount() {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [profileResult, companyResult] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('full_name,phone,profession,city_state,avatar_path')
-          .eq('user_id', session.user.id)
-          .maybeSingle(),
-        supabase
-          .from('company_profiles')
-          .select('company_name,document,responsible_name,professional_registration,phone,email,address,city_state,website')
-          .eq('user_id', session.user.id)
-          .maybeSingle(),
-      ]);
+      const profileResult = await supabase.from('profiles')
+        .select('full_name,phone,profession,city_state,avatar_path')
+        .eq('user_id', session.user.id).maybeSingle();
 
       if (profileResult.error) toast.error('Não foi possível carregar seu perfil.');
-      if (companyResult.error) toast.error('Não foi possível carregar os dados profissionais.');
 
       if (profileResult.data) {
         const nextProfile = {
@@ -156,19 +146,6 @@ export function MyAccount() {
         await loadAvatar(nextProfile.avatarPath);
       }
 
-      if (companyResult.data) {
-        setCompany({
-          companyName: companyResult.data.company_name || '',
-          document: companyResult.data.document || '',
-          responsibleName: companyResult.data.responsible_name || '',
-          professionalRegistration: companyResult.data.professional_registration || '',
-          phone: companyResult.data.phone || '',
-          email: companyResult.data.email || '',
-          address: companyResult.data.address || '',
-          cityState: companyResult.data.city_state || '',
-          website: companyResult.data.website || '',
-        });
-      }
       setLoading(false);
     };
 

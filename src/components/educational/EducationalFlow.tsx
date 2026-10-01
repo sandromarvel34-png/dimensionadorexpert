@@ -154,7 +154,7 @@ export const EducationalFlow = () => {
               <p><strong>Primeira seção comercial:</strong> {currentResults.voltageDropPreliminaryCommercialSection ?? currentResults.cableByVoltageDrop} mm²</p>
             </div>
             <MathFormula
-              title="2. Verificação da queda de tensão da seção comercial"
+              title="2. Verificação da queda de tensão do condutor final"
               legend={[
                 { symbol: 'R', label: 'Resistência elétrica em CA do condutor (Ω/km)' },
                 { symbol: 'X_L', label: 'Reatância indutiva da linha (Ω/km)' },
@@ -188,7 +188,7 @@ export const EducationalFlow = () => {
               <p className="text-sm text-muted-foreground">Seção final após verificação da queda de tensão</p>
               <p className="text-3xl font-bold text-primary mt-1">{currentResults.cableByVoltageDrop} mm²</p>
               <p className="text-sm text-slate-600 mt-2">
-                Queda calculada: {currentResults.voltageDropCalculated.toFixed(2)}% (limite informado: {currentInputs.maxVoltageDrop}%).
+                Queda no condutor final de {currentResults.finalCableSection} mm²: {currentResults.voltageDropCalculated.toFixed(2)}% (limite informado: {currentInputs.maxVoltageDrop}%).
                 {currentResults.voltageDropPreliminaryCommercialSection !== undefined &&
                  currentResults.voltageDropPreliminaryCommercialSection !== currentResults.cableByVoltageDrop
                   ? ` A seção comercial inicial de ${currentResults.voltageDropPreliminaryCommercialSection} mm² não atendeu à verificação R+X, por isso o sistema avançou para ${currentResults.cableByVoltageDrop} mm².`
@@ -323,3 +323,4 @@ export const EducationalFlow = () => {
     </div>
   );
 };
+

@@ -380,7 +380,7 @@ function auditProduct(product: ManufacturerProduct): ManufacturerProduct {
     return {
       ...product,
       verificationStatus: 'verified-exact',
-      catalogSource: OFFICIAL_SOURCE_BY_ID[product.id],
+      ...(OFFICIAL_SOURCE_BY_ID[product.id] ? { catalogSource: OFFICIAL_SOURCE_BY_ID[product.id]! } : {}),
       lifecycle: PHASE_OUT_PRODUCT_IDS.has(product.id) ? 'phase-out' : 'active',
       selectionNote: 'SKU conferido em fonte oficial. Ainda devem ser verificados os parâmetros de aplicação do circuito.',
     };
@@ -465,3 +465,4 @@ export const findCompatibleProduct = (
   const products = findCompatibleProducts(category, current, manufacturer, systemVoltage);
   return products.length > 0 ? products[0] : null;
 };
+

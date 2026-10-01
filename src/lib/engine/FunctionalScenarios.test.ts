@@ -37,7 +37,7 @@ describe('Dimensionador Expert — matriz funcional', () => {
       installationMethod,
       groupingCount: installationMethod.startsWith('G_') ? 1 : 2,
       ambientTemperature: installationMethod === 'D' ? 20 : 30,
-      buriedCableConfiguration: installationMethod === 'D' ? 'unipolarDuct' : undefined,
+      ...(installationMethod === 'D' ? { buriedCableConfiguration: 'unipolarDuct' as const } : {}),
     });
 
     expect(Number.isFinite(result.nominalCurrent)).toBe(true);
@@ -54,7 +54,7 @@ describe('Dimensionador Expert — matriz funcional', () => {
       installationMethod,
       groupingCount: 1,
       ambientTemperature: installationMethod === 'D' ? 20 : 30,
-      buriedCableConfiguration: installationMethod === 'D' ? 'multipolarDuct' : undefined,
+      ...(installationMethod === 'D' ? { buriedCableConfiguration: 'multipolarDuct' as const } : {}),
     });
 
     expect(Number.isFinite(result.nominalCurrent)).toBe(true);
@@ -210,3 +210,4 @@ describe('Dimensionador Expert — matriz funcional', () => {
     })).toThrow();
   });
 });
+
