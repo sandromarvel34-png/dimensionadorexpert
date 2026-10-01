@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -7,22 +8,22 @@ import {
   useState,
   type FormEvent,
   type ReactNode,
-} from 'react';
-import type { Session } from '@supabase/supabase-js';
-import { Eye, EyeOff, Loader2, LockKeyhole, Mail, ShieldCheck } from 'lucide-react';
-import { toast } from 'sonner';
+} from "react";
+import type { Session } from "@supabase/supabase-js";
+import { Eye, EyeOff, Loader2, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 
-import logoAeAsset from '@/assets/logo-ae.png.asset.json';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useAppStore } from '@/lib/store';
-import { WorkspaceGate } from './WorkspaceGate';
+import logoAeAsset from "@/assets/logo-ae.png.asset.json";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAppStore } from "@/lib/store";
+import { WorkspaceGate } from "./WorkspaceGate";
 
 export type UserAccess = {
-  role: 'user' | 'admin';
-  status: 'active' | 'suspended';
+  role: "user" | "admin";
+  status: "active" | "suspended";
   plan: string;
   access_started_at: string;
   access_expires_at: string | null;
@@ -40,35 +41,37 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const useAuth = () => {
   const value = useContext(AuthContext);
-  if (!value) throw new Error('useAuth deve ser usado dentro de AuthGate.');
+  if (!value) throw new Error("useAuth deve ser usado dentro de AuthGate.");
   return value;
 };
 
-type AuthMode = 'login' | 'signup' | 'forgot';
+type AuthMode = "login" | "signup" | "forgot";
 
-const APP_URL = 'https://dimensionadorexpert.lovable.app/';
+const APP_URL = "https://dimensionadorexpert.lovable.app/";
 
 const translateAuthError = (message: string) => {
   const normalized = message.toLowerCase();
-  if (normalized.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
-  if (normalized.includes('email not confirmed')) return 'Confirme seu e-mail antes de entrar.';
-  if (normalized.includes('user already registered')) return 'Este e-mail já possui cadastro.';
-  if (normalized.includes('password should be at least')) return 'A senha deve ter pelo menos 6 caracteres.';
-  if (normalized.includes('rate limit')) return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
+  if (normalized.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
+  if (normalized.includes("email not confirmed")) return "Confirme seu e-mail antes de entrar.";
+  if (normalized.includes("user already registered")) return "Este e-mail já possui cadastro.";
+  if (normalized.includes("password should be at least"))
+    return "A senha deve ter pelo menos 6 caracteres.";
+  if (normalized.includes("rate limit"))
+    return "Muitas tentativas. Aguarde alguns minutos e tente novamente.";
   return message;
 };
 
 function AuthScreen() {
-  const [mode, setMode] = useState<AuthMode>('login');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
-  const resetFeedback = () => setMessage('');
+  const resetFeedback = () => setMessage("");
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -76,33 +79,35 @@ function AuthScreen() {
 
     const normalizedEmail = email.trim().toLowerCase();
     if (!normalizedEmail) {
-      setMessage('Informe seu e-mail.');
+      setMessage("Informe seu e-mail.");
       return;
     }
 
     setSubmitting(true);
     try {
-      if (mode === 'forgot') {
+      if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
           redirectTo: `${APP_URL}?recovery=1`,
         });
         if (error) throw error;
-        setMessage('Enviamos as instruções para redefinir sua senha. Verifique sua caixa de entrada.');
+        setMessage(
+          "Enviamos as instruções para redefinir sua senha. Verifique sua caixa de entrada.",
+        );
         return;
       }
 
       if (password.length < 6) {
-        setMessage('A senha deve ter pelo menos 6 caracteres.');
+        setMessage("A senha deve ter pelo menos 6 caracteres.");
         return;
       }
 
-      if (mode === 'signup') {
+      if (mode === "signup") {
         if (!fullName.trim()) {
-          setMessage('Informe seu nome.');
+          setMessage("Informe seu nome.");
           return;
         }
         if (password !== confirmPassword) {
-          setMessage('As senhas informadas não são iguais.');
+          setMessage("As senhas informadas não são iguais.");
           return;
         }
 
@@ -117,9 +122,11 @@ function AuthScreen() {
         if (error) throw error;
 
         if (data.session) {
-          toast.success('Conta criada com sucesso.');
+          toast.success("Conta criada com sucesso.");
         } else {
-          setMessage('Cadastro realizado. Confirme seu e-mail para liberar o acesso.');
+          setMessage(
+            "Cadastro realizado. Confirme seu e-mail. O acesso será liberado pelo administrador após a contratação.",
+          );
         }
         return;
       }
@@ -130,7 +137,7 @@ function AuthScreen() {
       });
       if (error) throw error;
     } catch (error) {
-      const raw = error instanceof Error ? error.message : 'Não foi possível concluir a operação.';
+      const raw = error instanceof Error ? error.message : "Não foi possível concluir a operação.";
       setMessage(translateAuthError(raw));
     } finally {
       setSubmitting(false);
@@ -139,9 +146,9 @@ function AuthScreen() {
 
   const changeMode = (nextMode: AuthMode) => {
     setMode(nextMode);
-    setMessage('');
-    setPassword('');
-    setConfirmPassword('');
+    setMessage("");
+    setPassword("");
+    setConfirmPassword("");
   };
 
   return (
@@ -149,28 +156,37 @@ function AuthScreen() {
       <section className="hidden lg:flex lg:w-[46%] bg-slate-950 text-white p-12 xl:p-16 flex-col justify-between">
         <div>
           <div className="inline-flex items-center gap-3">
-            <img src={logoAeAsset.url} alt="Academia do Eletricista" className="h-9 w-auto object-contain brightness-0 invert" />
+            <img
+              src={logoAeAsset.url}
+              alt="Academia do Eletricista"
+              className="h-9 w-auto object-contain brightness-0 invert"
+            />
             <div>
               <p className="font-bold text-lg">Dimensionador Expert</p>
-              <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Comandos elétricos</p>
+              <p className="text-xs uppercase tracking-[0.16em] text-slate-400">
+                Comandos elétricos
+              </p>
             </div>
           </div>
         </div>
 
         <div className="max-w-lg">
-          <span className="text-xs font-bold uppercase tracking-[0.18em] text-blue-300">Área profissional</span>
+          <span className="text-xs font-bold uppercase tracking-[0.18em] text-blue-300">
+            Área profissional
+          </span>
           <h1 className="text-4xl xl:text-5xl font-black tracking-tight mt-4 leading-tight">
             Seus dimensionamentos e propostas em um só lugar.
           </h1>
           <p className="text-slate-300 text-lg mt-5 leading-relaxed">
-            Acesse sua conta para calcular, revisar resultados e preparar documentação comercial e técnica.
+            Acesse sua conta para calcular, revisar resultados e preparar documentação comercial e
+            técnica.
           </p>
           <div className="mt-8 grid gap-3">
             {[
-              'Dimensionamentos organizados por usuário',
-              'Propostas comerciais e memoriais vinculados aos cálculos',
-              'Dados protegidos por controle individual de acesso',
-            ].map(item => (
+              "Dimensionamentos organizados por usuário",
+              "Propostas comerciais e memoriais vinculados aos cálculos",
+              "Dados protegidos por controle individual de acesso",
+            ].map((item) => (
               <div key={item} className="flex items-center gap-3 text-sm text-slate-200">
                 <ShieldCheck className="w-5 h-5 text-blue-300 shrink-0" />
                 <span>{item}</span>
@@ -185,42 +201,52 @@ function AuthScreen() {
       <section className="flex-1 flex items-center justify-center px-4 sm:px-8 py-10">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <img src={logoAeAsset.url} alt="Academia do Eletricista" className="h-8 w-auto object-contain" />
+            <img
+              src={logoAeAsset.url}
+              alt="Academia do Eletricista"
+              className="h-8 w-auto object-contain"
+            />
             <div>
               <p className="font-bold text-slate-950">Dimensionador Expert</p>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">Comandos elétricos</p>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-slate-400">
+                Comandos elétricos
+              </p>
             </div>
           </div>
 
           <div className="rounded-[20px] border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
             <div>
               <span className="eyebrow">
-                {mode === 'login' ? 'Acesso' : mode === 'signup' ? 'Nova conta' : 'Recuperação de senha'}
+                {mode === "login"
+                  ? "Acesso"
+                  : mode === "signup"
+                    ? "Nova conta"
+                    : "Recuperação de senha"}
               </span>
               <h2 className="text-2xl font-black tracking-tight text-slate-950 mt-2">
-                {mode === 'login'
-                  ? 'Entrar no Dimensionador'
-                  : mode === 'signup'
-                    ? 'Criar sua conta'
-                    : 'Recuperar sua senha'}
+                {mode === "login"
+                  ? "Entrar no Dimensionador"
+                  : mode === "signup"
+                    ? "Criar sua conta"
+                    : "Recuperar sua senha"}
               </h2>
               <p className="text-sm text-slate-500 mt-2">
-                {mode === 'login'
-                  ? 'Use o e-mail e a senha cadastrados.'
-                  : mode === 'signup'
-                    ? 'Cadastre-se para acessar a área profissional.'
-                    : 'Informe seu e-mail para receber as instruções.'}
+                {mode === "login"
+                  ? "Use o e-mail e a senha cadastrados."
+                  : mode === "signup"
+                    ? "Cadastre-se para acessar a área profissional."
+                    : "Informe seu e-mail para receber as instruções."}
               </p>
             </div>
 
             <form onSubmit={submit} className="mt-7 space-y-4">
-              {mode === 'signup' && (
+              {mode === "signup" && (
                 <div className="space-y-2">
                   <Label htmlFor="auth-name">Nome</Label>
                   <Input
                     id="auth-name"
                     value={fullName}
-                    onChange={event => setFullName(event.target.value)}
+                    onChange={(event) => setFullName(event.target.value)}
                     placeholder="Seu nome"
                     autoComplete="name"
                   />
@@ -235,7 +261,7 @@ function AuthScreen() {
                     id="auth-email"
                     type="email"
                     value={email}
-                    onChange={event => setEmail(event.target.value)}
+                    onChange={(event) => setEmail(event.target.value)}
                     placeholder="voce@exemplo.com"
                     autoComplete="email"
                     className="pl-9"
@@ -243,25 +269,25 @@ function AuthScreen() {
                 </div>
               </div>
 
-              {mode !== 'forgot' && (
+              {mode !== "forgot" && (
                 <div className="space-y-2">
                   <Label htmlFor="auth-password">Senha</Label>
                   <div className="relative">
                     <LockKeyhole className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <Input
                       id="auth-password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
                       value={password}
-                      onChange={event => setPassword(event.target.value)}
+                      onChange={(event) => setPassword(event.target.value)}
                       placeholder="Mínimo de 6 caracteres"
-                      autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                      autoComplete={mode === "signup" ? "new-password" : "current-password"}
                       className="pl-9 pr-10"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(value => !value)}
+                      onClick={() => setShowPassword((value) => !value)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
-                      aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                      aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -269,14 +295,14 @@ function AuthScreen() {
                 </div>
               )}
 
-              {mode === 'signup' && (
+              {mode === "signup" && (
                 <div className="space-y-2">
                   <Label htmlFor="auth-confirm-password">Confirmar senha</Label>
                   <Input
                     id="auth-confirm-password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     value={confirmPassword}
-                    onChange={event => setConfirmPassword(event.target.value)}
+                    onChange={(event) => setConfirmPassword(event.target.value)}
                     placeholder="Digite a senha novamente"
                     autoComplete="new-password"
                   />
@@ -291,23 +317,36 @@ function AuthScreen() {
 
               <Button type="submit" disabled={submitting} className="w-full h-11 font-semibold">
                 {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                {mode === 'login' ? 'Entrar' : mode === 'signup' ? 'Criar conta' : 'Enviar instruções'}
+                {mode === "login"
+                  ? "Entrar"
+                  : mode === "signup"
+                    ? "Criar conta"
+                    : "Enviar instruções"}
               </Button>
             </form>
 
             <div className="mt-6 pt-5 border-t border-slate-100 text-sm">
-              {mode === 'login' && (
+              {mode === "login" && (
                 <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
-                  <button onClick={() => changeMode('forgot')} className="font-semibold text-slate-600 hover:text-primary text-left">
+                  <button
+                    onClick={() => changeMode("forgot")}
+                    className="font-semibold text-slate-600 hover:text-primary text-left"
+                  >
                     Esqueci minha senha
                   </button>
-                  <button onClick={() => changeMode('signup')} className="font-semibold text-primary hover:underline text-left">
+                  <button
+                    onClick={() => changeMode("signup")}
+                    className="font-semibold text-primary hover:underline text-left"
+                  >
                     Criar conta
                   </button>
                 </div>
               )}
-              {mode !== 'login' && (
-                <button onClick={() => changeMode('login')} className="font-semibold text-primary hover:underline">
+              {mode !== "login" && (
+                <button
+                  onClick={() => changeMode("login")}
+                  className="font-semibold text-primary hover:underline"
+                >
                   Voltar para o login
                 </button>
               )}
@@ -324,18 +363,18 @@ function AuthScreen() {
 }
 
 function UpdatePasswordScreen({ onDone }: { onDone: () => void }) {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (password.length < 6) {
-      toast.error('A senha deve ter pelo menos 6 caracteres.');
+      toast.error("A senha deve ter pelo menos 6 caracteres.");
       return;
     }
     if (password !== confirmPassword) {
-      toast.error('As senhas informadas não são iguais.');
+      toast.error("As senhas informadas não são iguais.");
       return;
     }
 
@@ -348,18 +387,26 @@ function UpdatePasswordScreen({ onDone }: { onDone: () => void }) {
       return;
     }
 
-    window.history.replaceState({}, '', window.location.pathname);
-    toast.success('Senha atualizada com sucesso.');
+    window.history.replaceState({}, "", window.location.pathname);
+    toast.success("Senha atualizada com sucesso.");
     onDone();
   };
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md rounded-[20px] border border-slate-200 bg-white p-7 sm:p-8 shadow-sm">
-        <img src={logoAeAsset.url} alt="Academia do Eletricista" className="h-8 w-auto object-contain" />
+        <img
+          src={logoAeAsset.url}
+          alt="Academia do Eletricista"
+          className="h-8 w-auto object-contain"
+        />
         <span className="eyebrow block mt-7">Segurança</span>
-        <h1 className="text-2xl font-black tracking-tight text-slate-950 mt-2">Defina sua nova senha</h1>
-        <p className="text-sm text-slate-500 mt-2">Crie uma nova senha para voltar a acessar o Dimensionador Expert.</p>
+        <h1 className="text-2xl font-black tracking-tight text-slate-950 mt-2">
+          Defina sua nova senha
+        </h1>
+        <p className="text-sm text-slate-500 mt-2">
+          Crie uma nova senha para voltar a acessar o Dimensionador Expert.
+        </p>
 
         <form onSubmit={submit} className="mt-7 space-y-4">
           <div className="space-y-2">
@@ -368,7 +415,7 @@ function UpdatePasswordScreen({ onDone }: { onDone: () => void }) {
               id="new-password"
               type="password"
               value={password}
-              onChange={event => setPassword(event.target.value)}
+              onChange={(event) => setPassword(event.target.value)}
               autoComplete="new-password"
               placeholder="Mínimo de 6 caracteres"
             />
@@ -379,7 +426,7 @@ function UpdatePasswordScreen({ onDone }: { onDone: () => void }) {
               id="confirm-new-password"
               type="password"
               value={confirmPassword}
-              onChange={event => setConfirmPassword(event.target.value)}
+              onChange={(event) => setConfirmPassword(event.target.value)}
               autoComplete="new-password"
             />
           </div>
@@ -397,23 +444,27 @@ function AccessBlockedScreen({
   reason,
   signOut,
 }: {
-  reason: 'suspended' | 'expired' | 'missing';
+  reason: "suspended" | "expired" | "missing";
   signOut: () => Promise<void>;
 }) {
-  const copy = reason === 'suspended'
-    ? {
-        title: 'Acesso suspenso',
-        description: 'Seu acesso ao Dimensionador Expert está suspenso. Entre em contato com o suporte para regularizar sua conta.',
-      }
-    : reason === 'expired'
+  const copy =
+    reason === "suspended"
       ? {
-          title: 'Período de acesso encerrado',
-          description: 'O período contratado para esta conta terminou. Renove o acesso para continuar usando o Dimensionador Expert.',
+          title: "Acesso suspenso",
+          description:
+            "Seu acesso ao Dimensionador Expert está suspenso. Entre em contato com o suporte para regularizar sua conta.",
         }
-      : {
-          title: 'Acesso não liberado',
-          description: 'Sua conta foi criada, mas ainda não possui uma liberação de acesso válida.',
-        };
+      : reason === "expired"
+        ? {
+            title: "Período de acesso encerrado",
+            description:
+              "O período contratado para esta conta terminou. Renove o acesso para continuar usando o Dimensionador Expert.",
+          }
+        : {
+            title: "Acesso não liberado",
+            description:
+              "Sua conta foi criada, mas ainda não possui uma liberação de acesso válida.",
+          };
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
@@ -441,9 +492,11 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [accessOwnerId, setAccessOwnerId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      setRecovering(params.get('recovery') === '1' || window.location.hash.includes('type=recovery'));
+      setRecovering(
+        params.get("recovery") === "1" || window.location.hash.includes("type=recovery"),
+      );
     }
 
     let receivedAuthEvent = false;
@@ -452,7 +505,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, nextSession) => {
       receivedAuthEvent = true;
-      if (event === 'PASSWORD_RECOVERY') setRecovering(true);
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
       if (activeUserId.current !== (nextSession?.user.id || null)) {
         useAppStore.getState().detach();
         setAccess(null);
@@ -471,10 +524,13 @@ export function AuthGate({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    return () => { alive = false; subscription.unsubscribe(); };
+    return () => {
+      alive = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const refreshAccess = async () => {
+  const refreshAccess = useCallback(async () => {
     if (!session?.user) {
       setAccess(null);
       return;
@@ -483,48 +539,63 @@ export function AuthGate({ children }: { children: ReactNode }) {
     const userId = session.user.id;
     setAccessLoading(true);
     const { data, error } = await supabase
-      .from('user_access')
-      .select('role,status,plan,access_started_at,access_expires_at')
-      .eq('user_id', userId)
+      .from("user_access")
+      .select("role,status,plan,access_started_at,access_expires_at")
+      .eq("user_id", userId)
       .maybeSingle();
 
     if (activeUserId.current !== userId) return;
 
     if (error) {
-      console.error('[Auth] Não foi possível carregar o acesso do usuário.', error);
+      console.error("[Auth] Não foi possível carregar o acesso do usuário.", error);
       setAccess(null);
     } else {
       setAccess(data as UserAccess | null);
       setAccessOwnerId(userId);
     }
     setAccessLoading(false);
-  };
+  }, [session?.user]);
 
   useEffect(() => {
     if (!session?.user) return;
 
     const user = session.user;
-    const fullName = typeof user.user_metadata?.['full_name'] === 'string'
-      ? user.user_metadata['full_name']
-      : null;
+    const fullName =
+      typeof user.user_metadata?.["full_name"] === "string"
+        ? user.user_metadata["full_name"]
+        : null;
 
-    void supabase
-      .from('profiles')
-      .upsert(
-        {
-          user_id: user.id,
-          full_name: fullName,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' },
-      );
+    void supabase.from("profiles").upsert(
+      {
+        user_id: user.id,
+        full_name: fullName,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
 
     void refreshAccess();
-  }, [session?.user.id]);
+  }, [session?.user, refreshAccess]);
+
+  useEffect(() => {
+    if (!session?.user.id) return;
+    const refresh = () => void refreshAccess();
+    const timer = window.setInterval(refresh, 30_000);
+    window.addEventListener("focus", refresh);
+    const expires = access?.access_expires_at ? Date.parse(access.access_expires_at) : NaN;
+    const expiryTimer = Number.isFinite(expires)
+      ? window.setTimeout(refresh, Math.max(0, Math.min(2_147_483_647, expires - Date.now() + 1)))
+      : undefined;
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(expiryTimer);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [session?.user.id, access?.access_expires_at, refreshAccess]);
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (error) toast.error('Não foi possível sair da conta.');
+    if (error) toast.error("Não foi possível sair da conta.");
   };
 
   const value = useMemo<AuthContextValue | null>(() => {
@@ -532,13 +603,13 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return {
       session,
       access,
-      isAdmin: access.role === 'admin',
+      isAdmin: access.role === "admin",
       refreshAccess,
       signOut,
     };
-  }, [session, access, accessOwnerId]);
+  }, [session, access, accessOwnerId, refreshAccess]);
 
-  if (loading || (session && (accessLoading && accessOwnerId !== session.user.id))) {
+  if (loading || (session && accessLoading && accessOwnerId !== session.user.id)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
@@ -555,8 +626,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   if (!session) return <AuthScreen />;
 
-  if (!access || accessOwnerId !== session.user.id) return <AccessBlockedScreen reason="missing" signOut={signOut} />;
-  if (access.status === 'suspended') return <AccessBlockedScreen reason="suspended" signOut={signOut} />;
+  if (!access || accessOwnerId !== session.user.id)
+    return <AccessBlockedScreen reason="missing" signOut={signOut} />;
+  if (access.status === "suspended")
+    return <AccessBlockedScreen reason="suspended" signOut={signOut} />;
 
   const expired = access.access_expires_at
     ? new Date(access.access_expires_at).getTime() < Date.now()
@@ -565,6 +638,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (expired) return <AccessBlockedScreen reason="expired" signOut={signOut} />;
   if (!value) return <AccessBlockedScreen reason="missing" signOut={signOut} />;
 
-  return <AuthContext.Provider value={value}><WorkspaceGate key={session.user.id}>{children}</WorkspaceGate></AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <WorkspaceGate key={session.user.id}>{children}</WorkspaceGate>
+    </AuthContext.Provider>
+  );
 }
-

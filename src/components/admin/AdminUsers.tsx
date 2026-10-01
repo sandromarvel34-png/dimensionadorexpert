@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 import {
   CalendarClock,
   CheckCircle2,
@@ -9,13 +9,13 @@ import {
   UserRound,
   Users,
   XCircle,
-} from 'lucide-react';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { toast } from "sonner";
 
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/components/auth/AuthGate';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/auth/AuthGate";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type AdminUser = {
   id: string;
@@ -33,8 +33,8 @@ type AdminUser = {
   } | null;
   access: {
     user_id: string;
-    role: 'user' | 'admin';
-    status: 'active' | 'suspended';
+    role: "user" | "admin";
+    status: "active" | "suspended";
     plan: string;
     access_started_at: string;
     access_expires_at: string | null;
@@ -47,13 +47,13 @@ type Draft = {
   expires: string;
 };
 
-const toDateInput = (value: string | null | undefined) => value ? value.slice(0, 10) : '';
+const toDateInput = (value: string | null | undefined) => (value ? value.slice(0, 10) : "");
 
 const formatDate = (value: string | null) => {
-  if (!value) return 'Nunca';
-  return new Intl.DateTimeFormat('pt-BR', {
-    dateStyle: 'short',
-    timeStyle: 'short',
+  if (!value) return "Nunca";
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
   }).format(new Date(value));
 };
 
@@ -65,30 +65,37 @@ export function AdminUsers() {
   const { session, isAdmin } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState('');
+  const [updatingId, setUpdatingId] = useState("");
 
   const loadUsers = async () => {
     setLoading(true);
-    const { data, error } = await supabase.functions.invoke('admin-users', {
-      method: 'GET',
-    });
-
-    if (error || !data?.users) {
-      toast.error('Não foi possível carregar os usuários.');
+    const nextUsers: AdminUser[] = [];
+    try {
+      let page = 1;
+      let hasMore = true;
+      while (hasMore) {
+        const { data, error } = await supabase.functions.invoke(`admin-users?page=${page}`, {
+          method: "GET",
+        });
+        if (error || !Array.isArray(data?.users)) throw new Error("Falha ao carregar usuários.");
+        nextUsers.push(...(data.users as AdminUser[]));
+        hasMore = data.hasMore === true;
+        page++;
+      }
+    } catch {
+      toast.error("Não foi possível carregar os usuários.");
       setLoading(false);
       return;
     }
-
-    const nextUsers = data.users as AdminUser[];
     setUsers(nextUsers);
     setDrafts(
       Object.fromEntries(
         nextUsers.map((user) => [
           user.id,
           {
-            plan: user.access?.plan || 'Acesso padrão',
+            plan: user.access?.plan || "Acesso padrão",
             expires: toDateInput(user.access?.access_expires_at),
           },
         ]),
@@ -104,58 +111,63 @@ export function AdminUsers() {
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return users;
-    return users.filter((user) =>
-      user.email.toLowerCase().includes(term) ||
-      (user.profile?.full_name || '').toLowerCase().includes(term) ||
-      (user.profile?.profession || '').toLowerCase().includes(term),
+    return users.filter(
+      (user) =>
+        user.email.toLowerCase().includes(term) ||
+        (user.profile?.full_name || "").toLowerCase().includes(term) ||
+        (user.profile?.profession || "").toLowerCase().includes(term),
     );
   }, [users, search]);
 
-  const activeCount = users.filter((user) => user.access?.status === 'active' && !isExpired(user)).length;
-  const suspendedCount = users.filter((user) => user.access?.status === 'suspended').length;
-  const expiredCount = users.filter((user) => user.access?.status === 'active' && isExpired(user)).length;
+  const activeCount = users.filter(
+    (user) => user.access?.status === "active" && !isExpired(user),
+  ).length;
+  const suspendedCount = users.filter((user) => user.access?.status === "suspended").length;
+  const expiredCount = users.filter(
+    (user) => user.access?.status === "active" && isExpired(user),
+  ).length;
 
   const updateAccess = async (
     user: AdminUser,
     patch: {
-      status?: 'active' | 'suspended';
+      status?: "active" | "suspended";
       plan?: string;
       accessExpiresAt?: string | null;
     },
   ) => {
     setUpdatingId(user.id);
-    const { data, error } = await supabase.functions.invoke('admin-users', {
-      method: 'POST',
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      method: "POST",
       body: {
         userId: user.id,
         ...patch,
       },
     });
-    setUpdatingId('');
+    setUpdatingId("");
 
     if (error || data?.error) {
-      toast.error(data?.error || 'Não foi possível atualizar o acesso.');
+      toast.error(data?.error || "Não foi possível atualizar o acesso.");
       return;
     }
 
-    const access = data.access as AdminUser['access'];
+    const access = data.access as AdminUser["access"];
     setUsers((current) =>
-      current.map((item) => item.id === user.id ? { ...item, access } : item),
+      current.map((item) => (item.id === user.id ? { ...item, access } : item)),
     );
     setDrafts((current) => ({
       ...current,
       [user.id]: {
-        plan: access?.plan || 'Acesso padrão',
+        plan: access?.plan || "Acesso padrão",
         expires: toDateInput(access?.access_expires_at),
       },
     }));
-    toast.success('Acesso atualizado.');
+    toast.success("Acesso atualizado.");
   };
 
   const saveDraft = async (user: AdminUser) => {
     const draft = drafts[user.id];
     await updateAccess(user, {
-      plan: draft?.plan || 'Acesso padrão',
+      plan: draft?.plan || "Acesso padrão",
       accessExpiresAt: draft?.expires ? new Date(`${draft.expires}T23:59:59`).toISOString() : null,
     });
   };
@@ -164,8 +176,8 @@ export function AdminUsers() {
     const expires = new Date();
     expires.setMonth(expires.getMonth() + 6);
     await updateAccess(user, {
-      status: 'active',
-      plan: 'Acesso 6 meses',
+      status: "active",
+      plan: "Acesso 6 meses",
       accessExpiresAt: expires.toISOString(),
     });
   };
@@ -189,7 +201,7 @@ export function AdminUsers() {
           <p>Controle contas, períodos de acesso e bloqueios do Dimensionador Expert.</p>
         </div>
         <Button variant="outline" onClick={() => void loadUsers()} disabled={loading}>
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
           Atualizar
         </Button>
       </div>
@@ -228,8 +240,11 @@ export function AdminUsers() {
           <div className="divide-y divide-slate-100">
             {filtered.map((user) => {
               const expired = isExpired(user);
-              const suspended = user.access?.status === 'suspended';
-              const draft = drafts[user.id] || { plan: user.access?.plan || '', expires: toDateInput(user.access?.access_expires_at) };
+              const suspended = user.access?.status === "suspended";
+              const draft = drafts[user.id] || {
+                plan: user.access?.plan || "",
+                expires: toDateInput(user.access?.access_expires_at),
+              };
               const isSelf = user.id === session.user.id;
               const busy = updatingId === user.id;
 
@@ -244,10 +259,12 @@ export function AdminUsers() {
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="font-bold text-slate-900 truncate">
-                              {user.profile?.full_name || 'Usuário sem nome'}
+                              {user.profile?.full_name || "Usuário sem nome"}
                             </p>
-                            {user.access?.role === 'admin' && (
-                              <span className="status-pill bg-violet-50 text-violet-700">Administrador</span>
+                            {user.access?.role === "admin" && (
+                              <span className="status-pill bg-violet-50 text-violet-700">
+                                Administrador
+                              </span>
                             )}
                           </div>
                           <p className="text-sm text-slate-500 truncate">{user.email}</p>
@@ -256,18 +273,24 @@ export function AdminUsers() {
                       <div className="grid grid-cols-2 gap-3 mt-4 text-xs">
                         <div>
                           <p className="text-slate-400">Cadastro</p>
-                          <p className="font-semibold text-slate-600 mt-1">{formatDate(user.createdAt)}</p>
+                          <p className="font-semibold text-slate-600 mt-1">
+                            {formatDate(user.createdAt)}
+                          </p>
                         </div>
                         <div>
                           <p className="text-slate-400">Último acesso</p>
-                          <p className="font-semibold text-slate-600 mt-1">{formatDate(user.lastSignInAt)}</p>
+                          <p className="font-semibold text-slate-600 mt-1">
+                            {formatDate(user.lastSignInAt)}
+                          </p>
                         </div>
                       </div>
                     </div>
 
                     <div className="xl:flex-1 grid md:grid-cols-[1fr_180px_auto] gap-3 items-end">
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-500">Plano / acesso</label>
+                        <label className="text-xs font-semibold text-slate-500">
+                          Plano / acesso
+                        </label>
                         <Input
                           value={draft.plan}
                           onChange={(event) =>
@@ -291,8 +314,12 @@ export function AdminUsers() {
                           }
                         />
                       </div>
-                      <Button variant="outline" onClick={() => void saveDraft(user)} disabled={busy}>
-                        {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Salvar'}
+                      <Button
+                        variant="outline"
+                        onClick={() => void saveDraft(user)}
+                        disabled={busy}
+                      >
+                        {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Salvar"}
                       </Button>
                     </div>
                   </div>
@@ -301,33 +328,44 @@ export function AdminUsers() {
                     <span
                       className={`status-pill ${
                         suspended
-                          ? 'bg-red-50 text-red-700'
+                          ? "bg-red-50 text-red-700"
                           : expired
-                            ? 'bg-amber-50 text-amber-700'
-                            : 'bg-emerald-50 text-emerald-700'
+                            ? "bg-amber-50 text-amber-700"
+                            : "bg-emerald-50 text-emerald-700"
                       }`}
                     >
-                      {suspended ? 'Suspenso' : expired ? 'Expirado' : 'Ativo'}
+                      {suspended ? "Suspenso" : expired ? "Expirado" : "Ativo"}
                     </span>
                     <span className="text-xs text-slate-400">
-                      {user.emailConfirmedAt ? 'E-mail confirmado' : 'E-mail pendente'}
+                      {user.emailConfirmedAt ? "E-mail confirmado" : "E-mail pendente"}
                     </span>
                     <div className="sm:ml-auto flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" onClick={() => void grantSixMonths(user)} disabled={busy}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => void grantSixMonths(user)}
+                        disabled={busy}
+                      >
                         Liberar 6 meses
                       </Button>
                       {suspended ? (
-                        <Button size="sm" onClick={() => void updateAccess(user, { status: 'active' })} disabled={busy}>
+                        <Button
+                          size="sm"
+                          onClick={() => void updateAccess(user, { status: "active" })}
+                          disabled={busy}
+                        >
                           Reativar acesso
                         </Button>
                       ) : (
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => void updateAccess(user, { status: 'suspended' })}
+                          onClick={() => void updateAccess(user, { status: "suspended" })}
                           disabled={busy || isSelf}
                           className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                          title={isSelf ? 'Você não pode suspender a própria conta.' : 'Suspender acesso'}
+                          title={
+                            isSelf ? "Você não pode suspender a própria conta." : "Suspender acesso"
+                          }
                         >
                           Suspender
                         </Button>

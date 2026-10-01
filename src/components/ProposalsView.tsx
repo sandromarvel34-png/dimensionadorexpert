@@ -1,59 +1,61 @@
-import { useMemo, useState } from 'react';
-import { useAppStore } from '@/lib/store';
-import { generateCommercialProposalPdf, generateDescriptiveMemorialPdf } from '@/lib/pdf/generateProposalPdf';
-import { Copy, FileText, Pencil, Printer, Search, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-import type { ProposalStatus, SavedProposal } from '@/types';
+import { useMemo, useState } from "react";
+import { useAppStore } from "@/lib/store";
+import {
+  generateCommercialProposalPdf,
+  generateDescriptiveMemorialPdf,
+} from "@/lib/pdf/generateProposalPdf";
+import { Copy, FileText, Pencil, Printer, Search, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import type { ProposalStatus, SavedProposal } from "@/types";
 
 const statusLabel: Record<ProposalStatus, string> = {
-  rascunho: 'Rascunho',
-  enviada: 'Enviada',
-  aprovada: 'Aprovada',
-  recusada: 'Recusada',
+  rascunho: "Rascunho",
+  enviada: "Enviada",
+  aprovada: "Aprovada",
+  recusada: "Recusada",
 };
 
 const statusClass: Record<ProposalStatus, string> = {
-  rascunho: 'border-slate-200 bg-slate-50 text-slate-700',
-  enviada: 'border-blue-200 bg-blue-50 text-blue-700',
-  aprovada: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-  recusada: 'border-red-200 bg-red-50 text-red-700',
+  rascunho: "border-slate-200 bg-slate-50 text-slate-700",
+  enviada: "border-blue-200 bg-blue-50 text-blue-700",
+  aprovada: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  recusada: "border-red-200 bg-red-50 text-red-700",
 };
 
 const money = (value: number) =>
-  value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export const ProposalsView = () => {
-  const {
-    proposals,
-    openProposal,
-    duplicateProposal,
-    deleteProposal,
-    setProposalStatus,
-  } = useAppStore();
+  const { proposals, openProposal, duplicateProposal, deleteProposal, setProposalStatus } =
+    useAppStore();
 
-  const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<'todas' | ProposalStatus>('todas');
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<"todas" | ProposalStatus>("todas");
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return proposals
-      .filter(item => filter === 'todas' || item.status === filter)
-      .filter(item => {
+      .filter((item) => filter === "todas" || item.status === filter)
+      .filter((item) => {
         if (!normalized) return true;
         return [
           item.clientData.name,
           item.clientData.doc,
           item.commercialData.serviceDescription,
           item.selectedManufacturer,
-        ].some(value => String(value || '').toLowerCase().includes(normalized));
+        ].some((value) =>
+          String(value || "")
+            .toLowerCase()
+            .includes(normalized),
+        );
       })
       .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt));
   }, [proposals, query, filter]);
 
-  const approved = proposals.filter(item => item.status === 'aprovada').length;
-  const sent = proposals.filter(item => item.status === 'enviada').length;
+  const approved = proposals.filter((item) => item.status === "aprovada").length;
+  const sent = proposals.filter((item) => item.status === "enviada").length;
   const totalApproved = proposals
-    .filter(item => item.status === 'aprovada')
+    .filter((item) => item.status === "aprovada")
     .reduce((sum, item) => sum + (item.total || 0), 0);
 
   const pdfData = (proposal: SavedProposal) => ({
@@ -69,24 +71,28 @@ export const ProposalsView = () => {
     currentResults: proposal.currentResults,
   });
 
-  const handlePrint = async (proposal: SavedProposal, type: 'proposal' | 'memorial') => {
+  const handlePrint = async (proposal: SavedProposal, type: "proposal" | "memorial") => {
     try {
-      if (type === 'proposal') {
-        await generateCommercialProposalPdf({ data: pdfData(proposal), action: 'print' });
+      if (type === "proposal") {
+        await generateCommercialProposalPdf({ data: pdfData(proposal), action: "print" });
       } else {
-        await generateDescriptiveMemorialPdf({ data: pdfData(proposal), action: 'print' });
+        await generateDescriptiveMemorialPdf({ data: pdfData(proposal), action: "print" });
       }
     } catch (error) {
       console.error(error);
-      toast.error('Não foi possível abrir o documento para impressão.');
+      toast.error("Não foi possível abrir o documento para impressão.");
     }
   };
 
   const handleDelete = async (proposal: SavedProposal) => {
-    const label = proposal.clientData.name || 'esta proposta';
+    const label = proposal.clientData.name || "esta proposta";
     if (!window.confirm(`Excluir a proposta de ${label}? Esta ação não pode ser desfeita.`)) return;
-    try { await deleteProposal(proposal.id); toast.success('Proposta excluída.'); }
-    catch { toast.error('Não foi possível excluir a proposta da conta.'); }
+    try {
+      await deleteProposal(proposal.id);
+      toast.success("Proposta excluída.");
+    } catch {
+      toast.error("Não foi possível excluir a proposta da conta.");
+    }
   };
 
   return (
@@ -122,27 +128,29 @@ export const ProposalsView = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               value={query}
-              onChange={e => setQuery(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar por cliente, documento ou serviço..."
               className="h-11 w-full rounded-[10px] border border-slate-300 bg-white pl-10 pr-4 text-sm focus:border-primary focus:ring-3 focus:ring-blue-100 outline-none"
             />
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {([
-              ['todas', 'Todas'],
-              ['rascunho', 'Rascunhos'],
-              ['enviada', `Enviadas ${sent ? `(${sent})` : ''}`],
-              ['aprovada', 'Aprovadas'],
-              ['recusada', 'Recusadas'],
-            ] as const).map(([value, label]) => (
+            {(
+              [
+                ["todas", "Todas"],
+                ["rascunho", "Rascunhos"],
+                ["enviada", `Enviadas ${sent ? `(${sent})` : ""}`],
+                ["aprovada", "Aprovadas"],
+                ["recusada", "Recusadas"],
+              ] as const
+            ).map(([value, label]) => (
               <button
                 key={value}
                 onClick={() => setFilter(value)}
                 className={`h-9 px-3 rounded-lg border text-sm font-semibold transition-all ${
                   filter === value
-                    ? 'border-primary bg-blue-50 text-primary'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                    ? "border-primary bg-blue-50 text-primary"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
                 }`}
               >
                 {label}
@@ -155,46 +163,58 @@ export const ProposalsView = () => {
           <div className="rounded-[16px] border border-dashed border-slate-300 bg-slate-50/60 py-14 px-6 text-center">
             <FileText className="w-8 h-8 text-slate-400 mx-auto" />
             <h3 className="font-semibold text-slate-900 mt-4">
-              {proposals.length === 0 ? 'Nenhuma proposta salva' : 'Nenhuma proposta encontrada'}
+              {proposals.length === 0 ? "Nenhuma proposta salva" : "Nenhuma proposta encontrada"}
             </h3>
             <p className="text-sm text-slate-500 mt-1">
               {proposals.length === 0
-                ? 'Clique em “Criar proposta comercial” após um dimensionamento. O rascunho será salvo automaticamente.'
-                : 'Altere a busca ou o filtro selecionado.'}
+                ? "Clique em “Criar proposta comercial” após um dimensionamento. O rascunho será salvo automaticamente."
+                : "Altere a busca ou o filtro selecionado."}
             </p>
           </div>
         ) : (
           <div className="space-y-3">
-            {filtered.map(proposal => (
-              <article key={proposal.id} className="rounded-[16px] border border-slate-200 bg-white p-4 md:p-5 hover:border-slate-300 transition-colors">
+            {filtered.map((proposal) => (
+              <article
+                key={proposal.id}
+                className="rounded-[16px] border border-slate-200 bg-white p-4 md:p-5 hover:border-slate-300 transition-colors"
+              >
                 <div className="grid grid-cols-1 xl:grid-cols-[1.3fr_0.7fr_auto] gap-5 xl:items-center">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-bold text-slate-950 truncate">
-                        {proposal.clientData.name || 'Cliente não informado'}
+                        {proposal.clientData.name || "Cliente não informado"}
                       </h3>
                       <span className={`status-pill ${statusClass[proposal.status]}`}>
                         {statusLabel[proposal.status]}
                       </span>
                     </div>
                     <p className="text-sm text-slate-600 mt-1 line-clamp-2">
-                      {proposal.commercialData.serviceDescription || 'Serviço sem descrição'}
+                      {proposal.commercialData.serviceDescription || "Serviço sem descrição"}
                     </p>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-slate-500">
-                      <span>Atualizada em {new Date(proposal.updatedAt).toLocaleDateString('pt-BR')}</span>
-                      <span>{proposal.currentInputs.power} {proposal.currentInputs.powerUnit} • {proposal.currentInputs.voltage} V</span>
+                      <span>
+                        Atualizada em {new Date(proposal.updatedAt).toLocaleDateString("pt-BR")}
+                      </span>
+                      <span>
+                        {proposal.currentInputs.power} {proposal.currentInputs.powerUnit} •{" "}
+                        {proposal.currentInputs.voltage} V
+                      </span>
                       <span>{proposal.selectedManufacturer}</span>
                     </div>
                   </div>
 
                   <div className="xl:text-right">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Valor</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                      Valor
+                    </p>
                     <p className="text-2xl font-bold text-slate-950 mt-1">
-                      {proposal.total > 0 ? money(proposal.total) : 'A definir'}
+                      {proposal.total > 0 ? money(proposal.total) : "A definir"}
                     </p>
                     <select
                       value={proposal.status}
-                      onChange={e => setProposalStatus(proposal.id, e.target.value as ProposalStatus)}
+                      onChange={(e) =>
+                        setProposalStatus(proposal.id, e.target.value as ProposalStatus)
+                      }
                       className="mt-2 h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700"
                     >
                       <option value="rascunho">Rascunho</option>
@@ -205,26 +225,46 @@ export const ProposalsView = () => {
                   </div>
 
                   <div className="flex flex-wrap xl:justify-end gap-2">
-                    <button onClick={() => openProposal(proposal.id)} className="btn-primary h-9 px-3 text-sm">
+                    <button
+                      onClick={() => openProposal(proposal.id)}
+                      className="btn-primary h-9 px-3 text-sm"
+                    >
                       <Pencil className="w-4 h-4" /> Abrir
                     </button>
-                    <button onClick={() => duplicateProposal(proposal.id)} className="btn-secondary h-9 px-3 text-sm" title="Duplicar">
+                    <button
+                      onClick={() => duplicateProposal(proposal.id)}
+                      className="btn-secondary h-9 px-3 text-sm"
+                      title="Duplicar"
+                    >
                       <Copy className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handlePrint(proposal, 'proposal')} className="btn-secondary h-9 px-3 text-sm" title="Imprimir proposta ou salvar como PDF">
+                    <button
+                      onClick={() => handlePrint(proposal, "proposal")}
+                      className="btn-secondary h-9 px-3 text-sm"
+                      title="Imprimir proposta ou salvar como PDF"
+                    >
                       <Printer className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleDelete(proposal)} className="h-9 px-3 rounded-[10px] border border-red-200 bg-white text-red-600 hover:bg-red-50 transition-colors" title="Excluir">
+                    <button
+                      onClick={() => handleDelete(proposal)}
+                      className="h-9 px-3 rounded-[10px] border border-red-200 bg-white text-red-600 hover:bg-red-50 transition-colors"
+                      title="Excluir"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-100">
-                  <button onClick={() => handlePrint(proposal, 'memorial')} className="text-xs font-semibold text-slate-600 hover:text-primary inline-flex items-center gap-1.5">
+                  <button
+                    onClick={() => handlePrint(proposal, "memorial")}
+                    className="text-xs font-semibold text-slate-600 hover:text-primary inline-flex items-center gap-1.5"
+                  >
                     <Printer className="w-3.5 h-3.5" /> Imprimir memorial
                   </button>
-                  <span className="text-xs text-slate-400">ou salvar como PDF pela janela de impressão</span>
+                  <span className="text-xs text-slate-400">
+                    ou salvar como PDF pela janela de impressão
+                  </span>
                 </div>
               </article>
             ))}
@@ -234,4 +274,3 @@ export const ProposalsView = () => {
     </div>
   );
 };
-
