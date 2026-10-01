@@ -1,3 +1,4 @@
+import { proposalTotals } from "../proposal/validation";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json, Tables } from "@/integrations/supabase/types";
 import type { CalculationInputs, CalculationResults, CompanyProfile, SavedProposal } from "@/types";
@@ -154,6 +155,7 @@ export const workspaceRepository: WorkspaceRepository = {
     check(result.error);
   },
   async saveProposal(userId, proposal) {
+    proposal = { ...proposal, total: proposalTotals(proposal).total };
     const r = await supabase
       .from("proposals")
       .upsert(proposalToRow(userId, proposal), { onConflict: "id" })

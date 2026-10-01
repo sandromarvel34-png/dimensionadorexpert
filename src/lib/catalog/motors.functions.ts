@@ -19,7 +19,11 @@ export async function getMotorCatalogFilters() {
     throw new Error(
       "Catálogo de motores indisponível. Use os dados da placa no preenchimento manual.",
     );
-  return data ?? [];
+  if (!data?.length)
+    throw new Error(
+      "Nenhum motor com dados verificados está disponível. Informe os dados da placa.",
+    );
+  return data;
 }
 
 export async function getMotorsByFilter({ data }: { data: MotorFilter }) {

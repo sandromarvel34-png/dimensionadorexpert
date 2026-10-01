@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import {
   Building2,
   Camera,
@@ -11,15 +11,15 @@ import {
   Trash2,
   UserRound,
   Wrench,
-} from 'lucide-react';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { toast } from "sonner";
 
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/components/auth/AuthGate';
-import { useAppStore } from '@/lib/store';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/components/auth/AuthGate";
+import { useAppStore } from "@/lib/store";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type ProfileForm = {
   fullName: string;
@@ -42,29 +42,29 @@ type CompanyForm = {
 };
 
 const emptyProfile: ProfileForm = {
-  fullName: '',
-  phone: '',
-  profession: '',
-  cityState: '',
-  avatarPath: '',
+  fullName: "",
+  phone: "",
+  profession: "",
+  cityState: "",
+  avatarPath: "",
 };
 
 const formatDate = (value: string | null | undefined) => {
-  if (!value) return 'Sem vencimento definido';
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(new Date(value));
+  if (!value) return "Sem vencimento definido";
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short" }).format(new Date(value));
 };
 
 const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
+  new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
   }).format(value);
 
 const statusLabel: Record<string, string> = {
-  rascunho: 'Rascunho',
-  enviada: 'Enviada',
-  aprovada: 'Aprovada',
-  recusada: 'Recusada',
+  rascunho: "Rascunho",
+  enviada: "Enviada",
+  aprovada: "Aprovada",
+  recusada: "Recusada",
 };
 
 export function MyAccount() {
@@ -84,16 +84,28 @@ export function MyAccount() {
 
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState(false);
-  const legacyKey = 'calculadora-eletrica-pro-storage';
-  const legacyOwner = typeof window === 'undefined' ? null : window.localStorage.getItem(`${legacyKey}:import-owner`);
-  const hasLegacy = typeof window !== 'undefined' && !!window.localStorage.getItem(legacyKey) && (!legacyOwner || legacyOwner === session.user.id) && !window.localStorage.getItem(`dimensionador-workspace-v2:${session.user.id}:legacy-imported`);
+  const legacyKey = "calculadora-eletrica-pro-storage";
+  const legacyOwner =
+    typeof window === "undefined" ? null : window.localStorage.getItem(`${legacyKey}:import-owner`);
+  const hasLegacy =
+    typeof window !== "undefined" &&
+    !!window.localStorage.getItem(legacyKey) &&
+    (!legacyOwner || legacyOwner === session.user.id) &&
+    !window.localStorage.getItem(`dimensionador-workspace-v2:${session.user.id}:legacy-imported`);
   const recoverLegacy = async () => {
-    const confirmation = window.prompt(`Os dados antigos deste navegador não têm identificação de usuário. Confirme que pertencem à conta ${session.user.email}. Digite IMPORTAR para vinculá-los a esta conta.`);
-    if (confirmation !== 'IMPORTAR') return;
+    const confirmation = window.prompt(
+      `Os dados antigos deste navegador não têm identificação de usuário. Confirme que pertencem à conta ${session.user.email}. Digite IMPORTAR para vinculá-los a esta conta.`,
+    );
+    if (confirmation !== "IMPORTAR") return;
     setImporting(true);
-    try { await importLegacy(); toast.success('Dados antigos importados para sua conta.'); }
-    catch (error) { toast.error(error instanceof Error ? error.message : 'Falha ao importar. Tente novamente.'); }
-    finally { setImporting(false); }
+    try {
+      await importLegacy();
+      toast.success("Dados antigos importados para sua conta.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Falha ao importar. Tente novamente.");
+    } finally {
+      setImporting(false);
+    }
   };
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingCompany, setSavingCompany] = useState(false);
@@ -110,37 +122,39 @@ export function MyAccount() {
     cityState: companyProfile.cityState,
     website: companyProfile.website,
   });
-  const [avatarUrl, setAvatarUrl] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [passwordSaving, setPasswordSaving] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState("");
 
   const loadAvatar = async (path: string) => {
     if (!path) {
-      setAvatarUrl('');
+      setAvatarUrl("");
       return;
     }
-    const { data } = await supabase.storage.from('avatars').createSignedUrl(path, 60 * 60);
-    setAvatarUrl(data?.signedUrl || '');
+    const { data } = await supabase.storage.from("avatars").createSignedUrl(path, 60 * 60);
+    setAvatarUrl(data?.signedUrl || "");
   };
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const profileResult = await supabase.from('profiles')
-        .select('full_name,phone,profession,city_state,avatar_path')
-        .eq('user_id', session.user.id).maybeSingle();
+      const profileResult = await supabase
+        .from("profiles")
+        .select("full_name,phone,profession,city_state,avatar_path")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
 
-      if (profileResult.error) toast.error('Não foi possível carregar seu perfil.');
+      if (profileResult.error) toast.error("Não foi possível carregar seu perfil.");
 
       if (profileResult.data) {
         const nextProfile = {
-          fullName: profileResult.data.full_name || '',
-          phone: profileResult.data.phone || '',
-          profession: profileResult.data.profession || '',
-          cityState: profileResult.data.city_state || '',
-          avatarPath: profileResult.data.avatar_path || '',
+          fullName: profileResult.data.full_name || "",
+          phone: profileResult.data.phone || "",
+          profession: profileResult.data.profession || "",
+          cityState: profileResult.data.city_state || "",
+          avatarPath: profileResult.data.avatar_path || "",
         };
         setProfile(nextProfile);
         await loadAvatar(nextProfile.avatarPath);
@@ -152,6 +166,16 @@ export function MyAccount() {
     void load();
   }, [session.user.id]);
 
+  useEffect(() => {
+    const refresh = () => void loadAvatar(profile.avatarPath);
+    const timer = window.setInterval(refresh, 45 * 60 * 1000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [profile.avatarPath]);
+
   const daysRemaining = useMemo(() => {
     if (!access.access_expires_at) return null;
     const diff = new Date(access.access_expires_at).getTime() - Date.now();
@@ -159,7 +183,7 @@ export function MyAccount() {
   }, [access.access_expires_at]);
 
   const approvedProposals = useMemo(
-    () => proposals.filter((proposal) => proposal.status === 'aprovada'),
+    () => proposals.filter((proposal) => proposal.status === "aprovada"),
     [proposals],
   );
 
@@ -169,25 +193,22 @@ export function MyAccount() {
   );
 
   const recentProposals = useMemo(
-    () =>
-      [...proposals]
-        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-        .slice(0, 5),
+    () => [...proposals].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 5),
     [proposals],
   );
 
-  const initials = (profile.fullName || session.user.email || 'U')
+  const initials = (profile.fullName || session.user.email || "U")
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
-    .join('');
+    .join("");
 
   const saveProfile = async (event?: FormEvent) => {
     event?.preventDefault();
     setSavingProfile(true);
 
-    const { error } = await supabase.from('profiles').upsert(
+    const { error } = await supabase.from("profiles").upsert(
       {
         user_id: session.user.id,
         full_name: profile.fullName.trim() || null,
@@ -197,20 +218,20 @@ export function MyAccount() {
         avatar_path: profile.avatarPath || null,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: 'user_id' },
+      { onConflict: "user_id" },
     );
 
     setSavingProfile(false);
 
     if (error) {
-      toast.error('Não foi possível salvar o perfil.');
+      toast.error("Não foi possível salvar o perfil.");
       return;
     }
 
     await supabase.auth.updateUser({
       data: { full_name: profile.fullName.trim() },
     });
-    toast.success('Perfil atualizado.');
+    toast.success("Perfil atualizado.");
   };
 
   const saveCompany = async (event?: FormEvent) => {
@@ -220,74 +241,74 @@ export function MyAccount() {
     try {
       setCompanyProfile({ ...company });
       await useAppStore.getState().retrySync();
-      if (useAppStore.getState().pending.company) throw new Error('Salvamento pendente.');
-      toast.success('Dados profissionais atualizados.');
-    } catch { toast.error('Não foi possível salvar os dados profissionais na conta.'); }
-    finally { setSavingCompany(false); }
-
+      if (useAppStore.getState().pending.company) throw new Error("Salvamento pendente.");
+      toast.success("Dados profissionais atualizados.");
+    } catch {
+      toast.error("Não foi possível salvar os dados profissionais na conta.");
+    } finally {
+      setSavingCompany(false);
+    }
   };
 
   const uploadAvatar = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    event.target.value = '';
+    event.target.value = "";
     if (!file) return;
 
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      toast.error('Use uma imagem JPG, PNG ou WebP.');
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error("Use uma imagem JPG, PNG ou WebP.");
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      toast.error('A foto deve ter no máximo 2 MB.');
+      toast.error("A foto deve ter no máximo 2 MB.");
       return;
     }
 
     setAvatarBusy(true);
     const path = `${session.user.id}/avatar`;
     const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(path, file, { upsert: true, contentType: file.type, cacheControl: '3600' });
+      .from("avatars")
+      .upload(path, file, { upsert: true, contentType: file.type, cacheControl: "3600" });
 
     if (uploadError) {
       setAvatarBusy(false);
-      toast.error('Não foi possível enviar a foto.');
+      toast.error("Não foi possível enviar a foto.");
       return;
     }
 
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .upsert(
-        {
-          user_id: session.user.id,
-          avatar_path: path,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' },
-      );
+    const { error: profileError } = await supabase.from("profiles").upsert(
+      {
+        user_id: session.user.id,
+        avatar_path: path,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
 
     setAvatarBusy(false);
 
     if (profileError) {
-      toast.error('A foto foi enviada, mas não foi vinculada ao perfil.');
+      toast.error("A foto foi enviada, mas não foi vinculada ao perfil.");
       return;
     }
 
     setProfile((current) => ({ ...current, avatarPath: path }));
     await loadAvatar(path);
-    window.dispatchEvent(new Event('dimensionador-profile-updated'));
-    toast.success('Foto atualizada.');
+    window.dispatchEvent(new Event("dimensionador-profile-updated"));
+    toast.success("Foto atualizada.");
   };
 
   const changePassword = async (event: FormEvent) => {
     event.preventDefault();
-    setPasswordMessage('');
+    setPasswordMessage("");
 
     if (password.length < 6) {
-      setPasswordMessage('A senha deve ter pelo menos 6 caracteres.');
+      setPasswordMessage("A senha deve ter pelo menos 6 caracteres.");
       return;
     }
 
     if (password !== passwordConfirm) {
-      setPasswordMessage('As senhas não coincidem.');
+      setPasswordMessage("As senhas não coincidem.");
       return;
     }
 
@@ -296,46 +317,61 @@ export function MyAccount() {
     setPasswordSaving(false);
 
     if (error) {
-      setPasswordMessage('Não foi possível alterar a senha.');
+      setPasswordMessage("Não foi possível alterar a senha.");
       return;
     }
 
-    setPassword('');
-    setPasswordConfirm('');
-    setPasswordMessage('Senha alterada com sucesso.');
+    setPassword("");
+    setPasswordConfirm("");
+    setPasswordMessage("Senha alterada com sucesso.");
   };
 
   const clearCloudCalculations = async () => {
     const typed = window.prompt(
-      'Esta ação apagará todo o histórico de dimensionamentos. Digite ZERAR para confirmar.',
+      "Esta ação apagará todo o histórico de dimensionamentos. Digite ZERAR para confirmar.",
     );
-    if (typed !== 'ZERAR') return;
+    if (typed !== "ZERAR") return;
 
-    try { await clearCalculations(); } catch { toast.error('Não foi possível limpar os dimensionamentos.'); return; }
+    try {
+      await clearCalculations();
+    } catch {
+      toast.error("Não foi possível limpar os dimensionamentos.");
+      return;
+    }
 
-    toast.success('Histórico de dimensionamentos zerado.');
+    toast.success("Histórico de dimensionamentos zerado.");
   };
 
   const clearCloudProposals = async () => {
     const typed = window.prompt(
-      'Esta ação apagará todas as propostas. Digite EXCLUIR para confirmar.',
+      "Esta ação apagará todas as propostas. Digite EXCLUIR para confirmar.",
     );
-    if (typed !== 'EXCLUIR') return;
+    if (typed !== "EXCLUIR") return;
 
-    try { await clearProposals(); } catch { toast.error('Não foi possível excluir as propostas.'); return; }
+    try {
+      await clearProposals();
+    } catch {
+      toast.error("Não foi possível excluir as propostas.");
+      return;
+    }
 
-    toast.success('Propostas excluídas.');
+    toast.success("Propostas excluídas.");
   };
 
   const clearEverything = async () => {
     const typed = window.prompt(
-      'Esta ação apagará dimensionamentos, propostas e clientes. Digite ZERAR TUDO para confirmar.',
+      "Esta ação apagará dimensionamentos, propostas e clientes. Digite ZERAR TUDO para confirmar.",
     );
-    if (typed !== 'ZERAR TUDO') return;
+    if (typed !== "ZERAR TUDO") return;
 
-    try { await resetWorkspace(); } catch { toast.error('Não foi possível zerar todos os dados. Tente novamente.'); return; }
+    try {
+      await resetWorkspace();
+    } catch {
+      toast.error("Não foi possível zerar todos os dados. Tente novamente.");
+      return;
+    }
 
-    toast.success('Dados de trabalho zerados.');
+    toast.success("Dados de trabalho zerados.");
   };
 
   if (loading) {
@@ -364,6 +400,7 @@ export function MyAccount() {
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
+                  onError={() => setAvatarUrl("")}
                   alt="Foto do usuário"
                   className="w-24 h-24 rounded-full border border-slate-200 object-cover"
                 />
@@ -376,7 +413,11 @@ export function MyAccount() {
                 className="absolute bottom-0 right-0 flex w-9 h-9 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm hover:bg-slate-50"
                 aria-label="Alterar foto"
               >
-                {avatarBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+                {avatarBusy ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4" />
+                )}
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -389,14 +430,14 @@ export function MyAccount() {
 
             <div className="min-w-0">
               <h2 className="truncate text-xl font-bold text-slate-950">
-                {profile.fullName || 'Complete seu perfil'}
+                {profile.fullName || "Complete seu perfil"}
               </h2>
               <p className="mt-1 truncate text-sm text-slate-500">{session.user.email}</p>
               <p className="mt-2 text-sm font-semibold text-primary">
-                {profile.profession || 'Profissão não informada'}
+                {profile.profession || "Profissão não informada"}
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                {avatarBusy ? 'Enviando foto...' : 'JPG, PNG ou WebP • máximo 2 MB'}
+                {avatarBusy ? "Enviando foto..." : "JPG, PNG ou WebP • máximo 2 MB"}
               </p>
             </div>
           </div>
@@ -421,7 +462,7 @@ export function MyAccount() {
 
             <div className="space-y-1.5">
               <Label>E-mail</Label>
-              <Input value={session.user.email || ''} disabled />
+              <Input value={session.user.email || ""} disabled />
             </div>
 
             <div className="space-y-1.5">
@@ -443,8 +484,12 @@ export function MyAccount() {
 
             <div className="sm:col-span-2 flex items-center gap-3">
               <Button type="submit" disabled={savingProfile}>
-                {savingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                {savingProfile ? 'Salvando...' : 'Salvar perfil'}
+                {savingProfile ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                {savingProfile ? "Salvando..." : "Salvar perfil"}
               </Button>
             </div>
           </form>
@@ -458,7 +503,11 @@ export function MyAccount() {
 
           <dl className="mt-5 space-y-4 text-sm">
             <InfoRow label="Produto" value="Dimensionador Expert" />
-            <InfoRow label="Status" value={access.status === 'active' ? 'Ativo' : 'Suspenso'} strong />
+            <InfoRow
+              label="Status"
+              value={access.status === "active" ? "Ativo" : "Suspenso"}
+              strong
+            />
             <InfoRow label="Plano" value={access.plan} />
             <InfoRow label="Início do acesso" value={formatDate(access.access_started_at)} />
             <InfoRow label="Vencimento" value={formatDate(access.access_expires_at)} />
@@ -468,14 +517,24 @@ export function MyAccount() {
             <div className="mt-6 rounded-xl bg-blue-50 p-4">
               <span className="text-xs uppercase tracking-wide text-primary">Tempo restante</span>
               <div className="mt-1 text-2xl font-bold text-slate-950">
-                {daysRemaining} dia{daysRemaining === 1 ? '' : 's'}
+                {daysRemaining} dia{daysRemaining === 1 ? "" : "s"}
               </div>
             </div>
           )}
         </div>
       </section>
 
-      {hasLegacy && <section className="mt-6 section-card p-6"><h2 className="font-bold">Recuperar trabalho anterior</h2><p className="text-sm text-slate-500 mt-2">Existem dados antigos neste navegador. Importe apenas se pertencem a você.</p><Button className="mt-4" disabled={importing} onClick={() => void recoverLegacy()}>{importing ? 'Importando...' : 'Importar meus dados antigos'}</Button></section>}
+      {hasLegacy && (
+        <section className="mt-6 section-card p-6">
+          <h2 className="font-bold">Recuperar trabalho anterior</h2>
+          <p className="text-sm text-slate-500 mt-2">
+            Existem dados antigos neste navegador. Importe apenas se pertencem a você.
+          </p>
+          <Button className="mt-4" disabled={importing} onClick={() => void recoverLegacy()}>
+            {importing ? "Importando..." : "Importar meus dados antigos"}
+          </Button>
+        </section>
+      )}
       <section className="mt-6 section-card p-6">
         <div className="flex items-center gap-2">
           <Wrench className="w-5 h-5 text-primary" />
@@ -490,8 +549,12 @@ export function MyAccount() {
         </div>
 
         <div className="mt-5 flex flex-wrap gap-3">
-          <Button variant="outline" onClick={() => setView('dashboard')}>Ver dimensionamentos</Button>
-          <Button variant="outline" onClick={() => setView('proposals')}>Ver propostas</Button>
+          <Button variant="outline" onClick={() => setView("dashboard")}>
+            Ver dimensionamentos
+          </Button>
+          <Button variant="outline" onClick={() => setView("proposals")}>
+            Ver propostas
+          </Button>
         </div>
       </section>
 
@@ -506,13 +569,22 @@ export function MyAccount() {
 
         <form onSubmit={saveCompany} className="mt-5 grid gap-4 sm:grid-cols-2">
           <Field label="Empresa / nome profissional">
-            <Input value={company.companyName} onChange={(e) => setCompany({ ...company, companyName: e.target.value })} />
+            <Input
+              value={company.companyName}
+              onChange={(e) => setCompany({ ...company, companyName: e.target.value })}
+            />
           </Field>
           <Field label="CPF / CNPJ">
-            <Input value={company.document} onChange={(e) => setCompany({ ...company, document: e.target.value })} />
+            <Input
+              value={company.document}
+              onChange={(e) => setCompany({ ...company, document: e.target.value })}
+            />
           </Field>
           <Field label="Responsável">
-            <Input value={company.responsibleName} onChange={(e) => setCompany({ ...company, responsibleName: e.target.value })} />
+            <Input
+              value={company.responsibleName}
+              onChange={(e) => setCompany({ ...company, responsibleName: e.target.value })}
+            />
           </Field>
           <Field label="Registro profissional">
             <Input
@@ -522,26 +594,46 @@ export function MyAccount() {
             />
           </Field>
           <Field label="Telefone">
-            <Input value={company.phone} onChange={(e) => setCompany({ ...company, phone: e.target.value })} />
+            <Input
+              value={company.phone}
+              onChange={(e) => setCompany({ ...company, phone: e.target.value })}
+            />
           </Field>
           <Field label="E-mail profissional">
-            <Input type="email" value={company.email} onChange={(e) => setCompany({ ...company, email: e.target.value })} />
+            <Input
+              type="email"
+              value={company.email}
+              onChange={(e) => setCompany({ ...company, email: e.target.value })}
+            />
           </Field>
           <div className="space-y-1.5 sm:col-span-2">
             <Label>Endereço</Label>
-            <Input value={company.address} onChange={(e) => setCompany({ ...company, address: e.target.value })} />
+            <Input
+              value={company.address}
+              onChange={(e) => setCompany({ ...company, address: e.target.value })}
+            />
           </div>
           <Field label="Cidade / UF">
-            <Input value={company.cityState} onChange={(e) => setCompany({ ...company, cityState: e.target.value })} />
+            <Input
+              value={company.cityState}
+              onChange={(e) => setCompany({ ...company, cityState: e.target.value })}
+            />
           </Field>
           <Field label="Site / Instagram">
-            <Input value={company.website} onChange={(e) => setCompany({ ...company, website: e.target.value })} />
+            <Input
+              value={company.website}
+              onChange={(e) => setCompany({ ...company, website: e.target.value })}
+            />
           </Field>
 
           <div className="sm:col-span-2">
             <Button type="submit" disabled={savingCompany}>
-              {savingCompany ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              {savingCompany ? 'Salvando...' : 'Salvar dados profissionais'}
+              {savingCompany ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              {savingCompany ? "Salvando..." : "Salvar dados profissionais"}
             </Button>
           </div>
         </form>
@@ -560,13 +652,18 @@ export function MyAccount() {
         ) : (
           <div className="mt-4 divide-y divide-slate-100">
             {recentProposals.map((proposal) => (
-              <div key={proposal.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
+              <div
+                key={proposal.id}
+                className="flex flex-wrap items-center justify-between gap-3 py-4"
+              >
                 <div className="min-w-0">
                   <div className="text-xs font-bold uppercase tracking-wide text-primary">
                     {statusLabel[proposal.status] || proposal.status}
                   </div>
                   <div className="mt-1 truncate text-sm font-semibold text-slate-900">
-                    {proposal.clientData.name || proposal.commercialData.serviceDescription || 'Proposta sem identificação'}
+                    {proposal.clientData.name ||
+                      proposal.commercialData.serviceDescription ||
+                      "Proposta sem identificação"}
                   </div>
                   <div className="mt-1 text-xs text-slate-500">
                     {formatDate(proposal.updatedAt)} • {formatCurrency(Number(proposal.total || 0))}
@@ -614,7 +711,7 @@ export function MyAccount() {
             {passwordMessage && <p className="text-sm text-slate-500">{passwordMessage}</p>}
             <Button type="submit" variant="outline" disabled={passwordSaving}>
               {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-              {passwordSaving ? 'Alterando...' : 'Alterar senha'}
+              {passwordSaving ? "Alterando..." : "Alterar senha"}
             </Button>
           </form>
         </div>
@@ -625,8 +722,8 @@ export function MyAccount() {
             <h2 className="text-lg font-bold text-slate-950">Suporte</h2>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-slate-500">
-            Precisa de ajuda com acesso, pagamento ou funcionamento do Dimensionador Expert?
-            Utilize o canal de atendimento informado no momento da compra.
+            Precisa de ajuda com acesso, pagamento ou funcionamento do Dimensionador Expert? Utilize
+            o canal de atendimento informado no momento da compra.
           </p>
           <p className="mt-4 text-xs text-slate-400">
             Ao solicitar suporte, informe o e-mail cadastrado nesta conta: {session.user.email}.
@@ -685,20 +782,16 @@ function InfoRow({
   return (
     <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
       <dt className="text-slate-500">{label}</dt>
-      <dd className={`text-right ${strong ? 'font-bold text-primary' : 'font-semibold text-slate-800'}`}>
+      <dd
+        className={`text-right ${strong ? "font-bold text-primary" : "font-semibold text-slate-800"}`}
+      >
         {value}
       </dd>
     </div>
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
@@ -706,4 +799,3 @@ function Field({
     </div>
   );
 }
-

@@ -31,8 +31,8 @@ jobs:
       - name: Typecheck application
         run: pnpm run typecheck
 
-      - name: Lint account workspace
-        run: pnpm exec eslint src/lib/workspace src/lib/store.ts src/components/auth/WorkspaceGate.tsx
+      - name: Lint application
+        run: pnpm run lint
 
       - name: Build application
         run: pnpm run build

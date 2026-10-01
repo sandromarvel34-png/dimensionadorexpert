@@ -1,6 +1,6 @@
-export type MotorPhase = 'monofasico' | 'trifasico';
-export type PowerUnit = 'cv' | 'hp' | 'kW';
-export type StarterType = 'direta' | 'reversao' | 'estrelaTriangulo' | 'softStarter' | 'inversor';
+export type MotorPhase = "monofasico" | "trifasico";
+export type PowerUnit = "cv" | "hp" | "kW";
+export type StarterType = "direta" | "reversao" | "estrelaTriangulo" | "softStarter" | "inversor";
 
 export interface CompanyProfile {
   companyName: string;
@@ -14,10 +14,10 @@ export interface CompanyProfile {
   website: string;
   logoDataUrl: string;
   brandColor: string;
-  logoBackground: 'light' | 'dark' | 'brand';
+  logoBackground: "light" | "dark" | "brand";
 }
 
-export type ProposalStatus = 'rascunho' | 'enviada' | 'aprovada' | 'recusada';
+export type ProposalStatus = "rascunho" | "enviada" | "aprovada" | "recusada";
 
 export interface ProposalLineItem {
   id: string;
@@ -56,7 +56,7 @@ export interface SavedProposal {
     discount: number;
     validity: number;
   };
-  selectedManufacturer: 'WEG' | 'Siemens' | 'Schneider';
+  selectedManufacturer: "WEG" | "Siemens" | "Schneider";
   companyProfile: CompanyProfile;
   currentInputs: CalculationInputs;
   currentResults: CalculationResults;
@@ -73,12 +73,12 @@ export interface TechnicalReference {
 }
 
 export interface CalculationInputs {
-  dataSource: 'manual' | 'catalog';
+  dataSource: "manual" | "catalog";
   motorCatalogData?: {
     id: string;
-    manufacturer: 'WEG';
+    manufacturer: "WEG";
     line: string;
-    speedType: 'SINGLE' | 'DAHLANDER' | 'DOUBLE_WINDING';
+    speedType: "SINGLE" | "DAHLANDER" | "DOUBLE_WINDING";
     poles: string;
     model: string;
     nominalCurrent: number;
@@ -107,10 +107,11 @@ export interface CalculationInputs {
   ambientTemperature?: number;
   ambientTempFactor?: number; // legado/compatibilidade
   soilThermalResistivity?: number; // K.m/W, aplicável ao método D
-  buriedCableConfiguration?: 'unipolarDuct' | 'multipolarDuct';
+  buriedCableConfiguration?: "unipolarDuct" | "multipolarDuct";
   shortCircuitCurrentKA?: number; // corrente de falta presumida no ponto (kA)
   shortCircuitDurationSeconds?: number; // tempo de eliminação da falta (s), até 5 s
-  voltageDropArrangement?: 'auto' | 'adjacent' | 'multipolar' | 'spaced2D' | 'spaced13cm' | 'spaced20cm' | 'trefoil';
+  voltageDropArrangement?:
+    "auto" | "adjacent" | "multipolar" | "spaced2D" | "spaced13cm" | "spaced20cm" | "trefoil";
   powerFactor?: number;
   serviceFactor?: number;
   efficiency?: number;
@@ -119,7 +120,17 @@ export interface CalculationInputs {
 export interface ManufacturerProduct {
   id: string;
   manufacturer: string;
-  category: 'disjuntor' | 'fusivel' | 'contator' | 'releTermico' | 'releTempo' | 'disjuntorMotor' | 'cabo' | 'softStarter' | 'inverter' | 'auxiliar';
+  category:
+    | "disjuntor"
+    | "fusivel"
+    | "contator"
+    | "releTermico"
+    | "releTempo"
+    | "disjuntorMotor"
+    | "cabo"
+    | "softStarter"
+    | "inverter"
+    | "auxiliar";
   model: string;
   commercialCode: string;
   description: string;
@@ -132,15 +143,15 @@ export interface ManufacturerProduct {
   poles?: number;
   utilizationCategory?: string;
   breakingCapacityKA?: number;
-  verificationStatus?: 'verified-exact' | 'verified-family' | 'blocked';
+  verificationStatus?: "verified-exact" | "verified-family" | "blocked";
   catalogSource?: string;
   selectionNote?: string;
-  lifecycle?: 'active' | 'legacy' | 'phase-out';
+  lifecycle?: "active" | "legacy" | "phase-out";
   price?: number;
 }
 
 export interface TechnicalRequirement {
-  category: ManufacturerProduct['category'];
+  category: ManufacturerProduct["category"];
   current?: number;
   voltage?: number;
   quantity: number;
@@ -154,17 +165,18 @@ export interface CalculationResults {
   cableByVoltageDrop: number; // mm²
   finalCableSection: number; // mm²
   voltageDropCalculated: number; // %
-  limitingCriterion: 'ampacity' | 'voltageDrop' | 'minimumSection' | 'shortCircuit';
+  limitingCriterion: "ampacity" | "voltageDrop" | "minimumSection" | "shortCircuit";
   correctionFactors?: {
     temperature: number;
     grouping: number;
     soilResistivity: number;
     combined: number;
   };
-  voltageDropModel?: 'resistiveApproximation' | 'acImpedanceRX';
+  voltageDropModel?: "resistiveApproximation" | "acImpedanceRX";
   voltageDropRequiredSectionTheoretical?: number;
   voltageDropPreliminaryCommercialSection?: number;
-  voltageDropArrangementUsed?: 'adjacent' | 'multipolar' | 'spaced2D' | 'spaced13cm' | 'spaced20cm' | 'trefoil';
+  voltageDropArrangementUsed?:
+    "adjacent" | "multipolar" | "spaced2D" | "spaced13cm" | "spaced20cm" | "trefoil";
   voltageDropResistanceOhmKm?: number;
   voltageDropReactanceOhmKm?: number;
   cableByShortCircuit?: number;

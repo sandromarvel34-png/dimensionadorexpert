@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import katex from 'katex';
-import { cn } from '@/lib/utils';
+import React, { useMemo } from "react";
+import katex from "katex";
+import { cn } from "@/lib/utils";
 
 interface MathFormulaProps {
   children: string;
@@ -10,32 +10,34 @@ interface MathFormulaProps {
   title?: string;
 }
 
-export const MathFormula: React.FC<MathFormulaProps> = ({ 
-  children, 
-  className, 
+export const MathFormula: React.FC<MathFormulaProps> = ({
+  children,
+  className,
   displayMode = true,
   legend,
-  title
+  title,
 }) => {
   const html = useMemo(() => {
     try {
-      if (!children) return '';
+      if (!children) return "";
       return katex.renderToString(children, {
         displayMode,
         throwOnError: false,
-        output: 'html',
+        output: "html",
       });
     } catch (e) {
-      console.error('KaTeX rendering error:', e);
-      return typeof children === 'string' ? children : '';
+      console.error("KaTeX rendering error:", e);
+      return typeof children === "string" ? children : "";
     }
   }, [children, displayMode]);
 
   return (
-    <div className={cn(
-      "w-full bg-slate-950 text-white rounded-[16px] p-5 md:p-7 space-y-5 overflow-hidden border border-slate-800 shadow-sm relative",
-      className
-    )}>
+    <div
+      className={cn(
+        "w-full bg-slate-950 text-white rounded-[16px] p-5 md:p-7 space-y-5 overflow-hidden border border-slate-800 shadow-sm relative",
+        className,
+      )}
+    >
       {/* Background decoration */}
       <div className="absolute top-0 right-0 p-4 opacity-5 select-none pointer-events-none">
         <span className="text-8xl font-serif">∑</span>
@@ -48,9 +50,9 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
       )}
 
       <div className="w-full overflow-x-auto overflow-y-hidden custom-scrollbar py-3 flex justify-center items-center min-h-[88px]">
-        <div 
+        <div
           className="katex-formula text-base md:text-xl lg:text-2xl"
-          dangerouslySetInnerHTML={{ __html: html }} 
+          dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>
 
@@ -60,15 +62,15 @@ export const MathFormula: React.FC<MathFormulaProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6">
             {legend.map((item, idx) => (
               <div key={idx} className="flex items-center gap-2 py-1">
-                <span 
+                <span
                   className="italic text-primary font-bold text-sm min-w-[30px] inline-flex items-center"
-                  dangerouslySetInnerHTML={{ 
-                    __html: item.symbol ? katex.renderToString(item.symbol, { throwOnError: false, output: 'html' }) : '' 
-                  }} 
+                  dangerouslySetInnerHTML={{
+                    __html: item.symbol
+                      ? katex.renderToString(item.symbol, { throwOnError: false, output: "html" })
+                      : "",
+                  }}
                 />
-                <span className="text-xs text-slate-400 font-medium">
-                  = {item.label}
-                </span>
+                <span className="text-xs text-slate-400 font-medium">= {item.label}</span>
               </div>
             ))}
           </div>

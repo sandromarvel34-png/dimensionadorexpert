@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { proposalTotals } from "../proposal/validation";
 import type {
   CalculationInputs,
   CalculationResults,
@@ -337,6 +338,7 @@ export function createWorkspaceStore(
         flushCompany(company);
       },
       saveProposal: (proposal) => {
+        proposal = { ...proposal, total: proposalTotals(proposal).total };
         context();
         set((s) => ({
           proposals: s.proposals.some((p) => p.id === proposal.id)

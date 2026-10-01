@@ -1,38 +1,46 @@
-import { CalculationEngine } from './CalculationEngine';
-import { findCompatibleProduct } from '../catalog';
+import type { CalculationInputs } from "@/types";
+import { CalculationEngine } from "./CalculationEngine";
+import { findCompatibleProduct } from "../catalog";
 
 export const generateAuditEvidence = () => {
-  const scenario = {
+  const scenario: CalculationInputs = {
+    dataSource: "manual",
+    quantity: 1,
     power: 75,
-    powerUnit: 'cv',
+    powerUnit: "cv",
     voltage: 220,
-    phase: 'trifasico',
+    phase: "trifasico",
     distance: 50,
-    starterType: 'direta',
+    starterType: "direta",
     maxVoltageDrop: 2,
-    preferredManufacturer: 'any',
-    installationMethod: 'B1',
+    preferredManufacturer: "any",
+    installationMethod: "B1",
     groupingCount: 1,
     ambientTempFactor: 0.87, // 40°C
     powerFactor: 0.85,
-    serviceFactor: 1.10,
-    efficiency: 0.90
+    serviceFactor: 1.1,
+    efficiency: 0.9,
   };
 
   const In = CalculationEngine.calculateNominalCurrent(
-    scenario.power, scenario.powerUnit, scenario.voltage, scenario.phase, scenario.powerFactor, scenario.efficiency
+    scenario.power,
+    scenario.powerUnit,
+    scenario.voltage,
+    scenario.phase,
+    scenario.powerFactor,
+    scenario.efficiency,
   );
-  const Ib = In * scenario.serviceFactor;
+  const Ib = In * (scenario.serviceFactor ?? 1);
   const fCorr = 0.87 * 1.0; // temp * agrup
   const I_corrigida = Ib / fCorr;
 
   // Encontra disjuntor
-  const breaker = findCompatibleProduct('disjuntor', Ib, 'WEG');
+  const breaker = findCompatibleProduct("disjuntor", Ib, "WEG");
   const In_disj = breaker ? breaker.nominalCurrent : Ib;
 
-  const results = CalculationEngine.performFullCalculation(scenario as any);
+  const results = CalculationEngine.performFullCalculation(scenario);
 
-  console.log('--- EVIDÊNCIA DE AUDITORIA TÉCNICA ---');
+  console.log("--- EVIDÊNCIA DE AUDITORIA TÉCNICA ---");
   console.log(`Motor: ${scenario.power}CV / ${scenario.voltage}V`);
   console.log(`In: ${In.toFixed(2)} A`);
   console.log(`Ib (In * FS): ${Ib.toFixed(2)} A`);
@@ -41,7 +49,7 @@ export const generateAuditEvidence = () => {
   console.log(`Critério Ib <= In_disj <= Iz: ${Ib.toFixed(2)} <= ${In_disj} <= Iz`);
   console.log(`Bitola Final Calculada: ${results.finalCableSection} mm²`);
   console.log(`Queda de Tensão (rho=0.0213): ${results.voltageDropCalculated.toFixed(2)}%`);
-  console.log('--------------------------------------');
+  console.log("--------------------------------------");
 };
 
 generateAuditEvidence();

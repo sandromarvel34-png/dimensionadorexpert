@@ -78,9 +78,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Dimensionador Expert — Academia do Eletricista" },
-      { name: "description", content: "Dimensionamento de condutores e comandos elétricos industriais por Academia do Eletricista." },
+      {
+        name: "description",
+        content:
+          "Dimensionamento de condutores e comandos elétricos industriais por Academia do Eletricista.",
+      },
       { property: "og:title", content: "Dimensionador Expert — Academia do Eletricista" },
-      { property: "og:description", content: "Dimensionamento de condutores e comandos elétricos industriais por Academia do Eletricista." },
+      {
+        property: "og:description",
+        content:
+          "Dimensionamento de condutores e comandos elétricos industriais por Academia do Eletricista.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -89,7 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "icon", href: "/favicon.ico?v=7100a9519932", type: "image/x-icon" },
       {
         rel: "stylesheet",
         href: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css",
