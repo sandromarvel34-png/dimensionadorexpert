@@ -17,8 +17,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+export type UserAccess = {
+  role: 'user' | 'admin';
+  status: 'active' | 'suspended';
+  plan: string;
+  access_started_at: string;
+  access_expires_at: string | null;
+};
+
 type AuthContextValue = {
   session: Session;
+  access: UserAccess;
+  isAdmin: boolean;
+  refreshAccess: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -379,9 +390,49 @@ function UpdatePasswordScreen({ onDone }: { onDone: () => void }) {
   );
 }
 
+function AccessBlockedScreen({
+  reason,
+  signOut,
+}: {
+  reason: 'suspended' | 'expired' | 'missing';
+  signOut: () => Promise<void>;
+}) {
+  const copy = reason === 'suspended'
+    ? {
+        title: 'Acesso suspenso',
+        description: 'Seu acesso ao Dimensionador Expert está suspenso. Entre em contato com o suporte para regularizar sua conta.',
+      }
+    : reason === 'expired'
+      ? {
+          title: 'Período de acesso encerrado',
+          description: 'O período contratado para esta conta terminou. Renove o acesso para continuar usando o Dimensionador Expert.',
+        }
+      : {
+          title: 'Acesso não liberado',
+          description: 'Sua conta foi criada, mas ainda não possui uma liberação de acesso válida.',
+        };
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-[20px] border border-slate-200 bg-white p-7 sm:p-8 shadow-sm text-center">
+        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto">
+          <LockKeyhole className="w-6 h-6 text-slate-600" />
+        </div>
+        <h1 className="text-2xl font-black tracking-tight text-slate-950 mt-5">{copy.title}</h1>
+        <p className="text-sm text-slate-500 mt-3 leading-relaxed">{copy.description}</p>
+        <Button onClick={() => void signOut()} variant="outline" className="w-full mt-6">
+          Sair da conta
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function AuthGate({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  const [access, setAccess] = useState<UserAccess | null>(null);
   const [loading, setLoading] = useState(true);
+  const [accessLoading, setAccessLoading] = useState(false);
   const [recovering, setRecovering] = useState(false);
 
   useEffect(() => {
@@ -395,6 +446,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (event === 'PASSWORD_RECOVERY') setRecovering(true);
       setSession(nextSession);
+      if (!nextSession) setAccess(null);
       setLoading(false);
     });
 
@@ -405,6 +457,28 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const refreshAccess = async () => {
+    if (!session?.user) {
+      setAccess(null);
+      return;
+    }
+
+    setAccessLoading(true);
+    const { data, error } = await supabase
+      .from('user_access')
+      .select('role,status,plan,access_started_at,access_expires_at')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[Auth] Não foi possível carregar o acesso do usuário.', error);
+      setAccess(null);
+    } else {
+      setAccess(data as UserAccess | null);
+    }
+    setAccessLoading(false);
+  };
 
   useEffect(() => {
     if (!session?.user) return;
@@ -424,20 +498,27 @@ export function AuthGate({ children }: { children: ReactNode }) {
         },
         { onConflict: 'user_id' },
       );
+
+    void refreshAccess();
   }, [session?.user.id]);
 
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) toast.error('Não foi possível sair da conta.');
+  };
+
   const value = useMemo<AuthContextValue | null>(() => {
-    if (!session) return null;
+    if (!session || !access) return null;
     return {
       session,
-      signOut: async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) toast.error('Não foi possível sair da conta.');
-      },
+      access,
+      isAdmin: access.role === 'admin',
+      refreshAccess,
+      signOut,
     };
-  }, [session]);
+  }, [session, access]);
 
-  if (loading) {
+  if (loading || (session && accessLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="text-center">
@@ -452,7 +533,17 @@ export function AuthGate({ children }: { children: ReactNode }) {
     return <UpdatePasswordScreen onDone={() => setRecovering(false)} />;
   }
 
-  if (!session || !value) return <AuthScreen />;
+  if (!session) return <AuthScreen />;
+
+  if (!access) return <AccessBlockedScreen reason="missing" signOut={signOut} />;
+  if (access.status === 'suspended') return <AccessBlockedScreen reason="suspended" signOut={signOut} />;
+
+  const expired = access.access_expires_at
+    ? new Date(access.access_expires_at).getTime() < Date.now()
+    : false;
+
+  if (expired) return <AccessBlockedScreen reason="expired" signOut={signOut} />;
+  if (!value) return <AccessBlockedScreen reason="missing" signOut={signOut} />;
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
