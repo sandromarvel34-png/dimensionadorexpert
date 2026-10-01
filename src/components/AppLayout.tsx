@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { FileText, FolderKanban, LayoutDashboard, LogOut, Menu, Plus, Settings, ShieldCheck, UserRound, X } from 'lucide-react';
 import logoAeAsset from '@/assets/logo-ae.png.asset.json';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 import { Dashboard } from './Dashboard';
 import { CalculatorWizard } from './CalculatorWizard';
 import { ResultsView } from './ResultsView';
@@ -20,6 +21,7 @@ export const AppLayout = () => {
   const { view, setView, currentResults } = useAppStore();
   const { session, access, signOut, isAdmin } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   const navigate = (target: MainView) => {
     setView(target);
@@ -49,6 +51,41 @@ export const AppLayout = () => {
   const accessExpires = access.access_expires_at
     ? new Date(access.access_expires_at).toLocaleDateString('pt-BR')
     : null;
+
+  useEffect(() => {
+    let active = true;
+
+    const loadAvatar = async () => {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('avatar_path')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (!active) return;
+
+      if (!profile?.avatar_path) {
+        setAvatarUrl('');
+        return;
+      }
+
+      const { data } = await supabase.storage
+        .from('avatars')
+        .createSignedUrl(profile.avatar_path, 60 * 60);
+
+      if (active) setAvatarUrl(data?.signedUrl || '');
+    };
+
+    const refreshAvatar = () => void loadAvatar();
+
+    void loadAvatar();
+    window.addEventListener('dimensionador-profile-updated', refreshAvatar);
+
+    return () => {
+      active = false;
+      window.removeEventListener('dimensionador-profile-updated', refreshAvatar);
+    };
+  }, [session.user.id]);
 
   return (
     <div className="min-h-screen bg-transparent">
@@ -92,8 +129,12 @@ export const AppLayout = () => {
 
             <details className="relative hidden md:block">
               <summary className="list-none cursor-pointer flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-2.5 py-2 hover:bg-slate-50 transition-colors">
-                <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">
-                  {initials}
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0">
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                  ) : (
+                    initials
+                  )}
                 </div>
                 <div className="max-w-[150px] text-left leading-tight">
                   <p className="truncate text-xs font-bold text-slate-800">{displayName}</p>
@@ -103,8 +144,12 @@ export const AppLayout = () => {
 
               <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700">
-                    {initials}
+                  <div className="w-11 h-11 rounded-full overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 shrink-0">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
+                    ) : (
+                      initials
+                    )}
                   </div>
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-slate-900">{displayName}</p>
