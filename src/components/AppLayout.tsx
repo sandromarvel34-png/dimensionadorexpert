@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { FileText, FolderKanban, LayoutDashboard, LogOut, Menu, Plus, X } from 'lucide-react';
+import { FileText, FolderKanban, LayoutDashboard, LogOut, Menu, Plus, ShieldCheck, UserRound, X } from 'lucide-react';
 import logoAeAsset from '@/assets/logo-ae.png.asset.json';
 import { cn } from '@/lib/utils';
 import { Dashboard } from './Dashboard';
@@ -11,12 +11,14 @@ import { ProposalsView } from './ProposalsView';
 import { Toaster } from '@/components/ui/sonner';
 import { EducationalFlow } from './educational/EducationalFlow';
 import { useAuth } from './auth/AuthGate';
+import { MyAccount } from './account/MyAccount';
+import { AdminUsers } from './admin/AdminUsers';
 
-type MainView = 'dashboard' | 'wizard' | 'results' | 'proposal' | 'proposals';
+type MainView = 'dashboard' | 'wizard' | 'results' | 'proposal' | 'proposals' | 'account' | 'admin';
 
 export const AppLayout = () => {
   const { view, setView, currentResults } = useAppStore();
-  const { signOut } = useAuth();
+  const { signOut, isAdmin } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navigate = (target: MainView) => {
@@ -28,6 +30,8 @@ export const AppLayout = () => {
     { label: 'Dashboard', target: 'dashboard', visible: true, icon: LayoutDashboard },
     { label: 'Propostas', target: 'proposals', visible: true, icon: FolderKanban },
     { label: 'Resultado', target: 'results', visible: !!currentResults, icon: FileText },
+    { label: 'Minha Conta', target: 'account', visible: true, icon: UserRound },
+    { label: 'Usuários', target: 'admin', visible: isAdmin, icon: ShieldCheck },
   ];
 
   return (
@@ -105,9 +109,11 @@ export const AppLayout = () => {
                 </button>
               );
             })}
-            <button onClick={() => navigate('wizard')} className="btn-primary w-full mt-2 h-11">
-              <Plus className="w-4 h-4" /> Novo dimensionamento
-            </button>
+            {view !== 'dashboard' && view !== 'wizard' && (
+              <button onClick={() => navigate('wizard')} className="btn-primary w-full mt-2 h-11">
+                <Plus className="w-4 h-4" /> Novo dimensionamento
+              </button>
+            )}
             <button
               onClick={() => {
                 setMobileOpen(false);
@@ -129,6 +135,8 @@ export const AppLayout = () => {
         {view === 'proposal' && currentResults && <ProposalFlow />}
         {view === 'proposals' && <ProposalsView />}
         {view === 'educational' && <EducationalFlow />}
+        {view === 'account' && <MyAccount />}
+        {view === 'admin' && isAdmin && <AdminUsers />}
       </main>
 
       <footer className="mt-16 border-t border-slate-200 bg-white/70">
