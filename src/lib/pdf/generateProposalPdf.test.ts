@@ -9,6 +9,7 @@ vi.mock("jspdf", async (importOriginal) => {
     jsPDF: class extends actual.jsPDF {
       constructor(options?: ConstructorParameters<typeof actual.jsPDF>[0]) {
         super(options);
+        vi.spyOn(this as jsPDF, "text");
         Object.defineProperty(this, "save", {
           value: () => {
             docs.push(this);
@@ -121,4 +122,24 @@ test("fecha janela reservada se a validação falhar", async () => {
   );
   expect(close).toHaveBeenCalled();
   expect(target.opener).toBeNull();
+});
+
+test("memorial identifica a corrente informada da placa", async () => {
+  const data = fixture();
+  data.currentInputs = { ...inputs, plateNominalCurrent: 18.5 };
+  data.currentResults = CalculationEngine.performFullCalculation(data.currentInputs);
+  docs.length = 0;
+  await generateDescriptiveMemorialPdf({ data });
+  expect(docs).toHaveLength(1);
+  const text = vi
+    .mocked(docs[0]!.text)
+    .mock.calls.flatMap((call) => (Array.isArray(call[0]) ? call[0] : [call[0]]))
+    .join(" ");
+  expect(text).toContain("informada da placa");
+  expect(text).toContain("18.50 A");
+  mkdirSync("/tmp/dimensionador-pdf-qa", { recursive: true });
+  writeFileSync(
+    "/tmp/dimensionador-pdf-qa/memorial-placa.pdf",
+    Buffer.from(docs[0]!.output("arraybuffer")),
+  );
 });

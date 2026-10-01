@@ -89,6 +89,18 @@ export class CalculationEngine {
       throw new Error("A queda de tensão admissível deve estar entre 0 e 4%.");
     }
 
+    if (
+      inputs.plateNominalCurrent !== undefined &&
+      (!Number.isFinite(inputs.plateNominalCurrent) || inputs.plateNominalCurrent <= 0)
+    ) {
+      throw new Error("Corrente nominal da placa deve ser maior que zero e finita.");
+    }
+    if (inputs.phase === "monofasico" && ["softStarter", "inversor"].includes(inputs.starterType)) {
+      throw new Error(
+        "Nesta versão, soft-starter e inversor são suportados apenas para motores trifásicos. Alimentação monofásica com motor trifásico exige seleção específica e não é suportada neste cálculo.",
+      );
+    }
+
     const pf = inputs.powerFactor ?? this.COS_PHI_DEFAULT;
     const eff = inputs.efficiency ?? this.EFFICIENCY_DEFAULT;
     const fs = inputs.serviceFactor ?? 1;
@@ -323,6 +335,8 @@ export class CalculationEngine {
       In = inputs.motorCatalogData.nominalCurrent;
       if (!Number.isFinite(In) || In <= 0)
         throw new Error("Corrente nominal do motor de catálogo inválida.");
+    } else if (inputs.plateNominalCurrent !== undefined) {
+      In = inputs.plateNominalCurrent;
     } else {
       In = this.calculateNominalCurrent(
         inputs.power,
@@ -559,6 +573,12 @@ export class CalculationEngine {
 
     return {
       nominalCurrent: In,
+      nominalCurrentSource:
+        inputs.dataSource === "catalog"
+          ? "catalog"
+          : inputs.plateNominalCurrent !== undefined
+            ? "plate"
+            : "estimated",
       cableByAmpacity: secAmp,
       cableByVoltageDrop: dropResult.selectedSection,
       finalCableSection: finalSection,

@@ -232,6 +232,8 @@ export const CalculatorWizard = () => {
         quantity: 1,
       };
     } else {
+      const plateText = String(formData.get("plateNominalCurrent") ?? "").trim();
+      const plateNominalCurrent = plateText ? Number(plateText) : undefined;
       const pf = parseFloat(formData.get("powerFactor") as string);
       const eff = parseFloat(formData.get("efficiency") as string);
 
@@ -246,6 +248,7 @@ export const CalculatorWizard = () => {
 
       inputs = {
         dataSource: "manual",
+        ...(plateNominalCurrent !== undefined ? { plateNominalCurrent } : {}),
         power: parseFloat(formData.get("power") as string),
         powerUnit: formData.get("powerUnit") as CalculationInputs["powerUnit"],
         voltage: parseFloat(formData.get("voltage") as string),
@@ -528,6 +531,21 @@ export const CalculatorWizard = () => {
                   </div>
 
                   <div className="space-y-3">
+                    <Label htmlFor="plateNominalCurrent">Corrente nominal da placa (A)</Label>
+                    <Input
+                      id="plateNominalCurrent"
+                      name="plateNominalCurrent"
+                      type="number"
+                      min="0.001"
+                      step="any"
+                      defaultValue={currentInputs?.plateNominalCurrent ?? ""}
+                      placeholder="Opcional: corrente na tensão e ligação utilizadas"
+                    />
+                    <p className="text-xs text-slate-500">
+                      Quando informada, esta corrente será usada no dimensionamento. Em branco, a
+                      corrente será estimada pela potência, tensão, fator de potência e rendimento.
+                      Informe o fator de potência da placa para a queda de tensão.
+                    </p>
                     <Label className="text-foreground font-semibold italic text-xs block text-muted-foreground mb-1">
                       Seu motor não é WEG? Informe os dados disponíveis na placa do motor.
                     </Label>
@@ -838,6 +856,9 @@ export const CalculatorWizard = () => {
 
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Tipo de partida</Label>
+                <p className="text-xs text-slate-500">
+                  Soft-starter e inversor: apenas motores e alimentação trifásicos nesta versão.
+                </p>
                 <Select name="starterType" defaultValue={currentInputs?.starterType || "direta"}>
                   <SelectTrigger className="h-12">
                     <SelectValue />
