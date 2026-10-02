@@ -757,9 +757,9 @@ const memorialPdf = createClientOnlyFn(
   },
 );
 
-const prepareOutput = (
-  generate: (request: ProposalPdfRequest) => Promise<void>,
-  request: ProposalPdfRequest,
+const prepareOutput = <T extends { action?: PdfOutputAction; printWindow?: Window | null }>(
+  generate: (request: T) => Promise<void>,
+  request: T,
 ) => {
   // Reserve the viewer during the original click, before imports or other awaits.
   let printWindow: Window | null = null;
@@ -786,60 +786,66 @@ export const generateDescriptiveMemorialPdf = createClientOnlyFn((request: Propo
 );
 
 export interface CalculationMemoryPdfRequest {
+  action?: PdfOutputAction;
+  printWindow?: Window | null;
   currentInputs: CalculationInputs;
   currentResults: CalculationResults;
   companyProfile: CompanyProfile;
 }
+const calculationMemoryPdf = createClientOnlyFn(async (request: CalculationMemoryPdfRequest) => {
+  const [{ jsPDF }, autoTableModule] = await Promise.all([
+    import("jspdf"),
+    import("jspdf-autotable"),
+  ]);
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
+  const data: ProposalPdfData = {
+    ...request,
+    clientData: { name: "", doc: "", phone: "", email: "" },
+    commercialData: { serviceDescription: "", technicianName: "", executingCompany: "" },
+    observations: "",
+    items: [],
+    labor: { hours: 0, rate: 0 },
+    costs: { travel: 0, others: 0, discount: 0, validity: 0 },
+    selectedManufacturer: "",
+  };
+  doc.setProperties({
+    title: "Memorial de cálculo - Dimensionador Expert",
+    author: companyName(request.companyProfile),
+    creator: "Dimensionador Expert",
+  });
+  addBrandedHeader(doc, data, "MEMORIAL DE CÁLCULO", "FÓRMULAS, DADOS E RESULTADOS", [
+    new Date().toLocaleDateString("pt-BR"),
+  ]);
+  let y = 46;
+  for (const section of buildCalculationMemory(request.currentInputs, request.currentResults)) {
+    y = ensureSpace(doc, data, y, 29, "MEMORIAL DE CÁLCULO");
+    y = sectionLabel(doc, request.companyProfile, section.title, y);
+    for (const line of section.lines) y = paragraph(doc, data, line, y + 2, "MEMORIAL DE CÁLCULO");
+  }
+  y = ensureSpace(doc, data, y, 35, "MEMORIAL DE CÁLCULO");
+  y = sectionLabel(doc, request.companyProfile, "Resumo do motor e do circuito", y);
+  autoTableModule.default(doc, {
+    startY: y,
+    body: serviceTechnicalRows(request.currentInputs, request.currentResults),
+    theme: "plain",
+    margin: { left: 14, right: 14, top: 22, bottom: 20 },
+    styles: { font: "helvetica", fontSize: 8, cellPadding: 2.2, textColor: NAVY },
+    columnStyles: { 0: { cellWidth: 64, fontStyle: "bold" }, 1: { cellWidth: 118 } },
+    alternateRowStyles: { fillColor: LIGHT },
+    didDrawPage: (tableData: HookData) => {
+      if (tableData.pageNumber > 1) addContinuationHeader(doc, data, "MEMORIAL DE CÁLCULO");
+    },
+  });
+  addFooters(doc, data, "Memorial de cálculo");
+  outputPdf(
+    doc,
+    `memorial-calculo-${filenamePart(String(request.currentInputs.power))}-${request.currentInputs.powerUnit}-${new Date().toISOString().slice(0, 10)}.pdf`,
+    request.action ?? "print",
+    request.printWindow,
+  );
+});
+
 export const generateCalculationMemoryPdf = createClientOnlyFn(
-  async (request: CalculationMemoryPdfRequest) => {
-    const [{ jsPDF }, autoTableModule] = await Promise.all([
-      import("jspdf"),
-      import("jspdf-autotable"),
-    ]);
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", compress: true });
-    const data: ProposalPdfData = {
-      ...request,
-      clientData: { name: "", doc: "", phone: "", email: "" },
-      commercialData: { serviceDescription: "", technicianName: "", executingCompany: "" },
-      observations: "",
-      items: [],
-      labor: { hours: 0, rate: 0 },
-      costs: { travel: 0, others: 0, discount: 0, validity: 0 },
-      selectedManufacturer: "",
-    };
-    doc.setProperties({
-      title: "Memorial de cálculo - Dimensionador Expert",
-      author: companyName(request.companyProfile),
-      creator: "Dimensionador Expert",
-    });
-    addBrandedHeader(doc, data, "MEMORIAL DE CÁLCULO", "FÓRMULAS, DADOS E RESULTADOS", [
-      new Date().toLocaleDateString("pt-BR"),
-    ]);
-    let y = 46;
-    for (const section of buildCalculationMemory(request.currentInputs, request.currentResults)) {
-      y = ensureSpace(doc, data, y, 29, "MEMORIAL DE CÁLCULO");
-      y = sectionLabel(doc, request.companyProfile, section.title, y);
-      for (const line of section.lines)
-        y = paragraph(doc, data, line, y + 2, "MEMORIAL DE CÁLCULO");
-    }
-    y = ensureSpace(doc, data, y, 35, "MEMORIAL DE CÁLCULO");
-    y = sectionLabel(doc, request.companyProfile, "Resumo do motor e do circuito", y);
-    autoTableModule.default(doc, {
-      startY: y,
-      body: serviceTechnicalRows(request.currentInputs, request.currentResults),
-      theme: "plain",
-      margin: { left: 14, right: 14, top: 22, bottom: 20 },
-      styles: { font: "helvetica", fontSize: 8, cellPadding: 2.2, textColor: NAVY },
-      columnStyles: { 0: { cellWidth: 64, fontStyle: "bold" }, 1: { cellWidth: 118 } },
-      alternateRowStyles: { fillColor: LIGHT },
-      didDrawPage: (tableData: HookData) => {
-        if (tableData.pageNumber > 1) addContinuationHeader(doc, data, "MEMORIAL DE CÁLCULO");
-      },
-    });
-    addFooters(doc, data, "Memorial de cálculo");
-    outputPdf(
-      doc,
-      `memorial-calculo-${filenamePart(String(request.currentInputs.power))}-${request.currentInputs.powerUnit}-${new Date().toISOString().slice(0, 10)}.pdf`,
-    );
-  },
+  (request: CalculationMemoryPdfRequest) =>
+    prepareOutput(calculationMemoryPdf, { ...request, action: request.action ?? "print" }),
 );
