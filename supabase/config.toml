@@ -1,1 +1,5 @@
-project_id = "eeqgcnrywplomqyuptqg"
+project_id = "dujirggwqffogqgdkbhr"
+
+# Greenn authenticates using X-Webhook-Token, validated inside the handler.
+[functions.greenn-webhook]
+verify_jwt = false
