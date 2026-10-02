@@ -1,3 +1,4 @@
+import { NAVY, SLATE, LIGHT, BORDER, hexToRgb } from "./pdfTheme";
 import { renderCalculationMemory } from "./renderCalculationMemory";
 import { serviceTechnicalRows } from "./calculationMemory";
 import { proposalTotals } from "../proposal/validation";
@@ -52,11 +53,6 @@ export interface ProposalPdfData {
   currentResults: CalculationResults;
 }
 
-const NAVY: [number, number, number] = [15, 23, 42];
-const SLATE: [number, number, number] = [71, 85, 105];
-const LIGHT: [number, number, number] = [248, 250, 252];
-const BORDER: [number, number, number] = [226, 232, 240];
-
 const money = (value: number) =>
   value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -73,15 +69,6 @@ const filenamePart = (value: string) =>
     .trim()
     .replace(/\s+/g, "-")
     .toLowerCase();
-
-const hexToRgb = (hex: string): [number, number, number] => {
-  const clean = /^#[0-9A-Fa-f]{6}$/.test(hex) ? hex.slice(1) : "2563EB";
-  return [
-    parseInt(clean.slice(0, 2), 16),
-    parseInt(clean.slice(2, 4), 16),
-    parseInt(clean.slice(4, 6), 16),
-  ];
-};
 
 const outputPdf = (
   doc: jsPDF,
