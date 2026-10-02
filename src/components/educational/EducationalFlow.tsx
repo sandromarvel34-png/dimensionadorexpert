@@ -1,8 +1,18 @@
 import { useState } from "react";
 import { useAppStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { BookOpen, ChevronLeft, ChevronRight, CheckCircle2, TriangleAlert } from "lucide-react";
+import {
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  TriangleAlert,
+  Download,
+} from "lucide-react";
 import { MathFormula } from "@/components/MathFormula";
+
+import { generateCalculationMemoryPdf } from "@/lib/pdf/generateProposalPdf";
+import { toast } from "sonner";
 
 const arrangementLabel: Record<string, string> = {
   adjacent: "Condutores carregados, justapostos",
@@ -14,8 +24,21 @@ const arrangementLabel: Record<string, string> = {
 };
 
 export const EducationalFlow = () => {
-  const { currentInputs, currentResults, setView } = useAppStore();
+  const { currentInputs, currentResults, companyProfile, setView } = useAppStore();
   const [step, setStep] = useState(1);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+  const handleGeneratePdf = async () => {
+    if (!currentInputs || !currentResults || generatingPdf) return;
+    setGeneratingPdf(true);
+    try {
+      await generateCalculationMemoryPdf({ currentInputs, currentResults, companyProfile });
+      toast.success("Memorial de cálculo gerado em PDF.");
+    } catch {
+      toast.error("Não foi possível gerar o memorial de cálculo. Tente novamente.");
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
 
   if (!currentInputs || !currentResults) return null;
 
@@ -407,9 +430,15 @@ export const EducationalFlow = () => {
               A capacidade de interrupção e a coordenação final da proteção permanecem como
               verificações do profissional.
             </p>
-            <Button onClick={() => setView("results")} className="mt-4">
-              Voltar aos resultados
-            </Button>
+            <div className="flex flex-wrap justify-center gap-3 mt-4">
+              <Button onClick={handleGeneratePdf} disabled={generatingPdf}>
+                <Download className="w-4 h-4 mr-2" />
+                {generatingPdf ? "Gerando PDF..." : "Gerar PDF da memória de cálculo"}
+              </Button>
+              <Button variant="outline" onClick={() => setView("results")}>
+                Voltar aos resultados
+              </Button>
+            </div>
           </div>
         );
 
