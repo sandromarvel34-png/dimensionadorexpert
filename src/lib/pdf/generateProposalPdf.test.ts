@@ -28,6 +28,7 @@ vi.mock("@tanstack/react-start", () => ({ createClientOnlyFn: (fn: unknown) => f
 import {
   generateCommercialProposalPdf,
   generateDescriptiveMemorialPdf,
+  generateCalculationMemoryPdf,
   type ProposalPdfData,
 } from "./generateProposalPdf";
 const inputs: CalculationInputs = {
@@ -148,4 +149,112 @@ test("fecha janela reservada se a validação falhar", async () => {
   );
   expect(close).toHaveBeenCalled();
   expect(target.opener).toBeNull();
+});
+
+const pdfText = (doc: jsPDF) =>
+  vi
+    .mocked(doc.text)
+    .mock.calls.flatMap((call) => (Array.isArray(call[0]) ? call[0] : [call[0]]))
+    .join(" ");
+test("memória de cálculo exporta fórmulas e valores para todas as partidas e monofásico", async () => {
+  mkdirSync("/tmp/dimensionador-pdf-qa", { recursive: true });
+  const scenarios: CalculationInputs[] = [
+    ...(["direta", "reversao", "estrelaTriangulo", "softStarter", "inversor"] as const).map(
+      (starterType) => ({ ...inputs, starterType }),
+    ),
+    { ...inputs, phase: "monofasico", voltage: 220 },
+    { ...inputs, shortCircuitCurrentKA: 5, shortCircuitDurationSeconds: 0.2 },
+    { ...inputs, power: 0.37, powerUnit: "kW", phase: "monofasico", voltage: 220 },
+    { ...inputs, powerUnit: "hp" },
+  ];
+  for (const [index, currentInputs] of scenarios.entries()) {
+    docs.length = 0;
+    const currentResults = CalculationEngine.performFullCalculation(currentInputs);
+    await generateCalculationMemoryPdf({
+      currentInputs,
+      currentResults,
+      companyProfile: fixture().companyProfile,
+    });
+    const doc = docs[0]!;
+    const text = pdfText(doc);
+    expect(text).toContain("In = P /");
+    expect(text).toContain("Ib = In x FS");
+    expect(text).toContain("Icorr = Ib / F");
+    expect(text).toContain("Iz,corr = Iz,tabela x F");
+    expect(text).toContain("dv% = 100 x dv / V");
+    expect(text).toContain("Sfinal = max");
+    expect(text).toContain(
+      currentResults.nominalCurrent.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+    );
+    expect(text).not.toMatch(/NaN|Infinity|undefined/);
+    if (currentInputs.starterType === "estrelaTriangulo")
+      expect(text).toContain("Iajuste = In / sqrt(3)");
+    if (currentResults.shortCircuitCheckPerformed) expect(text).toContain("Com k = 115");
+    else expect(text).toContain("Não realizada: Icc");
+    writeFileSync(
+      `/tmp/dimensionador-pdf-qa/memoria-${index}.pdf`,
+      Buffer.from(doc.output("arraybuffer")),
+    );
+  }
+});
+test("memória e memorial identificam o motor de catálogo e preservam sua corrente", async () => {
+  docs.length = 0;
+  const data = fixture();
+  data.currentInputs = {
+    ...inputs,
+    dataSource: "catalog",
+    starterType: "estrelaTriangulo",
+    motorCatalogData: {
+      id: "motor-test",
+      manufacturer: "WEG",
+      line: "W22",
+      speedType: "SINGLE",
+      poles: "4",
+      model: "W22 5 cv",
+      nominalCurrent: 8.75,
+      powerFactor: 0.85,
+      efficiency: 0.9,
+      power: 5,
+      powerUnit: "cv",
+      voltage: 380,
+      rpm: 1730,
+      frame: "100L",
+      catalogReference: "Catálogo W22",
+    },
+  };
+  data.currentResults = CalculationEngine.performFullCalculation(data.currentInputs);
+  await generateCalculationMemoryPdf({
+    currentInputs: data.currentInputs,
+    currentResults: data.currentResults,
+    companyProfile: data.companyProfile,
+  });
+  await generateDescriptiveMemorialPdf({ data });
+  for (const doc of docs) {
+    const text = pdfText(doc);
+    expect(text).toContain("WEG W22 5 cv");
+    expect(text).toContain("1730 rpm");
+    expect(text).toContain("100L");
+    expect(text).toContain("8,75 A");
+    expect(text).toContain("estrela-triângulo");
+    expect(text).toContain("40,00 m");
+  }
+  expect(pdfText(docs[0]!)).not.toContain("In = P /");
+  writeFileSync(
+    "/tmp/dimensionador-pdf-qa/memorial-motor-catalogo.pdf",
+    Buffer.from(docs[1]!.output("arraybuffer")),
+  );
+});
+test("memorial técnico independe dos valores comerciais", async () => {
+  docs.length = 0;
+  const data = fixture();
+  data.costs.discount = 999999;
+  await generateDescriptiveMemorialPdf({ data });
+  const text = pdfText(docs[0]!);
+  expect(text).toContain("Corrente de projeto (Ib)");
+  expect(text).toContain("Disjuntor principal / capacidade do cabo");
+  expect(text).not.toContain("999999");
+  expect(text).not.toContain("INVESTIMENTO TOTAL");
 });
