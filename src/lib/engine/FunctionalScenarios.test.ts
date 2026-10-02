@@ -100,13 +100,16 @@ describe("Dimensionador Expert — matriz funcional", () => {
     }
   });
 
-  test("não inclui automaticamente disjuntor principal, fusível e disjuntor-motor como conjunto obrigatório", () => {
+  test("inclui proteção principal e apresenta disjuntor-motor como alternativa ao relé térmico", () => {
     const result = CalculationEngine.performFullCalculation(triBase);
     const labels = result.technicalRequirements.map((item) => item.label);
 
-    expect(labels).not.toContain("Disjuntor do Circuito Principal (Força)");
+    expect(labels).toContain("Disjuntor do Circuito Principal (Força)");
     expect(labels).not.toContain("Fusíveis do Circuito Principal (Força)");
-    expect(labels).not.toContain("Disjuntor Motor");
+    expect(labels).toContain("Disjuntor Motor");
+    expect(
+      result.technicalRequirements.find((r) => r.category === "disjuntorMotor")?.isOptional,
+    ).toBe(true);
   });
 
   test("método D diferencia agrupamento unipolar e multipolar", () => {

@@ -36,6 +36,8 @@ export const EducationalFlow = () => {
   const ib = currentResults.nominalCurrent * fs;
   const combinedFactor = currentResults.correctionFactors?.combined ?? 1;
   const correctedCurrent = ib / combinedFactor;
+  const ampacityRequirement =
+    Math.max(ib, currentResults.principalBreakerCurrent ?? ib) / combinedFactor;
   const phaseFactor = currentInputs.phase === "trifasico" ? "\\sqrt{3}" : "1";
   const limitingLabel =
     currentResults.limitingCriterion === "ampacity"
@@ -126,20 +128,28 @@ export const EducationalFlow = () => {
             <p className="text-slate-600">
               Depois de obter a corrente corrigida, o sistema consulta a tabela de capacidade de
               condução correspondente ao método de instalação e ao número de condutores carregados.
-              A seção escolhida precisa ter capacidade de condução igual ou superior à corrente
-              corrigida.
+              A seção escolhida considera a corrente de projeto e a corrente nominal pré-selecionada
+              do disjuntor principal, aplicando os fatores de correção.
             </p>
             <MathFormula
               title="Critério da seção por ampacidade"
               legend={[
-                { symbol: "I_z", label: "Capacidade de condução de corrente da seção escolhida" },
+                {
+                  symbol: "I_{z,tabela}",
+                  label: "Capacidade de condução tabelada da seção escolhida",
+                },
+                {
+                  symbol: "I_{disj}",
+                  label: "Corrente nominal pré-selecionada do disjuntor principal",
+                },
+                { symbol: "F", label: "Produto dos fatores de correção" },
                 {
                   symbol: "I_{corr}",
                   label: "Corrente de projeto corrigida pelos fatores aplicáveis",
                 },
               ]}
             >
-              {`I_z \\geq I_{corr} = ${correctedCurrent.toFixed(2)}\\,A \\quad \\Rightarrow \\quad S_{amp} = ${currentResults.cableByAmpacity}\\,mm^2`}
+              {`I_{z,tabela} \\geq \\frac{\\max(I_b,I_{disj})}{F} = ${ampacityRequirement.toFixed(2)}\\,A \\quad \\Rightarrow \\quad S_{amp} = ${currentResults.cableByAmpacity}\\,mm^2`}
             </MathFormula>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg border">
@@ -308,11 +318,22 @@ export const EducationalFlow = () => {
                   Proteção principal ainda requer verificação complementar
                 </h3>
                 <p className="text-sm text-amber-900 mt-1">
-                  O aplicativo não seleciona automaticamente a proteção de curto-circuito sem Icc,
-                  Icu/Icn, curva e dados de coordenação. Isso evita apresentar uma proteção como
-                  “validada” sem os dados necessários.
+                  O disjuntor principal é pré-selecionado por corrente e número de polos,
+                  respeitando a capacidade do cabo. A seleção final ainda exige verificar Icc,
+                  Icu/Icn, curva de disparo, corrente de partida e coordenação.
                 </p>
               </div>
+            </div>
+            <div className="bg-white p-5 rounded-xl border">
+              <p className="font-semibold">Circuito principal</p>
+              <p className="text-sm text-slate-600 mt-2">
+                Corrente pré-selecionada:{" "}
+                {(currentResults.principalBreakerCurrent ?? ib).toFixed(1)} A.
+                {currentResults.cableCurrentCapacity !== undefined &&
+                  ` Capacidade corrigida do cabo: ${currentResults.cableCurrentCapacity.toFixed(1)} A.`}
+                {currentInputs.phase === "trifasico" &&
+                  " Disjuntor tripolar; o disjuntor-motor é apresentado como alternativa à proteção de sobrecarga por relé térmico nas partidas eletromecânicas."}
+              </p>
             </div>
             <div className="bg-white p-5 rounded-xl border">
               <p className="font-semibold">Circuito de comando</p>
@@ -330,18 +351,18 @@ export const EducationalFlow = () => {
         if (starter === "direta")
           lines.push(
             `1 contator com referência de corrente ≥ ${ib.toFixed(1)} A`,
-            `1 relé térmico cuja faixa cubra ${ib.toFixed(1)} A`,
+            `1 relé térmico cuja faixa cubra ${currentResults.nominalCurrent.toFixed(1)} A`,
           );
         if (starter === "reversao")
           lines.push(
             `2 contatores com referência de corrente ≥ ${ib.toFixed(1)} A`,
-            `1 relé térmico cuja faixa cubra ${ib.toFixed(1)} A`,
+            `1 relé térmico cuja faixa cubra ${currentResults.nominalCurrent.toFixed(1)} A`,
           );
         if (starter === "estrelaTriangulo")
           lines.push(
             `Contatores K1/K2: referência ≥ ${(ib * 0.58).toFixed(1)} A`,
             `Contator K3: referência ≥ ${(ib * 0.33).toFixed(1)} A`,
-            `Relé térmico: faixa cobrindo ${(ib * 0.58).toFixed(1)} A`,
+            `Relé térmico dentro do triângulo: faixa cobrindo ${(currentResults.nominalCurrent / Math.sqrt(3)).toFixed(1)} A; na linha, usar a corrente nominal do motor`,
             "Relé de tempo estrela-triângulo",
           );
         if (starter === "softStarter")

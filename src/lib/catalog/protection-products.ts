@@ -1,0 +1,162 @@
+import type { ManufacturerProduct } from "@/types";
+
+// Faixas e códigos transcritos dos catálogos oficiais WEG:
+// RW 50042397 p.9; MPW 50009822 p.14/16; MDW 50163783 p.20.
+// A conferência do SKU não equivale à coordenação do circuito.
+const overloadRanges: [number, number, string, string][] = [
+  [0.28, 0.4, "RW27-1D3-D004", "10045630"],
+  [0.43, 0.63, "RW27-1D3-C063", "10186032"],
+  [0.56, 0.8, "RW27-1D3-D008", "10186033"],
+  [0.8, 1.2, "RW27-1D3-D012", "10045631"],
+  [1.2, 1.8, "RW27-1D3-D018", "10045632"],
+  [1.8, 2.8, "RW27-1D3-D028", "10452548"],
+  [2.8, 4.0, "RW27-1D3-U004", "10452213"],
+  [4.0, 6.3, "RW27-1D3-D063", "10045633"],
+  [5.6, 8.0, "RW27-1D3-U008", "10452197"],
+  [7.0, 10.0, "RW27-1D3-U010", "10045634"],
+  [8.0, 12.5, "RW27-1D3-D125", "10452967"],
+  [10.0, 15.0, "RW27-1D3-U015", "10452384"],
+  [11.0, 17.0, "RW27-1D3-U017", "10452204"],
+  [15.0, 23.0, "RW27-1D3-U023", "10452205"],
+  [22.0, 32.0, "RW27-1D3-U032", "10452382"],
+  [25.0, 40.0, "RW67-1D3-U040", "10452216"],
+  [32.0, 50.0, "RW67-1D3-U050", "10452217"],
+  [25.0, 40.0, "RW67-2D3-U040", "10844133"],
+  [32.0, 50.0, "RW67-2D3-U050", "10186035"],
+  [40.0, 57.0, "RW67-2D3-U057", "10452201"],
+  [50.0, 63.0, "RW67-2D3-U063", "10452218"],
+  [57.0, 70.0, "RW67-2D3-U070", "10045635"],
+  [63.0, 80.0, "RW67-2D3-U080", "10045636"],
+  [63.0, 80.0, "RW117-1D3-U080", "10186370"],
+  [75.0, 97.0, "RW117-1D3-U097", "10410002"],
+  [90.0, 112.0, "RW117-1D3-U112", "10410003"],
+  [63.0, 80.0, "RW117-2D3-U080", "11033689"],
+  [75.0, 97.0, "RW117-2D3-U097", "10045646"],
+  [90.0, 112.0, "RW117-2D3-U112", "10410004"],
+  [100.0, 150.0, "RW317-1D3-U150", "10045647"],
+  [140.0, 215.0, "RW317-1D3-U215", "10410005"],
+  [200.0, 310.0, "RW317-1D3-U310", "10410006"],
+  [400.0, 600.0, "RW407-1D3-U600", "10452250"],
+  [560.0, 840.0, "RW407-1D3-U840", "10045637"],
+  [275, 420, "RW317-1D3-U420", "10410007"],
+];
+const motorBreakerRanges: [number, number, string, string][] = [
+  [0.1, 0.16, "MPW18-3-C016", "12429311"],
+  [0.16, 0.25, "MPW18-3-C025", "12429312"],
+  [0.25, 0.4, "MPW18-3-D004", "12429313"],
+  [0.4, 0.63, "MPW18-3-C063", "12429315"],
+  [0.63, 1.0, "MPW18-3-U001", "12429317"],
+  [1.0, 1.6, "MPW18-3-D016", "12429368"],
+  [1.6, 2.5, "MPW18-3-D025", "12429369"],
+  [2.5, 4.0, "MPW18-3-U004", "12429370"],
+  [4.0, 6.3, "MPW18-3-D063", "12429371"],
+  [12, 18, "MPW18-3-U018", "12429374"],
+  [32, 40, "MPW40-3-U040", "12382551"],
+];
+const breakerCodes: [number, string, string][] = [
+  [2, "14110147", "14110169"],
+  [4, "14110168", "14110170"],
+  [6, "14110023", "14110079"],
+  [10, "14110083", "14110084"],
+  [16, "14110098", "14110099"],
+  [20, "14110103", "14110104"],
+  [25, "14110108", "14110110"],
+  [32, "14110116", "14110118"],
+  [40, "14110124", "14110125"],
+  [50, "14110138", "14110139"],
+  [63, "14110142", "14110143"],
+  [80, "14849036", "14849121"],
+  [100, "14849037", "14849122"],
+  [125, "14849118", "14849123"],
+];
+const exact = { verificationStatus: "verified-exact", lifecycle: "active" } as const;
+
+const moldedCaseRatings: [number, string][] = [
+  [160, "DWB160"],
+  [200, "DWB250"],
+  [250, "DWB250"],
+  [320, "DWB400"],
+  [400, "DWB400"],
+  [500, "DWB800"],
+  [630, "DWB800"],
+  [800, "DWB800"],
+  [1000, "DWB1000"],
+  [1250, "DWB1600"],
+  [1600, "DWB1600"],
+];
+
+export const VERIFIED_PROTECTION_PRODUCTS: ManufacturerProduct[] = [
+  ...overloadRanges.map(([min, max, model, commercialCode]): ManufacturerProduct => ({
+    id: `weg-overload-${model.toLowerCase()}`,
+    manufacturer: "WEG",
+    category: "releTermico",
+    model,
+    commercialCode,
+    description: `Relé térmico ${model}, ${min}-${max} A`,
+    nominalCurrent: max,
+    adjustmentRange: { min, max },
+    poles: 3,
+    catalogSource: "WEG — RW 50042397, p.9",
+    ...exact,
+    selectionNote:
+      "Faixa de ajuste conferida. Confirmar a montagem no contator ou usar a base individual correspondente. Ajustar pela corrente do motor e pela posição do relé no circuito.",
+  })),
+  ...motorBreakerRanges.map(([min, max, model, commercialCode]): ManufacturerProduct => ({
+    id: `weg-motor-breaker-${model.toLowerCase()}`,
+    manufacturer: "WEG",
+    category: "disjuntorMotor",
+    model,
+    commercialCode,
+    description: `Disjuntor-motor ${model}, ${min}-${max} A`,
+    nominalCurrent: max,
+    adjustmentRange: { min, max },
+    poles: 3,
+    voltage: 690,
+    catalogSource: "WEG — MPW 50009822, p.14/16",
+    ...exact,
+    selectionNote:
+      "Confirmar capacidade de interrupção na tensão de uso, ajuste e coordenação com o contator. Pode substituir a proteção de sobrecarga por relé térmico.",
+  })),
+  ...breakerCodes.flatMap(([nominalCurrent, code2, code3]) =>
+    [2, 3].map((poles): ManufacturerProduct => ({
+      id: `weg-mdwh-d${nominalCurrent}-${poles}`,
+      manufacturer: "WEG",
+      category: "disjuntor",
+      model: `MDWH-D${nominalCurrent}-${poles}`,
+      commercialCode: poles === 2 ? code2 : code3,
+      description: `Minidisjuntor MDWH, ${poles} polos, curva D, ${nominalCurrent} A`,
+      nominalCurrent,
+      poles,
+      voltage: 440,
+      ...(nominalCurrent >= 6
+        ? {
+            breakingCapacityByVoltage: [
+              { voltage: 220, capacityKA: 15 },
+              { voltage: 400, capacityKA: 10 },
+              { voltage: 440, capacityKA: 7.5 },
+            ],
+          }
+        : {}),
+      catalogSource: "WEG — MDW 50163783, p.20",
+      ...exact,
+      selectionNote:
+        "Pré-seleção por corrente e polos. Confirmar curva, corrente de partida, capacidade de interrupção na tensão de uso e coordenação; para soft-starter/inversor seguir a tabela do equipamento.",
+    })),
+  ),
+  ...moldedCaseRatings.map(([nominalCurrent, model]): ManufacturerProduct => ({
+    id: `weg-dwb-reference-${nominalCurrent}`,
+    manufacturer: "WEG",
+    category: "disjuntor",
+    model: `${model} — ${nominalCurrent} A, 3P`,
+    commercialCode: "",
+    description: `Disjuntor em caixa moldada, referência ${model}, ${nominalCurrent} A, 3 polos`,
+    nominalCurrent,
+    poles: 3,
+    voltage: 690,
+    verificationStatus: "verified-family",
+    lifecycle: "active",
+    catalogSource: "WEG — Disjuntores em caixa moldada DW 50009825",
+    selectionNote:
+      "Família e corrente de referência. Confirmar variante de disparador, ajuste, Icu na tensão de uso e coordenação antes da especificação final.",
+  })),
+];

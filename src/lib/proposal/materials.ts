@@ -6,19 +6,24 @@ export function buildRequirementItems(
   results: CalculationResults,
   brand: Brand,
 ): ProposalLineItem[] {
-  return results.technicalRequirements.map((req, index) => {
+  return results.technicalRequirements.flatMap((req, index) => {
+    if (req.isOptional) return [];
     const product = results.compatibleProducts[req.label]?.[brand]?.[0];
     const reference =
       product?.verificationStatus === "verified-exact"
         ? `${product.model}${product.commercialCode ? ` — Ref. ${product.commercialCode}` : ""}`
-        : `referência a confirmar${req.current !== undefined ? ` — corrente requerida ${req.current.toFixed(1)} A` : ""}`;
-    return {
-      id: `requirement:${index}:${req.label}`,
-      desc: `${req.label} — ${brand} — ${reference}${product ? "" : " — sem produto compatível no catálogo"}`,
-      qtd: req.quantity,
-      unit: "un",
-      price: "",
-    };
+        : product
+          ? `${product.model} — referência comercial a confirmar`
+          : `referência a confirmar${req.current !== undefined ? ` — corrente requerida ${req.current.toFixed(1)} A` : ""}`;
+    return [
+      {
+        id: `requirement:${index}:${req.label}`,
+        desc: `${req.label} — ${brand} — ${reference}${product ? "" : " — sem produto compatível no catálogo"}`,
+        qtd: req.quantity,
+        unit: "un",
+        price: "",
+      },
+    ];
   });
 }
 

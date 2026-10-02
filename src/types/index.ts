@@ -143,6 +143,7 @@ export interface ManufacturerProduct {
   poles?: number;
   utilizationCategory?: string;
   breakingCapacityKA?: number;
+  breakingCapacityByVoltage?: { voltage: number; capacityKA: number }[];
   verificationStatus?: "verified-exact" | "verified-family" | "blocked";
   catalogSource?: string;
   selectionNote?: string;
@@ -151,6 +152,8 @@ export interface ManufacturerProduct {
 }
 
 export interface TechnicalRequirement {
+  poles?: number;
+  note?: string;
   category: ManufacturerProduct["category"];
   current?: number;
   voltage?: number;
@@ -162,6 +165,8 @@ export interface TechnicalRequirement {
 export interface CalculationResults {
   nominalCurrent: number;
   nominalCurrentSource?: "plate" | "catalog" | "estimated";
+  principalBreakerCurrent?: number;
+  cableCurrentCapacity?: number;
   cableByAmpacity: number; // mm²
   cableByVoltageDrop: number; // mm²
   finalCableSection: number; // mm²

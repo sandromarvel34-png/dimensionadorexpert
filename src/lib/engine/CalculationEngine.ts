@@ -4,7 +4,7 @@ import {
   ManufacturerProduct,
   TechnicalRequirement,
 } from "../../types";
-import { findCompatibleProduct, findCompatibleProducts } from "../catalog";
+import { findCompatibleProducts } from "../catalog";
 import { AMPACITY_TABLES_NBR5410 } from "./ampacity-tables";
 import {
   AIR_TEMPERATURE_FACTORS_PVC,
@@ -364,12 +364,15 @@ export class CalculationEngine {
     const mfr = inputs.preferredManufacturer === "any" ? undefined : inputs.preferredManufacturer;
 
     const numConductors: 2 | 3 = inputs.phase === "trifasico" ? 3 : 2;
-    // O cabo é dimensionado pela corrente de projeto corrigida. A proteção
-    // principal exige coordenação própria (Icc/Icu/curva/partida) e não é
-    // escolhida automaticamente sem esses dados.
+    // Pré-seleção de corrente nominal da proteção de força. A verificação
+    // de curva, Icu e coordenação permanece separada da seleção por corrente.
+    const principalBreakerCurrent = [
+      2, 4, 6, 10, 16, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250, 320, 400, 500, 630, 800,
+      1000, 1250, 1600,
+    ].find((rating) => rating >= Ib);
     const secAmp = this.getSectionByAmpacity(
       correctedCurrentForTable,
-      correctedCurrentForTable,
+      (principalBreakerCurrent ?? Ib) / combinedCorrectionFactor,
       method,
       numConductors,
     );
@@ -445,11 +448,34 @@ export class CalculationEngine {
     const requirements: TechnicalRequirement[] = [
       {
         category: "disjuntor",
+        current: principalBreakerCurrent ?? Ib,
+        poles: numConductors,
+        quantity: 1,
+        label: "Disjuntor do Circuito Principal (Força)",
+        note: "Pré-seleção por corrente e polos; verificar curva de disparo, corrente de partida, Icu/Icn e coordenação. Para acionamentos eletrônicos, seguir a tabela do fabricante.",
+      },
+      {
+        category: "disjuntor",
         current: 6,
         quantity: 1,
         label: "Disjuntor do Circuito Auxiliar (Comando)",
       },
     ];
+
+    const electromechanicalStarter = ["direta", "reversao", "estrelaTriangulo"].includes(
+      inputs.starterType,
+    );
+    if (inputs.phase === "trifasico" && electromechanicalStarter) {
+      requirements.push({
+        category: "disjuntorMotor",
+        current: In,
+        poles: 3,
+        quantity: 1,
+        label: "Disjuntor Motor",
+        isOptional: true,
+        note: "Alternativa à proteção de sobrecarga por relé térmico. Não somar automaticamente as duas soluções; confirmar ajuste, coordenação e montagem conforme o esquema escolhido.",
+      });
+    }
 
     if (inputs.starterType === "direta") {
       requirements.push({
@@ -460,7 +486,7 @@ export class CalculationEngine {
       });
       requirements.push({
         category: "releTermico",
-        current: Ib,
+        current: In,
         quantity: 1,
         label: "Relé Térmico",
       });
@@ -473,7 +499,7 @@ export class CalculationEngine {
       });
       requirements.push({
         category: "releTermico",
-        current: Ib,
+        current: In,
         quantity: 1,
         label: "Relé Térmico",
       });
@@ -492,7 +518,8 @@ export class CalculationEngine {
       });
       requirements.push({
         category: "releTermico",
-        current: Ib * 0.58,
+        current: In / Math.sqrt(3),
+        note: "Relé instalado dentro do triângulo: ajuste In/√3. Se instalado na linha, usar a corrente nominal In e selecionar outra faixa.",
         quantity: 1,
         label: "Relé Térmico",
       });
@@ -517,6 +544,10 @@ export class CalculationEngine {
       });
     }
 
+    const cableCapacity =
+      AMPACITY_TABLES_NBR5410.find(
+        (entry) => entry.method === method && entry.conductors === numConductors,
+      )!.table[finalSection]! * combinedCorrectionFactor;
     const compatibleProducts: Record<string, Record<string, ManufacturerProduct[]>> = {};
     requirements.forEach((req) => {
       const brandMap: Record<string, ManufacturerProduct[]> = {};
@@ -526,46 +557,57 @@ export class CalculationEngine {
           req.current ?? 0,
           brand,
           inputs.voltage,
-        );
+        )
+          .filter((product) => req.poles === undefined || product.poles === req.poles)
+          .filter((product) => {
+            if (
+              req.label !== "Disjuntor do Circuito Principal (Força)" ||
+              inputs.shortCircuitCurrentKA === undefined
+            )
+              return true;
+            const capacity = product.breakingCapacityByVoltage?.find(
+              (entry) => inputs.voltage <= entry.voltage,
+            )?.capacityKA;
+            return capacity === undefined || capacity >= inputs.shortCircuitCurrentKA;
+          })
+          .filter(
+            (product) =>
+              req.label !== "Disjuntor do Circuito Principal (Força)" ||
+              (product.nominalCurrent ?? Infinity) <= cableCapacity + 1e-9,
+          );
       });
       compatibleProducts[req.label] = brandMap;
     });
-
+    const selectedReferences = (label: string) => {
+      const candidates = compatibleProducts[label] ?? {};
+      return mfr
+        ? (Object.entries(candidates).find(
+            ([brand]) => brand.toLowerCase() === mfr.toLowerCase(),
+          )?.[1] ?? [])
+        : Object.values(candidates).flat();
+    };
+    const selectedReference = (label: string) => selectedReferences(label)[0] ?? null;
     const protections: CalculationResults["protections"] = {
-      breaker: null,
-      motorBreaker: null,
+      breaker: selectedReference("Disjuntor do Circuito Principal (Força)"),
+      motorBreaker: selectedReference("Disjuntor Motor"),
       diazedFuse: null,
       nhFuse: null,
-      thermalRelay:
-        findCompatibleProduct(
-          "releTermico",
-          inputs.starterType === "estrelaTriangulo" ? Ib * 0.58 : Ib,
-          mfr,
-          inputs.voltage,
-        ) ?? null,
-      contactor: findCompatibleProducts(
-        "contator",
-        inputs.starterType === "estrelaTriangulo" ? Ib * 0.58 : Ib,
-        mfr,
-        inputs.voltage,
+      thermalRelay: electromechanicalStarter ? selectedReference("Relé Térmico") : null,
+      contactor: selectedReferences(
+        inputs.starterType === "direta"
+          ? "Contator de Potência (K1)"
+          : "Contatores de Potência (K1, K2)",
       ),
-      timerRelay:
-        inputs.starterType === "estrelaTriangulo"
-          ? (findCompatibleProduct("releTempo", 0, mfr, inputs.voltage) ?? null)
-          : null,
-      softStarter:
-        inputs.starterType === "softStarter"
-          ? (findCompatibleProduct("softStarter", Ib, mfr, inputs.voltage) ?? null)
-          : null,
-      inverter:
-        inputs.starterType === "inversor"
-          ? (findCompatibleProduct("inverter", Ib, mfr, inputs.voltage) ?? null)
-          : null,
+      timerRelay: selectedReference("Relé de Tempo Estrela-Triângulo"),
+      softStarter: selectedReference("Soft-Starter"),
+      inverter: selectedReference("Inversor de Frequência"),
     };
 
     return {
       nominalCurrent: In,
       nominalCurrentSource: inputs.dataSource === "catalog" ? "catalog" : "estimated",
+      ...(principalBreakerCurrent !== undefined ? { principalBreakerCurrent } : {}),
+      cableCurrentCapacity: cableCapacity,
       cableByAmpacity: secAmp,
       cableByVoltageDrop: dropResult.selectedSection,
       finalCableSection: finalSection,

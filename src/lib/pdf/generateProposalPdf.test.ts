@@ -9,6 +9,7 @@ vi.mock("jspdf", async (importOriginal) => {
     jsPDF: class extends actual.jsPDF {
       constructor(options?: ConstructorParameters<typeof actual.jsPDF>[0]) {
         super(options);
+        vi.spyOn(this as jsPDF, "text");
         Object.defineProperty(this, "save", {
           value: () => {
             docs.push(this);
@@ -21,6 +22,7 @@ vi.mock("jspdf", async (importOriginal) => {
 });
 import { emptyCompany } from "../workspace/store";
 import { CalculationEngine } from "../engine/CalculationEngine";
+import { buildRequirementItems } from "../proposal/materials";
 import type { CalculationInputs } from "@/types";
 vi.mock("@tanstack/react-start", () => ({ createClientOnlyFn: (fn: unknown) => fn }));
 import {
@@ -84,6 +86,31 @@ const fixture = (long = false): ProposalPdfData => ({
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+});
+test("proposta inclui proteção de força e relé WEG com códigos do dimensionamento", async () => {
+  const data = fixture();
+  data.currentInputs = { ...inputs, voltage: 220, distance: 5 };
+  data.currentResults = CalculationEngine.performFullCalculation(data.currentInputs);
+  data.items = buildRequirementItems(data.currentResults, "WEG").map((item) => ({
+    ...item,
+    price: 10,
+  }));
+  docs.length = 0;
+  await generateCommercialProposalPdf({ data });
+  expect(docs).toHaveLength(1);
+  const text = vi
+    .mocked(docs[0]!.text)
+    .mock.calls.flatMap((call) => (Array.isArray(call[0]) ? call[0] : [call[0]]))
+    .join(" ");
+  expect(text).toContain("MDWH-D16-3");
+  expect(text).toContain("14110099");
+  expect(text).toContain("RW27-1D3-U015");
+  expect(text).toContain("10452384");
+  mkdirSync("/tmp/dimensionador-pdf-qa", { recursive: true });
+  writeFileSync(
+    "/tmp/dimensionador-pdf-qa/protecao-5cv.pdf",
+    Buffer.from(docs[0]!.output("arraybuffer")),
+  );
 });
 test("gera proposta e memorial completos com textos extensos e paginação", async () => {
   mkdirSync("/tmp/dimensionador-pdf-qa", { recursive: true });
