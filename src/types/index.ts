@@ -94,8 +94,6 @@ export interface CalculationInputs {
   power: number;
   powerUnit: PowerUnit;
   voltage: number;
-  /** Corrente nominal da placa, opcional na entrada manual. */
-  plateNominalCurrent?: number;
   phase: MotorPhase;
   distance: number;
   starterType: StarterType;
