@@ -25,23 +25,14 @@ describe("Regression: Motors Module Baseline", () => {
   test("75cv scenario (Validation Point)", () => {
     const results = CalculationEngine.performFullCalculation(baselineScenario);
 
-    // In = 189.23 A
-    // Ib = 189.23 * 1.10 = 208.15 A
-    // Disjuntor WEG >= 208.15 A -> Encontra DWA250 (225A ou 250A conforme catálogo)
-    // Tabela B1 (3 condutores):
-    // 120mm² = 239A
-    // 150mm² = 275A
-
-    // Se In_disj = 225A -> 225A <= 239A (120mm²) -> Resultaria em 120mm²
-    // Se In_disj = 250A -> 250A <= 275A (150mm²) -> Resultaria em 150mm²
-
+    // In ≈189,23 A; Ib ≈208,15 A. Proteção de referência: 250 A.
+    // B1/3: 120 mm² conduz 239 A; 150 mm² conduz 275 A.
+    // A seção de 120 mm² não atende à corrente nominal desta proteção.
     expect(results.nominalCurrent).toBeCloseTo(189.23, 1);
-
-    // O usuário relatou anteriormente que 75cv deveria ser 150mm².
-    // Se está dando 120mm², é porque o disjuntor selecionado está sendo <= 239A.
-    // Vamos congelar o comportamento atual (120mm²) ou investigar se há erro na seleção do disjuntor.
-    // Conforme logs anteriores, o usuário insistiu em 150mm² para esse cenário.
-    expect(results.finalCableSection).toBe(120);
+    expect(results.principalBreakerCurrent).toBe(250);
+    expect(results.protections.breaker?.nominalCurrent).toBe(250);
+    expect(results.cableCurrentCapacity).toBe(275);
+    expect(results.finalCableSection).toBe(150);
     expect(results.limitingCriterion).toBe("ampacity");
   });
 

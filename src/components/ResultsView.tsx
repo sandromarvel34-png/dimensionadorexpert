@@ -308,6 +308,7 @@ export const ResultsView = () => {
                 )}
               </div>
 
+              {req.note && <p className="text-sm text-muted-foreground">{req.note}</p>}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {["WEG", "Siemens", "Schneider"].map((mfr) => {
                   const products = currentResults.compatibleProducts[req.label]?.[mfr] || [];

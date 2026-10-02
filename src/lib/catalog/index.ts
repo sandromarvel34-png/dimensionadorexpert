@@ -1,4 +1,5 @@
 import { ManufacturerProduct } from "../../types";
+import { VERIFIED_PROTECTION_PRODUCTS } from "./protection-products";
 
 const RAW_MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   // Disjuntores Motores WEG MPW
@@ -2607,8 +2608,12 @@ function auditProduct(product: ManufacturerProduct): ManufacturerProduct {
   };
 }
 
-export const MANUFACTURER_CATALOG: ManufacturerProduct[] =
-  RAW_MANUFACTURER_CATALOG.map(auditProduct);
+export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
+  ...RAW_MANUFACTURER_CATALOG.filter(
+    (p) => !(p.manufacturer === "WEG" && p.category === "releTermico"),
+  ).map(auditProduct),
+  ...VERIFIED_PROTECTION_PRODUCTS,
+];
 
 export const getProductsByCategory = (category: string) =>
   MANUFACTURER_CATALOG.filter((p) => p.category === category && p.verificationStatus !== "blocked");
@@ -2620,7 +2625,7 @@ export const findCompatibleProducts = (
   systemVoltage?: number,
 ): ManufacturerProduct[] => {
   const mfr = manufacturer === "any" || !manufacturer ? undefined : manufacturer;
-  const voltageSensitive = ["disjuntor", "contator", "softStarter", "inverter"];
+  const voltageSensitive = ["disjuntor", "disjuntorMotor", "contator", "softStarter", "inverter"];
 
   const filtered = MANUFACTURER_CATALOG.filter((p) => {
     if (p.category !== category) return false;
@@ -2675,8 +2680,8 @@ export const findCompatibleProducts = (
     .filter((p) => p.nominalCurrent !== undefined && p.nominalCurrent >= current)
     .sort(
       (a, b) =>
-        verificationRank(a) - verificationRank(b) ||
-        (a.nominalCurrent || 0) - (b.nominalCurrent || 0),
+        (a.nominalCurrent || 0) - (b.nominalCurrent || 0) ||
+        verificationRank(a) - verificationRank(b),
     );
 };
 

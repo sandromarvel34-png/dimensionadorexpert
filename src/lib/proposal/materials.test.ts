@@ -19,7 +19,9 @@ describe("Materiais da proposta", () => {
   test("requisito sem produto permanece visível e identificado", () => {
     const noMatches = { ...results, compatibleProducts: {} };
     const rows = buildRequirementItems(noMatches, "WEG");
-    expect(rows).toHaveLength(results.technicalRequirements.length);
+    expect(rows).toHaveLength(
+      results.technicalRequirements.filter((req) => !req.isOptional).length,
+    );
     expect(rows.every((row) => row.desc.includes("sem produto compatível"))).toBe(true);
   });
   test("troca de fabricante preserva linhas próprias, cabos, quantidades e preços próprios", () => {
