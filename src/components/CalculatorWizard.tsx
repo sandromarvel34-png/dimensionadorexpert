@@ -859,9 +859,6 @@ export const CalculatorWizard = () => {
 
               <div className="space-y-3">
                 <Label className="text-foreground font-semibold">Tipo de partida</Label>
-                <p className="text-xs text-slate-500">
-                  Soft-starter e inversor: apenas motores e alimentação trifásicos nesta versão.
-                </p>
                 <Select name="starterType" defaultValue={currentInputs?.starterType || "direta"}>
                   <SelectTrigger className="h-12">
                     <SelectValue />
