@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
-
+import type { Database } from "@/integrations/supabase/types";
+import { ORIGINAL_WEG_MOTORS } from "./original-motors";
+type MotorRow = Database["public"]["Tables"]["motor_catalog"]["Row"];
 type MotorFilter = {
   line: string;
   speed_type?: string | undefined;
@@ -7,43 +9,47 @@ type MotorFilter = {
   power_cv?: number | undefined;
   voltage?: number | undefined;
 };
-
-// Use the signed-in browser client. A server function using this browser
-// singleton cannot inherit the browser's authenticated session.
-export async function getMotorCatalogFilters() {
-  const { data, error } = await supabase
-    .from("motor_catalog")
-    .select("line,speed_type,poles,power_cv,voltage")
-    .eq("is_active", true);
-  if (error)
-    throw new Error(
-      "Catálogo de motores indisponível. Use os dados da placa no preenchimento manual.",
-    );
-  if (!data?.length)
-    throw new Error(
-      "Nenhum motor com dados verificados está disponível. Informe os dados da placa.",
-    );
-  return data;
-}
-
-export async function getMotorsByFilter({ data }: { data: MotorFilter }) {
-  let query = supabase
-    .from("motor_catalog")
-    .select("*")
-    .eq("is_active", true)
-    .eq("line", data.line);
-  if (data.speed_type) {
-    if (!["SINGLE", "DAHLANDER", "DOUBLE_WINDING"].includes(data.speed_type))
-      throw new Error("Tipo de motor inválido.");
-    query = query.eq("speed_type", data.speed_type as "SINGLE" | "DAHLANDER" | "DOUBLE_WINDING");
+// Preserve the original catalog when the optional cloud catalog is empty or offline.
+async function loadCatalog(): Promise<MotorRow[]> {
+  const rows: MotorRow[] = [];
+  try {
+    for (let start = 0; ; start += 500) {
+      const { data, error } = await supabase
+        .from("motor_catalog")
+        .select("*")
+        .eq("is_active", true)
+        .eq("manufacturer", "WEG")
+        .order("id")
+        .range(start, start + 499);
+      if (error) return ORIGINAL_WEG_MOTORS;
+      rows.push(...(data ?? []));
+      if ((data?.length ?? 0) < 500) break;
+    }
+    return rows.length ? rows : ORIGINAL_WEG_MOTORS;
+  } catch {
+    return ORIGINAL_WEG_MOTORS;
   }
-  if (data.poles) query = query.eq("poles", data.poles);
-  if (data.power_cv !== undefined) query = query.eq("power_cv", data.power_cv);
-  if (data.voltage !== undefined) query = query.eq("voltage", data.voltage);
-  const { data: motors, error } = await query.order("model_code", { ascending: true });
-  if (error)
-    throw new Error(
-      "Não foi possível consultar os motores. Use os dados da placa no preenchimento manual.",
-    );
-  return motors ?? [];
+}
+export async function getMotorCatalogFilters() {
+  return (await loadCatalog()).map(({ line, speed_type, poles, power_cv, voltage }) => ({
+    line,
+    speed_type,
+    poles,
+    power_cv,
+    voltage,
+  }));
+}
+export async function getMotorsByFilter({ data }: { data: MotorFilter }) {
+  if (data.speed_type && !["SINGLE", "DAHLANDER", "DOUBLE_WINDING"].includes(data.speed_type))
+    throw new Error("Tipo de motor inválido.");
+  return (await loadCatalog())
+    .filter(
+      (motor) =>
+        motor.line === data.line &&
+        (!data.speed_type || motor.speed_type === data.speed_type) &&
+        (!data.poles || motor.poles === data.poles) &&
+        (data.power_cv === undefined || motor.power_cv === data.power_cv) &&
+        (data.voltage === undefined || motor.voltage === data.voltage),
+    )
+    .sort((a, b) => (a.model_code ?? "").localeCompare(b.model_code ?? ""));
 }

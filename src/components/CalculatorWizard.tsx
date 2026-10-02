@@ -15,9 +15,10 @@ import { toast } from "sonner";
 import { CalculationInputs } from "@/types";
 import { CalculationEngine } from "@/lib/engine/CalculationEngine";
 import { ArrowLeft, Loader2, Database, ClipboardList, Info, CheckCircle2 } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { getMotorCatalogFilters, getMotorsByFilter } from "@/lib/catalog/motors.functions";
+import { ORIGINAL_WEG_MOTORS } from "@/lib/catalog/original-motors";
 
 export const CalculatorWizard = () => {
   const { setView, setCalculation, currentInputs } = useAppStore();
@@ -31,9 +32,10 @@ export const CalculatorWizard = () => {
 
   // Catalog selection state
   const [catalogError, setCatalogError] = useState("");
-  const [filters, setFilters] = useState<
-    Pick<MotorRow, "line" | "speed_type" | "poles" | "power_cv" | "voltage">[]
-  >([]);
+  const [filters, setFilters] =
+    useState<Pick<MotorRow, "line" | "speed_type" | "poles" | "power_cv" | "voltage">[]>(
+      ORIGINAL_WEG_MOTORS,
+    );
   const [selectedLine, setSelectedLine] = useState<string>(
     currentInputs?.motorCatalogData?.line || "",
   );
@@ -53,6 +55,7 @@ export const CalculatorWizard = () => {
   const [selectedMotorId, setSelectedMotorId] = useState<string>(
     currentInputs?.motorCatalogData?.id || "",
   );
+  const restoreSelection = useRef(true);
   const availableLines = useMemo(() => Array.from(new Set(filters.map((f) => f.line))), [filters]);
   const availableTypes = useMemo(
     () =>
@@ -126,7 +129,6 @@ export const CalculatorWizard = () => {
   useEffect(() => {
     let cancelled = false;
     setAvailableMotors([]);
-    setSelectedMotorId("");
     const loadMotors = async () => {
       if (selectedLine) {
         try {
@@ -143,20 +145,42 @@ export const CalculatorWizard = () => {
                   : undefined,
             },
           });
-          if (!cancelled) setAvailableMotors(motors);
+          if (!cancelled) {
+            setAvailableMotors(motors);
+            const savedMotor = restoreSelection.current
+              ? currentInputs?.motorCatalogData
+              : undefined;
+            restoreSelection.current = false;
+            setSelectedMotorId((previous) =>
+              motors.some((m) => m.id === previous)
+                ? previous
+                : savedMotor
+                  ? (motors.find(
+                      (m) =>
+                        m.line === savedMotor.line &&
+                        m.speed_type === savedMotor.speedType &&
+                        m.poles === savedMotor.poles &&
+                        m.power_cv === savedMotor.power &&
+                        m.voltage === savedMotor.voltage,
+                    )?.id ?? "")
+                  : "",
+            );
+            setCatalogError("");
+          }
         } catch (error) {
           if (!cancelled)
             setCatalogError(error instanceof Error ? error.message : "Catálogo indisponível.");
         }
       } else {
         setAvailableMotors([]);
+        setSelectedMotorId("");
       }
     };
     loadMotors();
     return () => {
       cancelled = true;
     };
-  }, [selectedLine, selectedType, selectedPoles, selectedPower, selectedVoltage]);
+  }, [selectedLine, selectedType, selectedPoles, selectedPower, selectedVoltage, currentInputs]);
 
   const selectedMotor = availableMotors.find((m) => m.id === selectedMotorId);
 
@@ -232,8 +256,6 @@ export const CalculatorWizard = () => {
         quantity: 1,
       };
     } else {
-      const plateText = String(formData.get("plateNominalCurrent") ?? "").trim();
-      const plateNominalCurrent = plateText ? Number(plateText) : undefined;
       const pf = parseFloat(formData.get("powerFactor") as string);
       const eff = parseFloat(formData.get("efficiency") as string);
 
@@ -248,7 +270,6 @@ export const CalculatorWizard = () => {
 
       inputs = {
         dataSource: "manual",
-        ...(plateNominalCurrent !== undefined ? { plateNominalCurrent } : {}),
         power: parseFloat(formData.get("power") as string),
         powerUnit: formData.get("powerUnit") as CalculationInputs["powerUnit"],
         voltage: parseFloat(formData.get("voltage") as string),
@@ -403,7 +424,6 @@ export const CalculatorWizard = () => {
 
               <button
                 type="button"
-                disabled={!!catalogError || !filters.length}
                 onClick={() => setDataSource("catalog")}
                 className={cn(
                   "flex items-center gap-3 p-4 rounded-[10px] border-2 transition-all text-left",
@@ -425,11 +445,9 @@ export const CalculatorWizard = () => {
                 <div>
                   <p className="font-bold text-sm">Selecionar motor WEG</p>
                   {(catalogError || !filters.length) && (
-                    <p className="text-xs mt-1">
-                      Catálogo ainda sem motores verificados. Use os dados da placa.
-                    </p>
+                    <p className="text-xs mt-1">Carregando os motores disponíveis...</p>
                   )}
-                  <p className="text-xs opacity-80">Carregar dados do catálogo oficial</p>
+                  <p className="text-xs opacity-80">Carregar os dados do motor automaticamente</p>
                 </div>
               </button>
             </div>
@@ -531,21 +549,6 @@ export const CalculatorWizard = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="plateNominalCurrent">Corrente nominal da placa (A)</Label>
-                    <Input
-                      id="plateNominalCurrent"
-                      name="plateNominalCurrent"
-                      type="number"
-                      min="0.001"
-                      step="any"
-                      defaultValue={currentInputs?.plateNominalCurrent ?? ""}
-                      placeholder="Opcional: corrente na tensão e ligação utilizadas"
-                    />
-                    <p className="text-xs text-slate-500">
-                      Quando informada, esta corrente será usada no dimensionamento. Em branco, a
-                      corrente será estimada pela potência, tensão, fator de potência e rendimento.
-                      Informe o fator de potência da placa para a queda de tensão.
-                    </p>
                     <Label className="text-foreground font-semibold italic text-xs block text-muted-foreground mb-1">
                       Seu motor não é WEG? Informe os dados disponíveis na placa do motor.
                     </Label>
