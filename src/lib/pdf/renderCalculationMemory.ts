@@ -1,8 +1,21 @@
+import { registerCalculationFont } from "./calculationFont";
 import { NAVY, SLATE, LIGHT, BORDER, hexToRgb } from "./pdfTheme";
 import type { jsPDF } from "jspdf";
 import type { autoTable as AutoTable } from "jspdf-autotable";
 import type { CalculationInputs, CalculationResults, CompanyProfile } from "@/types";
 import { buildCalculationMemory, serviceTechnicalRows, technicalNumber } from "./calculationMemory";
+
+const mathematicalText = (text: string) =>
+  text
+    .replace(/sqrt\(1 - cos²\(phi\)\)/g, "√(1 − cos²(φ))")
+    .replace(/sqrt\(3\)/g, "√3")
+    .replace(/sqrt\(([^()]+)\)/g, "√($1)")
+    .replace(/\bphi\b/g, "φ")
+    .replace(/\beta\b/g, "η")
+    .replace(/\brho\b/g, "ρ")
+    .replace(/ x /g, " × ")
+    .replace(/>=/g, "≥")
+    .replace(/<=/g, "≤");
 
 /** Print layout only. All calculation content comes from the recorded inputs/results. */
 export function renderCalculationMemory(
@@ -14,6 +27,7 @@ export function renderCalculationMemory(
     companyProfile: CompanyProfile;
   },
 ) {
+  registerCalculationFont(doc);
   const { currentInputs: inputs, currentResults: results, companyProfile: company } = request;
   const ink = NAVY;
   const muted = SLATE;
@@ -59,13 +73,12 @@ export function renderCalculationMemory(
     y += 13;
   };
   const paragraph = (text: string, small = false) => {
-    font(small ? 8 : 9.5, false, muted);
-    // Standard PDF fonts cannot encode mathematical Unicode; keep the motor notes readable.
-    const printable = text.replace(/√3/g, "sqrt(3)").replace(/≥/g, ">=").replace(/≤/g, "<=");
+    font(small ? 8 : 9.5, false, muted, "CalculationSans");
+    const printable = mathematicalText(text);
     const lines: string[] = doc.splitTextToSize(printable, 174);
     for (const line of lines) {
       space(5);
-      font(small ? 8 : 9.5, false, muted);
+      font(small ? 8 : 9.5, false, muted, "CalculationSans");
       doc.text(line, 18, y);
       y += small ? 4 : 5;
     }
@@ -74,8 +87,8 @@ export function renderCalculationMemory(
   const equation = (text: string) => {
     // Keep each formula and its numeric application together; explanatory prose follows separately.
     const parts = text.split(/\. (?=[A-ZÀ-Ú])/);
-    const expression = parts.shift()!;
-    font(9, false, ink, "courier");
+    const expression = mathematicalText(parts.shift()!);
+    font(9, false, ink, "CalculationSans");
     const lines: string[] = doc.splitTextToSize(expression, 164);
     const height = 12 + lines.length * 4.8;
     space(height + 4);
@@ -87,7 +100,7 @@ export function renderCalculationMemory(
     doc.rect(16, y + 2, 0.8, height - 4, "F");
     font(6.8, true, accent);
     doc.text("FÓRMULA E APLICAÇÃO", 21, y + 6);
-    font(9, false, ink, "courier");
+    font(9, false, ink, "CalculationSans");
     doc.text(lines, 21, y + 12, { lineHeightFactor: 1.5 });
     y += height + 5;
     if (parts.length) paragraph(parts.join(". "), true);
@@ -191,6 +204,11 @@ export function renderCalculationMemory(
       space(Math.min(height, 249));
     }
     heading(String(index + 2).padStart(2, "0"), section.title.replace(/^\d+\.\s*/, ""));
+    if (index === 0) {
+      paragraph(
+        "Símbolos: √3 = raiz quadrada de 3 (aproximadamente 1,732); cos(φ) = fator de potência; φ (fi) = ângulo do fator de potência; η (éta) = rendimento do motor. P = potência em watts; V = tensão em volts; In = corrente nominal em amperes.",
+      );
+    }
     section.lines.forEach((line) =>
       equationPattern.test(line) ? equation(line) : paragraph(line, index === 6),
     );

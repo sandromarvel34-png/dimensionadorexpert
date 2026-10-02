@@ -179,10 +179,10 @@ test("memória de cálculo exporta fórmulas e valores para todas as partidas e 
     const doc = docs[0]!;
     const text = pdfText(doc);
     expect(text).toContain("In = P /");
-    expect(text).toContain("Ib = In x FS");
+    expect(text).toContain("Ib = In × FS");
     expect(text).toContain("Icorr = Ib / F");
-    expect(text).toContain("Iz,corr = Iz,tabela x F");
-    expect(text).toContain("dv% = 100 x dv / V");
+    expect(text).toContain("Iz,corr = Iz,tabela × F");
+    expect(text).toContain("dv% = 100 × dv / V");
     expect(text).toContain("Sfinal = max");
     expect(text).toContain(
       currentResults.nominalCurrent.toLocaleString("pt-BR", {
@@ -190,9 +190,11 @@ test("memória de cálculo exporta fórmulas e valores para todas as partidas e 
         maximumFractionDigits: 2,
       }),
     );
-    expect(text).not.toMatch(/NaN|Infinity|undefined/);
+    expect(text).not.toMatch(/NaN|Infinity|undefined|sqrt|phi/);
+    expect(text).toContain("cos(φ)");
+    expect(text).toContain("η (éta) = rendimento do motor");
     if (currentInputs.starterType === "estrelaTriangulo")
-      expect(text).toContain("Iajuste = In / sqrt(3)");
+      expect(text).toContain("Iajuste = In / √3");
     if (currentResults.shortCircuitCheckPerformed) expect(text).toContain("Com k = 115");
     else expect(text).toContain("Não realizada: Icc");
     writeFileSync(
