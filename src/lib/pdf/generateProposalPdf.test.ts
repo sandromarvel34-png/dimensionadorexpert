@@ -171,6 +171,7 @@ test("memória de cálculo exporta fórmulas e valores para todas as partidas e 
     docs.length = 0;
     const currentResults = CalculationEngine.performFullCalculation(currentInputs);
     await generateCalculationMemoryPdf({
+      action: "save",
       currentInputs,
       currentResults,
       companyProfile: fixture().companyProfile,
@@ -227,6 +228,7 @@ test("memória e memorial identificam o motor de catálogo e preservam sua corre
   };
   data.currentResults = CalculationEngine.performFullCalculation(data.currentInputs);
   await generateCalculationMemoryPdf({
+    action: "save",
     currentInputs: data.currentInputs,
     currentResults: data.currentResults,
     companyProfile: data.companyProfile,
@@ -257,4 +259,39 @@ test("memorial técnico independe dos valores comerciais", async () => {
   expect(text).toContain("Disjuntor principal / capacidade do cabo");
   expect(text).not.toContain("999999");
   expect(text).not.toContain("INVESTIMENTO TOTAL");
+});
+
+test("memória de cálculo abre janela de impressão no clique e avisa se bloqueada", async () => {
+  const open = vi.fn(() => null);
+  vi.stubGlobal("window", { open });
+  const data = fixture();
+  const pending = generateCalculationMemoryPdf({
+    currentInputs: data.currentInputs,
+    currentResults: data.currentResults,
+    companyProfile: data.companyProfile,
+  });
+  expect(open).toHaveBeenCalledWith("", "_blank");
+  await expect(pending).rejects.toThrow("bloqueou a impressão");
+});
+test("memória de cálculo abre o documento para imprimir sem baixar automaticamente", async () => {
+  docs.length = 0;
+  const replace = vi.fn();
+  const target = {
+    opener: {},
+    closed: false,
+    document: { title: "", body: { textContent: "" } },
+    location: { replace },
+    close: vi.fn(),
+  };
+  vi.stubGlobal("window", { open: vi.fn(() => target), setTimeout: vi.fn() });
+  const data = fixture();
+  await generateCalculationMemoryPdf({
+    currentInputs: data.currentInputs,
+    currentResults: data.currentResults,
+    companyProfile: data.companyProfile,
+  });
+  expect(replace).toHaveBeenCalledWith(expect.stringMatching(/^blob:/));
+  expect(docs).toHaveLength(0);
+  expect(target.opener).toBeNull();
+  expect(target.close).not.toHaveBeenCalled();
 });

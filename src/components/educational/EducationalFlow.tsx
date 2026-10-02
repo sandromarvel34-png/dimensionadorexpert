@@ -7,7 +7,7 @@ import {
   ChevronRight,
   CheckCircle2,
   TriangleAlert,
-  Download,
+  Printer,
 } from "lucide-react";
 import { MathFormula } from "@/components/MathFormula";
 
@@ -26,17 +26,26 @@ const arrangementLabel: Record<string, string> = {
 export const EducationalFlow = () => {
   const { currentInputs, currentResults, companyProfile, setView } = useAppStore();
   const [step, setStep] = useState(1);
-  const [generatingPdf, setGeneratingPdf] = useState(false);
-  const handleGeneratePdf = async () => {
-    if (!currentInputs || !currentResults || generatingPdf) return;
-    setGeneratingPdf(true);
+  const [preparingPrint, setPreparingPrint] = useState(false);
+  const handlePrintMemory = async () => {
+    if (!currentInputs || !currentResults || preparingPrint) return;
+    setPreparingPrint(true);
     try {
-      await generateCalculationMemoryPdf({ currentInputs, currentResults, companyProfile });
-      toast.success("Memorial de cálculo gerado em PDF.");
-    } catch {
-      toast.error("Não foi possível gerar o memorial de cálculo. Tente novamente.");
+      await generateCalculationMemoryPdf({
+        currentInputs,
+        currentResults,
+        companyProfile,
+        action: "print",
+      });
+      toast.success("Memorial de cálculo aberto para impressão.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível abrir o memorial para impressão.",
+      );
     } finally {
-      setGeneratingPdf(false);
+      setPreparingPrint(false);
     }
   };
 
@@ -431,9 +440,9 @@ export const EducationalFlow = () => {
               verificações do profissional.
             </p>
             <div className="flex flex-wrap justify-center gap-3 mt-4">
-              <Button onClick={handleGeneratePdf} disabled={generatingPdf}>
-                <Download className="w-4 h-4 mr-2" />
-                {generatingPdf ? "Gerando PDF..." : "Gerar PDF da memória de cálculo"}
+              <Button onClick={handlePrintMemory} disabled={preparingPrint}>
+                <Printer className="w-4 h-4 mr-2" />
+                {preparingPrint ? "Preparando impressão..." : "Imprimir memória de cálculo"}
               </Button>
               <Button variant="outline" onClick={() => setView("results")}>
                 Voltar aos resultados
