@@ -1,3 +1,4 @@
+import { NAVY, SLATE, LIGHT, BORDER, hexToRgb } from "./pdfTheme";
 import type { jsPDF } from "jspdf";
 import type { autoTable as AutoTable } from "jspdf-autotable";
 import type { CalculationInputs, CalculationResults, CompanyProfile } from "@/types";
@@ -14,11 +15,11 @@ export function renderCalculationMemory(
   },
 ) {
   const { currentInputs: inputs, currentResults: results, companyProfile: company } = request;
-  const ink: [number, number, number] = [24, 39, 57];
-  const muted: [number, number, number] = [85, 101, 120];
-  const accent: [number, number, number] = [0, 106, 120];
-  const border: [number, number, number] = [218, 228, 234];
-  const pale: [number, number, number] = [241, 247, 249];
+  const ink = NAVY;
+  const muted = SLATE;
+  const accent = hexToRgb(company.brandColor);
+  const border = BORDER;
+  const pale = LIGHT;
   const name = company.companyName.trim() || "Dimensionador Expert";
   let y = 18;
   const font = (size: number, bold = false, color = ink, family = "helvetica") => {
@@ -168,7 +169,7 @@ export function renderCalculationMemory(
       0: { cellWidth: 64, fontStyle: "bold", textColor: muted },
       1: { cellWidth: 114 },
     },
-    alternateRowStyles: { fillColor: [247, 249, 251] },
+    alternateRowStyles: { fillColor: LIGHT },
     didDrawPage: (table) => {
       if (table.pageNumber > 1) continuation();
     },
