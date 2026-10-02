@@ -47,7 +47,7 @@ export const useAuth = () => {
 
 type AuthMode = "login" | "signup" | "forgot";
 
-const APP_URL = "https://dimensionadorexpert.lovable.app/";
+const APP_URL = "https://dimensione.comandoseletricosexpert.com.br/";
 
 const translateAuthError = (message: string) => {
   const normalized = message.toLowerCase();
