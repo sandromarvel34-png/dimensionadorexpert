@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import katex from "katex";
+import { explainMissingReference } from "@/lib/catalog/selection";
 
 export const ResultsView = () => {
   const { currentResults, currentInputs, setView, startNewProposal } = useAppStore();
@@ -313,12 +314,22 @@ export const ResultsView = () => {
                 {["WEG", "Siemens", "Schneider"].map((mfr) => {
                   const products = currentResults.compatibleProducts[req.label]?.[mfr] || [];
                   const product = products[0];
+                  const alternative =
+                    req.category === "disjuntorMotor" && !product
+                      ? [
+                          currentResults.compatibleProducts[
+                            "Disjuntor do Circuito Principal (Força)"
+                          ]?.[mfr]?.[0],
+                          currentResults.compatibleProducts["Relé Térmico"]?.[mfr]?.[0],
+                        ]
+                      : [];
+                  const hasAlternative = alternative.length === 2 && alternative.every(Boolean);
                   return (
                     <div
                       key={mfr}
                       className={cn(
                         "rounded-[14px] border p-4 transition-all",
-                        product
+                        product || hasAlternative
                           ? "border-slate-200 bg-white shadow-sm"
                           : "border-slate-200 bg-slate-100/60 opacity-70",
                       )}
@@ -353,9 +364,25 @@ export const ResultsView = () => {
                             )}
                           </div>
                         </>
+                      ) : hasAlternative ? (
+                        <>
+                          <p className="text-sm font-semibold text-foreground">
+                            Proteção alternativa: disjuntor de força + relé de sobrecarga
+                          </p>
+                          {alternative.map((p) => (
+                            <p key={p!.id} className="text-sm text-foreground mt-2">
+                              {p!.model}
+                            </p>
+                          ))}
+                          <p className="text-xs text-muted-foreground mt-3">
+                            O conjunto substitui a opção de disjuntor-motor; confirmar ajuste,
+                            coordenação e montagem. Não adicionar as duas soluções ao mesmo
+                            circuito.
+                          </p>
+                        </>
                       ) : (
                         <p className="text-sm text-slate-400 italic py-4">
-                          Nenhuma referência compatível validada na base atual.
+                          {explainMissingReference(req, mfr, currentInputs)}
                         </p>
                       )}
                     </div>

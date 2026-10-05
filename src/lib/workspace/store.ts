@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { refreshManufacturerReferences } from "../catalog/selection";
 import { proposalTotals } from "../proposal/validation";
 import type {
   CalculationInputs,
@@ -323,7 +324,7 @@ export function createWorkspaceStore(
       openHistoryItem: (item) =>
         set({
           currentInputs: item.inputs,
-          currentResults: item.results,
+          currentResults: refreshManufacturerReferences(item.results, item.inputs),
           currentHistoryId: item.id,
           selectedManufacturer: item.manufacturer,
           selectedProducts: {},
@@ -359,7 +360,7 @@ export function createWorkspaceStore(
         set({
           currentProposalId: p.id,
           currentInputs: p.currentInputs,
-          currentResults: p.currentResults,
+          currentResults: refreshManufacturerReferences(p.currentResults, p.currentInputs),
           currentHistoryId: p.calculationHistoryId,
           selectedManufacturer: p.selectedManufacturer,
           selectedProducts: {},

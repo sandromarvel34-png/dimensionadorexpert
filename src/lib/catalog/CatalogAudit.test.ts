@@ -60,16 +60,25 @@ describe("Auditoria do catálogo de fabricantes", () => {
 
   test("SSW05 usa SKUs oficiais e respeita a faixa 220-460 V", () => {
     const at380 = findCompatibleProducts("softStarter", 20, "WEG", 380);
-    expect(at380[0]?.model).toBe("SSW050030T2246TPZ");
-    expect(at380[0]?.commercialCode).toBe("10413823");
-    expect(findCompatibleProducts("softStarter", 20, "WEG", 480)).toHaveLength(0);
+    expect(at380.find((p) => p.model === "SSW050030T2246TPZ")?.model).toBe("SSW050030T2246TPZ");
+    expect(at380.find((p) => p.model === "SSW050030T2246TPZ")?.commercialCode).toBe("10413823");
+    expect(
+      findCompatibleProducts("softStarter", 20, "WEG", 480).some((p) =>
+        p.model.startsWith("SSW05"),
+      ),
+    ).toBe(false);
+    expect(findCompatibleProducts("softStarter", 20, "WEG", 480).length).toBeGreaterThan(0);
   });
 
   test("CFW300 não oferece os antigos registros fictícios de 24 A e 33 A", () => {
     const drives = getProductsByCategory("inverter").filter((p) => p.manufacturer === "WEG");
     expect(drives.some((p) => /24A|33A/.test(p.model))).toBe(false);
     expect(findCompatibleProduct("inverter", 14, "WEG", 220)?.commercialCode).toBe("13059939");
-    expect(findCompatibleProduct("inverter", 14, "WEG", 380)?.commercialCode).toBe("14148367");
+    expect(
+      findCompatibleProducts("inverter", 14, "WEG", 380).some(
+        (p) => p.commercialCode === "14148367",
+      ),
+    ).toBe(true);
   });
 
   test("temporizadores estrela-triângulo são referências apropriadas e auditadas", () => {

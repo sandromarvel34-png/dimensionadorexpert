@@ -140,6 +140,9 @@ export interface ManufacturerProduct {
   adjustmentRange?: { min: number; max: number };
   voltageRange?: { min: number; max: number };
   controlVoltage?: number;
+  inputPhases?: 1 | 3;
+  electricalSelectionVerified?: boolean;
+  minimumMotorCurrent?: number;
   poles?: number;
   utilizationCategory?: string;
   breakingCapacityKA?: number;

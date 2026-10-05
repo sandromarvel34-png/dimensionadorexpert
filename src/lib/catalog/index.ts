@@ -1,4 +1,5 @@
 import { ManufacturerProduct } from "../../types";
+import { AUDITED_PRODUCTS } from "./audited-products";
 import { VERIFIED_PROTECTION_PRODUCTS } from "./protection-products";
 
 const RAW_MANUFACTURER_CATALOG: ManufacturerProduct[] = [
@@ -2569,6 +2570,17 @@ const OFFICIAL_SOURCE_BY_ID: Record<string, string> = {
 };
 
 function auditProduct(product: ManufacturerProduct): ManufacturerProduct {
+  if (
+    product.category === "softStarter" &&
+    product.manufacturer === "WEG" &&
+    product.model.startsWith("SSW05")
+  ) {
+    product = {
+      ...product,
+      minimumMotorCurrent: (product.nominalCurrent ?? 0) * 0.3,
+      inputPhases: 3,
+    };
+  }
   if (BLOCKED_PRODUCT_IDS.has(product.id) || /^100000\d*$/.test(product.commercialCode)) {
     return {
       ...product,
@@ -2610,9 +2622,16 @@ function auditProduct(product: ManufacturerProduct): ManufacturerProduct {
 
 export const MANUFACTURER_CATALOG: ManufacturerProduct[] = [
   ...RAW_MANUFACTURER_CATALOG.filter(
-    (p) => !(p.manufacturer === "WEG" && p.category === "releTermico"),
+    (p) =>
+      !(p.manufacturer === "WEG" && p.category === "releTermico") &&
+      p.category !== "contator" &&
+      !(
+        p.manufacturer !== "WEG" &&
+        ["disjuntorMotor", "releTermico", "disjuntor"].includes(p.category)
+      ),
   ).map(auditProduct),
   ...VERIFIED_PROTECTION_PRODUCTS,
+  ...AUDITED_PRODUCTS,
 ];
 
 export const getProductsByCategory = (category: string) =>
@@ -2641,14 +2660,15 @@ export const findCompatibleProducts = (
       }
     }
 
-    // Soft-starters e inversores só podem ser sugeridos quando o SKU foi
-    // auditado como exato, pois corrente e faixa de tensão fazem parte da seleção.
+    // A família eletrônica exige dados elétricos auditados e configuração explícita.
     if (
       (category === "softStarter" || category === "inverter") &&
-      p.verificationStatus !== "verified-exact"
+      p.verificationStatus !== "verified-exact" &&
+      !(p.electricalSelectionVerified && p.voltageRange && p.inputPhases === 3 && p.catalogSource)
     ) {
       return false;
     }
+    if (p.minimumMotorCurrent !== undefined && current < p.minimumMotorCurrent) return false;
     return true;
   });
 
