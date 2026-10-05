@@ -4,7 +4,7 @@ import {
   ManufacturerProduct,
   TechnicalRequirement,
 } from "../../types";
-import { findCompatibleProducts } from "../catalog";
+import { selectManufacturerReferences } from "../catalog/selection";
 import { AMPACITY_TABLES_NBR5410 } from "./ampacity-tables";
 import {
   AIR_TEMPERATURE_FACTORS_PVC,
@@ -548,36 +548,7 @@ export class CalculationEngine {
       AMPACITY_TABLES_NBR5410.find(
         (entry) => entry.method === method && entry.conductors === numConductors,
       )!.table[finalSection]! * combinedCorrectionFactor;
-    const compatibleProducts: Record<string, Record<string, ManufacturerProduct[]>> = {};
-    requirements.forEach((req) => {
-      const brandMap: Record<string, ManufacturerProduct[]> = {};
-      ["WEG", "Siemens", "Schneider"].forEach((brand) => {
-        brandMap[brand] = findCompatibleProducts(
-          req.category,
-          req.current ?? 0,
-          brand,
-          inputs.voltage,
-        )
-          .filter((product) => req.poles === undefined || product.poles === req.poles)
-          .filter((product) => {
-            if (
-              req.label !== "Disjuntor do Circuito Principal (Força)" ||
-              inputs.shortCircuitCurrentKA === undefined
-            )
-              return true;
-            const capacity = product.breakingCapacityByVoltage?.find(
-              (entry) => inputs.voltage <= entry.voltage,
-            )?.capacityKA;
-            return capacity === undefined || capacity >= inputs.shortCircuitCurrentKA;
-          })
-          .filter(
-            (product) =>
-              req.label !== "Disjuntor do Circuito Principal (Força)" ||
-              (product.nominalCurrent ?? Infinity) <= cableCapacity + 1e-9,
-          );
-      });
-      compatibleProducts[req.label] = brandMap;
-    });
+    const compatibleProducts = selectManufacturerReferences(requirements, inputs, cableCapacity);
     const selectedReferences = (label: string) => {
       const candidates = compatibleProducts[label] ?? {};
       return mfr
