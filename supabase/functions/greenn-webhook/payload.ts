@@ -32,15 +32,21 @@ export function parseSale(body: unknown): SaleEvent | null {
   const status = p.currentStatus;
   if (!["paid", "refunded", "chargedback"].includes(String(status))) return null;
   if (sale.status !== status) throw new Error("Status divergente");
-  // Greenn documents offer=null. This product has a single 6-month plan;
-  // the legacy product has 6/12-month offers and cannot use this fallback.
+  // Product 196443 is sold with one 6-month plan across all of its offers.
+  // Its authenticated product ID determines the plan; offer metadata is optional.
+  // Product 196035 still needs the offer to distinguish 6 from 12 months.
   const hash = object(p.offer).hash;
-  const nullableOffer =
-    p.offer == null || (typeof p.offer === "object" && !Array.isArray(p.offer) && hash == null);
-  const offer = product.id === 196443 && nullableOffer ? "mkimrj" : hash;
-  if (typeof offer !== "string" || !Object.hasOwn(OFFERS, offer))
-    throw new Error("Oferta não reconhecida");
-  if (PRODUCTS[offer] !== product.id) throw new Error("Produto e oferta divergentes");
+  let offer: string;
+  if (product.id === 196443) {
+    if (typeof hash === "string" && Object.hasOwn(PRODUCTS, hash) && PRODUCTS[hash] !== product.id)
+      throw new Error("Produto e oferta divergentes");
+    offer = "mkimrj";
+  } else {
+    if (typeof hash !== "string" || !Object.hasOwn(OFFERS, hash))
+      throw new Error("Oferta não reconhecida");
+    if (PRODUCTS[hash] !== product.id) throw new Error("Produto e oferta divergentes");
+    offer = hash;
+  }
   const email = object(p.client).email;
   if (
     typeof email !== "string" ||
