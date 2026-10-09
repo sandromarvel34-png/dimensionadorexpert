@@ -49,3 +49,7 @@ Nenhuma compra real ou envio a destinatário foi feito durante a validação aut
 ## Oferta de teste
 
 A oferta `ndY8mn` do produto `196443` também libera 6 meses e usa o mesmo fluxo de e-mail, reembolso e chargeback. Ela precisa estar selecionada na entrega Webhook da Greenn para receber os eventos. Outras ofertas desconhecidas continuam rejeitadas.
+
+## Campo de oferta ausente na Greenn
+
+A documentação oficial permite `offer: null`. O produto `196443` tem plano único de 6 meses; eventos sem oferta usam a referência interna `mkimrj`, sem deduzir prazo pelo preço. A oferta de teste explícita também libera 6 meses. Reenvios e estornos aceitam as duas referências equivalentes sem alterar o prazo ou a identidade do comprador. O produto antigo `196035`, com planos distintos de 6/12 meses, exige a oferta. Hash desconhecido ou incompatível continua rejeitado. Se forem criados outros prazos no produto 196443, esta regra precisa ser revista antes de vender.

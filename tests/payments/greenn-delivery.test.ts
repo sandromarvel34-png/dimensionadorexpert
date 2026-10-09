@@ -34,6 +34,12 @@ describe("Purchase access emails", () => {
       product: { id: 196443 },
     };
     expect(parseSale(payload)).toEqual(event);
+    for (const offer of [null, undefined, {}, { hash: null }]) {
+      expect(parseSale({ ...payload, offer })).toEqual(event);
+      expect(() => parseSale({ ...payload, product: { id: 196035 }, offer })).toThrow();
+    }
+    expect(() => parseSale({ ...payload, offer: "mkimrj" })).toThrow();
+    expect(() => parseSale({ ...payload, offer: { hash: "" } })).toThrow();
     expect(parseSale({ ...payload, offer: { hash: "ndY8mn" } })).toEqual({
       ...event,
       offer: "ndY8mn",

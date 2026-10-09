@@ -32,7 +32,12 @@ export function parseSale(body: unknown): SaleEvent | null {
   const status = p.currentStatus;
   if (!["paid", "refunded", "chargedback"].includes(String(status))) return null;
   if (sale.status !== status) throw new Error("Status divergente");
-  const offer = object(p.offer).hash;
+  // Greenn documents offer=null. This product has a single 6-month plan;
+  // the legacy product has 6/12-month offers and cannot use this fallback.
+  const hash = object(p.offer).hash;
+  const nullableOffer =
+    p.offer == null || (typeof p.offer === "object" && !Array.isArray(p.offer) && hash == null);
+  const offer = product.id === 196443 && nullableOffer ? "mkimrj" : hash;
   if (typeof offer !== "string" || !Object.hasOwn(OFFERS, offer))
     throw new Error("Oferta não reconhecida");
   if (PRODUCTS[offer] !== product.id) throw new Error("Produto e oferta divergentes");
