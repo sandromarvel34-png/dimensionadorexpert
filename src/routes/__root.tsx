@@ -93,12 +93,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon-uploaded.svg?v=20261009-2" },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon-uploaded.svg?v=20261009-3" },
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico?v=7100a9519932", type: "image/x-icon" },
       {
         rel: "stylesheet",
         href: "https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css",
