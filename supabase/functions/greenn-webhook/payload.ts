@@ -1,5 +1,6 @@
 export const PRODUCT_ID = 196035;
-export const OFFERS: Record<string, number> = { "4Q1tqK": 6, fMqpDz: 12 };
+export const OFFERS: Record<string, number> = { "4Q1tqK": 6, fMqpDz: 12, mkimrj: 6 };
+const PRODUCTS: Record<string, number> = { "4Q1tqK": 196035, fMqpDz: 196035, mkimrj: 196443 };
 export type SaleEvent = {
   saleId: number;
   email: string;
@@ -20,7 +21,7 @@ export function parseSale(body: unknown): SaleEvent | null {
   const p = object(body),
     sale = object(p.sale),
     product = object(p.product);
-  if (product.id !== PRODUCT_ID) return null;
+  if (product.id !== PRODUCT_ID && product.id !== 196443) return null;
   if (p.type !== "sale" || p.event !== "saleUpdated" || sale.type !== "TRANSACTION")
     throw new Error("Evento inválido");
   const status = p.currentStatus;
@@ -29,6 +30,7 @@ export function parseSale(body: unknown): SaleEvent | null {
   const offer = object(p.offer).hash;
   if (typeof offer !== "string" || !Object.hasOwn(OFFERS, offer))
     throw new Error("Oferta não reconhecida");
+  if (PRODUCTS[offer] !== product.id) throw new Error("Produto e oferta divergentes");
   const email = object(p.client).email;
   if (
     typeof email !== "string" ||

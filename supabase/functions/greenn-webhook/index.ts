@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.112.3";
 import { createHandler } from "./handler.ts";
+import { deliverAccess } from "./delivery.ts";
 Deno.serve(
   createHandler({
     token: () => Deno.env.get("GREENN_WEBHOOK_TOKEN"),
@@ -23,6 +24,34 @@ Deno.serve(
         console.error("greenn-webhook: database processing failed", error.code);
         throw new Error("Database processing failed");
       }
+      await deliverAccess(event, {
+        claim: async (saleId) => {
+          const { data, error } = await admin.rpc("claim_greenn_access_email", {
+            p_sale_id: saleId,
+          });
+          if (error) throw new Error("Email claim failed");
+          return data;
+        },
+        invite: async (email, redirectTo) => {
+          const { error } = await admin.auth.admin.inviteUserByEmail(email, { redirectTo });
+          if (error) throw new Error("Invite failed");
+        },
+        loginLink: async (email, emailRedirectTo) => {
+          const { error } = await admin.auth.signInWithOtp({
+            email,
+            options: { shouldCreateUser: false, emailRedirectTo },
+          });
+          if (error) throw new Error("Login email failed");
+        },
+        finish: async (saleId, lease, errorCode) => {
+          const { error } = await admin.rpc("finish_greenn_access_email", {
+            p_sale_id: saleId,
+            p_lease_id: lease,
+            p_error: errorCode,
+          });
+          if (error) throw new Error("Email finish failed");
+        },
+      });
     },
   }),
 );
