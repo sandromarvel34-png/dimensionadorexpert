@@ -45,3 +45,7 @@ Nenhuma compra real ou envio a destinatário foi feito durante a validação aut
 ## Verificação
 
 37 testes de webhook e envio, typecheck dos módulos puros e lint. Testes SQL em transação com rollback verificam os 13 cenários antigos e os novos: oferta atual, confirmação de convite, renovação, lease concorrente, retomada de erro, duplicata, reembolso e permissões. Advisors: tabelas privadas RLS sem políticas intencionalmente bloqueadas aos clientes; alerta preexistente de proteção contra senhas vazadas desligada.
+
+## Oferta de teste
+
+A oferta `ndY8mn` do produto `196443` também libera 6 meses e usa o mesmo fluxo de e-mail, reembolso e chargeback. Ela precisa estar selecionada na entrega Webhook da Greenn para receber os eventos. Outras ofertas desconhecidas continuam rejeitadas.

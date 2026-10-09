@@ -34,6 +34,14 @@ describe("Purchase access emails", () => {
       product: { id: 196443 },
     };
     expect(parseSale(payload)).toEqual(event);
+    expect(parseSale({ ...payload, offer: { hash: "ndY8mn" } })).toEqual({
+      ...event,
+      offer: "ndY8mn",
+    });
+    expect(() =>
+      parseSale({ ...payload, product: { id: 196035 }, offer: { hash: "ndY8mn" } }),
+    ).toThrow();
+    expect(() => parseSale({ ...payload, offer: { hash: "unknown" } })).toThrow();
     expect(() => parseSale({ ...payload, product: { id: 196035 } })).toThrow();
     expect(() => parseSale({ ...payload, offer: { hash: "4Q1tqK" } })).toThrow();
   });
