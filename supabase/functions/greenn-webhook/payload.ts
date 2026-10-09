@@ -1,6 +1,11 @@
 export const PRODUCT_ID = 196035;
-export const OFFERS: Record<string, number> = { "4Q1tqK": 6, fMqpDz: 12, mkimrj: 6 };
-const PRODUCTS: Record<string, number> = { "4Q1tqK": 196035, fMqpDz: 196035, mkimrj: 196443 };
+export const OFFERS: Record<string, number> = { "4Q1tqK": 6, fMqpDz: 12, mkimrj: 6, ndY8mn: 6 };
+const PRODUCTS: Record<string, number> = {
+  "4Q1tqK": 196035,
+  fMqpDz: 196035,
+  mkimrj: 196443,
+  ndY8mn: 196443,
+};
 export type SaleEvent = {
   saleId: number;
   email: string;
