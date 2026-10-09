@@ -17,7 +17,7 @@ const setup = (confirmed = false) => ({
   finish: vi.fn().mockResolvedValue(undefined),
 });
 describe("Purchase access emails", () => {
-  it("accepts current checkout only with its product and 6 months", () => {
+  it("uses the current product single 6-month plan across all offers", () => {
     const payload = {
       type: "sale",
       event: "saleUpdated",
@@ -34,20 +34,23 @@ describe("Purchase access emails", () => {
       product: { id: 196443 },
     };
     expect(parseSale(payload)).toEqual(event);
-    for (const offer of [null, undefined, {}, { hash: null }]) {
+    for (const offer of [
+      null,
+      undefined,
+      {},
+      { hash: null },
+      { hash: "new-offer" },
+      { hash: "" },
+      "mkimrj",
+    ]) {
       expect(parseSale({ ...payload, offer })).toEqual(event);
       expect(() => parseSale({ ...payload, product: { id: 196035 }, offer })).toThrow();
     }
-    expect(() => parseSale({ ...payload, offer: "mkimrj" })).toThrow();
-    expect(() => parseSale({ ...payload, offer: { hash: "" } })).toThrow();
-    expect(parseSale({ ...payload, offer: { hash: "ndY8mn" } })).toEqual({
-      ...event,
-      offer: "ndY8mn",
-    });
+    expect(parseSale({ ...payload, offer: { hash: "ndY8mn" } })).toEqual(event);
     expect(() =>
       parseSale({ ...payload, product: { id: 196035 }, offer: { hash: "ndY8mn" } }),
     ).toThrow();
-    expect(() => parseSale({ ...payload, offer: { hash: "unknown" } })).toThrow();
+    expect(parseSale({ ...payload, offer: { hash: "unknown" } })).toEqual(event);
     expect(() => parseSale({ ...payload, product: { id: 196035 } })).toThrow();
     expect(() => parseSale({ ...payload, offer: { hash: "4Q1tqK" } })).toThrow();
   });

@@ -136,6 +136,18 @@ describe("Greenn HTTP handler", () => {
     expect((await handler(request(payload("bad")))).status).toBe(400);
     expect(record).not.toHaveBeenCalled();
   });
+  it.each(["paid", "refunded", "chargedback"])(
+    "processes %s for the single-plan product even with an unlisted offer",
+    async (status) => {
+      const record = vi.fn().mockResolvedValue(undefined);
+      const handler = createHandler({ token: () => "test-only", record });
+      const body = { ...payload("different-offer", status), product: { id: 196443 } };
+      expect((await handler(request(body))).status).toBe(200);
+      expect(record).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ offer: "mkimrj", months: 6, status }),
+      );
+    },
+  );
   it("does not acknowledge a failed DB transaction as successful", async () => {
     const handler = createHandler({
       token: () => "test-only",
