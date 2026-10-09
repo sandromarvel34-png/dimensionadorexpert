@@ -1,4 +1,43 @@
 import { parseSale, validToken, type SaleEvent } from "./payload.ts";
+const validationErrors = new Set([
+  "Evento inválido",
+  "Status divergente",
+  "Oferta não reconhecida",
+  "Produto e oferta divergentes",
+  "E-mail inválido",
+  "Venda inválida",
+  "Data inválida",
+  "Data futura",
+]);
+const object = (value: unknown): Record<string, unknown> =>
+  value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+export function invalidPayloadDiagnostic(error: unknown, body: unknown) {
+  const p = object(body),
+    sale = object(p.sale);
+  const shape = (value: unknown) =>
+    typeof value !== "string"
+      ? "missing_or_not_string"
+      : /^\d{4}-\d{2}-\d{2}T/.test(value)
+        ? "iso"
+        : /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(value)
+          ? "sql_datetime"
+          : "other";
+  return {
+    reason:
+      error instanceof Error && validationErrors.has(error.message)
+        ? error.message
+        : "Malformed JSON or unreadable body",
+    saleType: p.type === "sale",
+    saleUpdated: p.event === "saleUpdated",
+    transaction: sale.type === "TRANSACTION",
+    numericSaleId: typeof sale.id === "number",
+    numericProductId: typeof object(p.product).id === "number",
+    paidDateShape: shape(sale.paid_at),
+    updatedDateShape: shape(sale.updated_at),
+  };
+}
 const json = (body: unknown, status = 200) => Response.json(body, { status });
 export function createHandler(deps: {
   token: () => string | undefined;
@@ -15,6 +54,7 @@ export function createHandler(deps: {
     if (!reader) return json({ error: "Payload inválido" }, 400);
     const chunks: Uint8Array[] = [];
     let size = 0;
+    let body: unknown;
     try {
       while (true) {
         const { done, value } = await reader.read();
@@ -32,7 +72,8 @@ export function createHandler(deps: {
         bytes.set(chunk, offset);
         offset += chunk.length;
       }
-      const event = parseSale(JSON.parse(new TextDecoder().decode(bytes)));
+      body = JSON.parse(new TextDecoder().decode(bytes));
+      const event = parseSale(body);
       if (!event) return json({ received: true, ignored: true });
       try {
         await deps.record(event);
@@ -40,7 +81,8 @@ export function createHandler(deps: {
         return json({ error: "Falha ao registrar evento" }, 500);
       }
       return json({ received: true });
-    } catch {
+    } catch (error) {
+      console.error("greenn-webhook: invalid payload", invalidPayloadDiagnostic(error, body));
       return json({ error: "Payload inválido" }, 400);
     }
   };
